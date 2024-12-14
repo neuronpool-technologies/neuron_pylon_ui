@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://vectors.neuronpool.com/sitemap.xml
+Host: https://vectors.neuronpool.com/

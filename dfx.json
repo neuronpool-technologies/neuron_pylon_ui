@@ -1,13 +1,11 @@
 {
   "canisters": {
-    "neuron_pylon_ui_backend": {
-      "main": "src/neuron_pylon_ui_backend/main.mo",
-      "type": "motoko"
+    "neuron_pylon": {
+      "id": "6jvpj-sqaaa-aaaaj-azwnq-cai",
+      "type": "pull"
     },
     "neuron_pylon_ui_frontend": {
-      "dependencies": [
-        "neuron_pylon_ui_backend"
-      ],
+      "dependencies": ["neuron_pylon"],
       "frontend": {
         "entrypoint": "src/neuron_pylon_ui_frontend/src/index.html"
       },

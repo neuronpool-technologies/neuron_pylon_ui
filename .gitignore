@@ -19,6 +19,8 @@ target/
 # frontend code
 node_modules/
 dist/
+package-lock.json
+canister_ids.json
 
 # environment variables
 .env
