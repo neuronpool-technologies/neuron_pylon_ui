@@ -1,0 +1,29 @@
+{
+  "canisters": {
+    "neuron_pylon_ui_backend": {
+      "main": "src/neuron_pylon_ui_backend/main.mo",
+      "type": "motoko"
+    },
+    "neuron_pylon_ui_frontend": {
+      "dependencies": [
+        "neuron_pylon_ui_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/neuron_pylon_ui_frontend/src/index.html"
+      },
+      "source": [
+        "src/neuron_pylon_ui_frontend/assets",
+        "dist/neuron_pylon_ui_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
