@@ -23,6 +23,7 @@
     "@dfinity/auth-client": "^2.1.1",
     "@dfinity/candid": "^2.1.1",
     "@dfinity/ledger-icp": "^2.3.0",
+    "@dfinity/ledger-icrc": "^2.6.4",
     "@dfinity/principal": "^2.1.1",
     "@dfinity/utils": "^2.3.0",
     "@emotion/react": "^11.11.4",

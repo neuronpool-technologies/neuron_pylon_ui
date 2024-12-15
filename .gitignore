@@ -21,6 +21,7 @@ node_modules/
 dist/
 package-lock.json
 canister_ids.json
+canister.sh
 
 # environment variables
 .env
