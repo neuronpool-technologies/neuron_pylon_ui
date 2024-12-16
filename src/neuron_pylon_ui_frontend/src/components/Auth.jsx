@@ -26,6 +26,7 @@ import {
   setPrincipal,
   fetchWallet,
 } from "../state/ProfileSlice";
+import { fetchBillingInformation } from "../state/BillingSlice";
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor } from "@dfinity/agent";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,6 +54,7 @@ const validateAgents = async (identity) => {
 const Auth = () => {
   const dispatch = useDispatch();
   const logged_in = useSelector((state) => state.Profile.logged_in);
+  const billingStatus = useSelector((state) => state.Billing.status);
 
   const [client, setClient] = useState();
 
@@ -72,6 +74,12 @@ const Auth = () => {
       const principal = identity.getPrincipal();
       dispatch(setPrincipal(principal.toString()));
       dispatch(setLogin());
+    }
+  };
+
+  const fetchData = async () => {
+    if (billingStatus === "idle" || billingStatus === "failed") {
+      dispatch(fetchBillingInformation());
     }
   };
 
@@ -97,6 +105,7 @@ const Auth = () => {
 
   useEffect(() => {
     initAuth();
+    fetchData();
   }, []);
 
   return (
