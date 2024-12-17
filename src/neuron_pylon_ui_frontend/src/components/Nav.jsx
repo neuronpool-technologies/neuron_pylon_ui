@@ -29,6 +29,7 @@ import {
 import logo from "../../assets/logo.svg";
 import { NavLink } from "react-router-dom";
 import { darkColor, lightColor } from "../colors";
+import Search from "./Search";
 
 const LinkItems = [
   {
@@ -49,7 +50,7 @@ const Nav = () => {
   return (
     <>
       <Box px={{ base: 3, md: 6 }}>
-        <Flex h={20} alignItems={"center"}>
+        <Flex h={20} align="center">
           <NavLink to="/">
             <ChakraImage alt="NeuronPool logo" h={35} src={logo} />
           </NavLink>
@@ -68,6 +69,7 @@ const Nav = () => {
           <Spacer />
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={3}>
+              <Search />
               {isDesktop ? (
                 <Button
                   onClick={toggleColorMode}

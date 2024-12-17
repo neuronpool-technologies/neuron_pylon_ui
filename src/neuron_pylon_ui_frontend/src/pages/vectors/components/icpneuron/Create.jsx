@@ -32,10 +32,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { WarningIcon, TimeIcon, StarIcon } from "@chakra-ui/icons";
-import IcLogo from "../../../../assets/ic-logo.png";
-import { e8sToIcp, icpToE8s } from "../../../tools/conversions";
+import IcLogo from "../../../../../assets/ic-logo.png";
+import { e8sToIcp, icpToE8s } from "../../../../tools/conversions";
 import { useSelector, useDispatch } from "react-redux";
-import { Auth, InfoRow, ProcessTime } from "../../../components";
+import { Auth, InfoRow, ProcessTime } from "../../../../components";
 import {
   lightBorderColor,
   darkBorderColor,
@@ -43,11 +43,11 @@ import {
   darkColorBox,
   darkColor,
   lightColor,
-} from "../../../colors";
+} from "../../../../colors";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { Principal } from "@dfinity/principal";
-import { fetchWallet } from "../../../state/ProfileSlice";
-import { showToast } from "../../../tools/toast";
+import { fetchWallet } from "../../../../state/ProfileSlice";
+import { showToast } from "../../../../tools/toast";
 
 const steps = [{ description: "Approve ICP" }, { description: "Stake ICP" }];
 
@@ -144,7 +144,7 @@ const Create = () => {
       </Text>
       <InputGroup>
         <InputLeftElement pointerEvents="none" h="100%">
-          <TimeIcon alt="Time icon" h={"20px"} w={"auto"} />
+          <TimeIcon alt="Time icon" color="gray.300" h={"20px"} w={"auto"} />
         </InputLeftElement>
         <Input
           pl={10}
@@ -158,7 +158,7 @@ const Create = () => {
       </InputGroup>
       <InputGroup>
         <InputLeftElement pointerEvents="none" h="100%">
-          <StarIcon alt="Star icon" h={"20px"} w={"auto"} />
+          <StarIcon alt="Star icon" color="gray.300" h={"20px"} w={"auto"} />
         </InputLeftElement>
         <Input
           pl={10}

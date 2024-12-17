@@ -14,7 +14,8 @@ import {
   lightBorderColor,
   darkBorderColor,
 } from "../../colors";
-import { Create, CreateBalance, VectorInfo } from "./components";
+import { CreateBalance, MetaInfo } from "./components";
+import { Create } from "./components/icpneuron";
 import { useSelector } from "react-redux";
 
 const Vectors = () => {
@@ -42,8 +43,8 @@ const Vectors = () => {
         </Flex>
         <VStack spacing={3} align="start">
           <Divider />
-          <Create />
-          <VectorInfo />
+          {/* <Create />
+          <MetaInfo /> */}
         </VStack>
       </Box>
     </Container>

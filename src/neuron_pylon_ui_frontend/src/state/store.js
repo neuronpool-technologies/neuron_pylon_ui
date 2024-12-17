@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import Profile from "./ProfileSlice";
-import Billing from "./BillingSlice";
+import Meta from "./MetaSlice";
 
 const store = configureStore({
-  reducer: { Profile, Billing },
+  reducer: { Profile, Meta },
 });
 
 export default store;

@@ -62,6 +62,12 @@ export function deepConvertToString(obj) {
     return obj.toString();
   }
 
+  // Special case: Principal
+
+  if (obj && obj._isPrincipal) {
+    return obj.toString();
+  }
+
   // Special case: Array
   if (Array.isArray(obj)) {
     return obj.map(deepConvertToString);
@@ -70,12 +76,7 @@ export function deepConvertToString(obj) {
   // Recursive case: object
   const newObj = {};
   for (const [key, value] of Object.entries(obj)) {
-    // Special case: handle the "winner" key
-    if (key === "winner") {
-      newObj[key] = value.toString();
-    } else {
-      newObj[key] = deepConvertToString(value);
-    }
+    newObj[key] = deepConvertToString(value);
   }
 
   return newObj;
