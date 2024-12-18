@@ -1,7 +1,7 @@
 import React from "react";
 import { Nav, Footer } from "./components";
 import { Flex, Box } from "@chakra-ui/react";
-import { Vectors, Wallet, ErrorPage } from "./pages";
+import { Vectors, Wallet, ById, ByController, ErrorPage } from "./pages";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,6 +15,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Vectors />} />
+          <Route path="/controller/:controller" element={<ByController />} />
+          <Route path="/id/:id" element={<ById />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>
