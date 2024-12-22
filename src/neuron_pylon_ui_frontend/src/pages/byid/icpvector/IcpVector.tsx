@@ -5,7 +5,11 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { DestinationBox, SourceBox } from "./components";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
-const IcpNeuronVector = ({ icpvector }: { icpvector: NodeShared }) => {
+type IcpNeuronVectorProps = {
+  icpvector: NodeShared;
+};
+
+const IcpNeuronVector = ({ icpvector }: IcpNeuronVectorProps) => {
   return (
     <>
       <Flex align="center" w="100%">

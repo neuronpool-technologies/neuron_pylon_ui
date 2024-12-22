@@ -2,7 +2,9 @@ import React from "react";
 import { useClipboard, IconButton } from "@chakra-ui/react";
 import { CopyIcon, CheckIcon } from "@chakra-ui/icons";
 
-const CopyAddress = ({ address }: { address: string }) => {
+type CopyAddressProps = { address: string };
+
+const CopyAddress = ({ address }: CopyAddressProps) => {
   const { hasCopied, onCopy } = useClipboard(address);
 
   return (

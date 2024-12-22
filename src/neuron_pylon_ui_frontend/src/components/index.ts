@@ -4,5 +4,4 @@ export { default as Search } from "./Search";
 export { default as InfoRow } from "./InfoRow";
 export { default as HintPopover } from "./HintPopover";
 export { default as WalletFaq } from "./faqs/WalletFaq";
-export { default as ProcessTime } from "./ProcessTime";
 export { default as Footer } from "./Footer";

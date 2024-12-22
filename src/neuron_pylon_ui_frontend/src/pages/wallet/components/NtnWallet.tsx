@@ -53,6 +53,7 @@ import { showToast } from "@/tools/toast";
 import InfoRow from "@/components/InfoRow";
 import { startNeuronPylonClient } from "@/client/Client";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
+import { BatchCommandRequest } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const NtnWallet = () => {
   const { logged_in, ntn_balance, principal } = useTypedSelector(
@@ -100,9 +101,14 @@ const NtnWallet = () => {
 
 export default NtnWallet;
 
-const Refresh = ({ principal, logged_in }) => {
+type RefreshProps = {
+  principal: string;
+  logged_in: boolean;
+};
+
+const Refresh = ({ principal, logged_in }: RefreshProps) => {
   const dispatch = useTypedDispatch();
-  const [rotation, setRotation] = useState(0);
+  const [rotation, setRotation] = useState<number>(0);
 
   const refresh = () => {
     const newRotation = rotation + 360; // Increment by 360 degrees
@@ -144,7 +150,7 @@ const ReceiveNtn = () => {
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? lightColorBox : darkColorBox}>
-          <ModalHeader>Receive</ModalHeader>
+          <ModalHeader sx={{ textAlign: "center" }}>Receive</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
@@ -196,12 +202,12 @@ const SendNtn = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useTypedDispatch();
 
-  const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState("");
+  const [address, setAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
 
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [sending, setSending] = useState<boolean>(false);
+  const [sent, setSent] = useState<boolean>(false);
+  const [failed, setFailed] = useState<boolean>(false);
 
   const Transfer = async () => {
     const amountConverted = icpToE8s(Number(amount));
@@ -213,7 +219,7 @@ const SendNtn = () => {
       const pylon = await startNeuronPylonClient();
 
       try {
-        await pylon.icrc55_command({
+        const transferArgs: BatchCommandRequest = {
           expire_at: [],
           request_id: [],
           controller: { owner: Principal.fromText(principal), subaccount: [] },
@@ -242,7 +248,9 @@ const SendNtn = () => {
               },
             },
           ],
-        });
+        };
+
+        await pylon.icrc55_command(transferArgs);
 
         setSending(false);
         setSent(true);
@@ -281,7 +289,7 @@ const SendNtn = () => {
       <Modal isOpen={isOpen} onClose={closeModal} isCentered>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? lightColorBox : darkColorBox}>
-          <ModalHeader>Send</ModalHeader>
+          <ModalHeader sx={{ textAlign: "center" }}>Send</ModalHeader>
           {!sending ? <ModalCloseButton /> : null}
           <ModalBody>
             {!sent ? (

@@ -20,10 +20,10 @@ import { darkBorderColor, darkColorBox, lightColorBox } from "@/colors";
 
 const Search = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState<string>("");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
 
@@ -31,7 +31,7 @@ const Search = () => {
     setSearchText("");
     onClose();
   };
-  
+
   return (
     <>
       <Button
@@ -47,7 +47,7 @@ const Search = () => {
       <Modal isOpen={isOpen} onClose={closeModal} isCentered>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? lightColorBox : darkColorBox}>
-          <ModalHeader>Search</ModalHeader>
+          <ModalHeader sx={{ textAlign: "center" }}>Search</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <InputGroup w="100%">

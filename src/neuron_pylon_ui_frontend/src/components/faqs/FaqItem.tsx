@@ -14,7 +14,9 @@ import {
   darkBorderColor,
 } from "@/colors";
 
-const FaqItem = ({ title, body }) => {
+type FaqItemProps = { title: string; body: string };
+
+const FaqItem = ({ title, body }: FaqItemProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <AccordionItem

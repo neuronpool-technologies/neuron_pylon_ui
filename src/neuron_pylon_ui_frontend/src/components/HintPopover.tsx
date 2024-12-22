@@ -10,7 +10,11 @@ import {
 import { InfoIcon } from "@chakra-ui/icons";
 import { darkColorBox, lightColorBox } from "@/colors";
 
-const HintPopover = ({ details }) => {
+type HintPopoverProps = {
+  details: string;
+};
+
+const HintPopover = ({ details }: HintPopoverProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (

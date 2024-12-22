@@ -2,7 +2,9 @@ import React from "react";
 import { useColorMode, Flex, Text, Spacer } from "@chakra-ui/react";
 import { lightGrayTextColor, darkGrayTextColor } from "@/colors";
 
-const InfoRow = ({ title, stat, children }) => {
+type InfoRowProps = { title: string; stat: string; children: React.ReactNode };
+
+const InfoRow = ({ title, stat, children }: InfoRowProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <>

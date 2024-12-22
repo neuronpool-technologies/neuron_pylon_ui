@@ -26,7 +26,7 @@ import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 const ById = () => {
   const { id } = useParams();
   const { colorMode, toggleColorMode } = useColorMode();
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [icpvector, setIcpVector] = useState<NodeShared | null>(null);
 
   const loadVector = async () => {

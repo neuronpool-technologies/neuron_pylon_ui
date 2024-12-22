@@ -2,7 +2,9 @@ import React from "react";
 import { Heading, VStack, Flex, Text } from "@chakra-ui/react";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 
-const NotFoundBox = ({ id }: { id: string }) => {
+type NotFoundBoxProps = { id: string };
+
+const NotFoundBox = ({ id }: NotFoundBoxProps) => {
   return (
     <Flex align="center" justify="center" w="100%" h={300}>
       <VStack>

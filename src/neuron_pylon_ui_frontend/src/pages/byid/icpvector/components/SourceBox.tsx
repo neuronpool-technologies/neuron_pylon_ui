@@ -18,7 +18,11 @@ import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import CopyAddress from "./CopyAddress";
 import { SourceEndpointResp } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
-const SourceBox = ({ source }: { source: SourceEndpointResp }) => {
+type SourceBoxProps = {
+  source: SourceEndpointResp;
+};
+
+const SourceBox = ({ source }: SourceBoxProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   if (!("ic" in source.endpoint)) return;

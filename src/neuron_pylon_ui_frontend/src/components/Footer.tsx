@@ -13,7 +13,13 @@ import githubLogo from "../../assets/github_logo.svg";
 import { darkBorderColor, lightBorderColor } from "@/colors";
 import logoHorizontalLight from "../../assets/logo_horizontal_light.svg";
 import logoHorizontalDark from "../../assets/logo_horizontal_dark.svg";
-// import Terms from "./Terms";
+
+type SocialIconLinkProps = {
+  image: string;
+  alt: string;
+  link: string;
+  xLogo?: boolean;
+};
 
 const Footer = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -41,19 +47,17 @@ const Footer = () => {
             image={xLogo}
             alt={"twitter link"}
             link={"https://x.com/NeuronPool"}
-            xLogo={true}
+            xLogo
           />
           <SocialIconLink
             image={discordLogo}
             alt={"discord link"}
             link={"https://discord.gg/5jRHUYnsrM"}
-            xLogo={false}
           />
           <SocialIconLink
             image={githubLogo}
             alt={"github link"}
             link={"https://github.com/neuronpool-technologies"}
-            xLogo={false}
           />
         </Flex>
       </Flex>
@@ -63,7 +67,7 @@ const Footer = () => {
 
 export default Footer;
 
-const SocialIconLink = ({ image, alt, link, xLogo }) => {
+const SocialIconLink = ({ image, alt, link, xLogo }: SocialIconLinkProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (

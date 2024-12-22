@@ -28,7 +28,7 @@ import {
 } from "../state/ProfileSlice";
 import { fetchMetaInformation } from "../state/MetaSlice";
 import { AuthClient } from "@dfinity/auth-client";
-import { Actor } from "@dfinity/agent";
+import { Actor, Identity } from "@dfinity/agent";
 import IcLogo from "../../assets/ic-logo.png";
 import { darkColorBox, lightColorBox } from "@/colors";
 import { startNeuronPylonClient } from "@/client/Client";
@@ -41,7 +41,7 @@ const invalidateAgents = async () => {
   agent.invalidateIdentity();
 };
 
-const validateAgents = async (identity) => {
+const validateAgents = async (identity: Identity) => {
   // // a fix for discarding the old actor with the anonymous identity
   // // see https://forum.dfinity.org/t/issue-with-dfinity-agent-npm-package-agenterror-server-returned-an-error-code-403/33253/2?u=dfxjesse
   // // replaceIdentity makes sure the old local delegation is not cached anymore
@@ -56,7 +56,7 @@ const Auth = () => {
   const logged_in = useTypedSelector((state) => state.Profile.logged_in);
   const metaStatus = useTypedSelector((state) => state.Meta.status);
 
-  const [client, setClient] = useState(null);
+  const [client, setClient] = useState<AuthClient | null>(null);
 
   const initAuth = async () => {
     await invalidateAgents();
@@ -192,7 +192,6 @@ const UserProfile = () => {
             ? principal.substring(0, 7) + "..." + principal.substring(57, 63)
             : null}
         </Flex>
-        {/* <CopyToClipboardButton value={principal} type={"principal ID"} /> */}
         <CopyToClipboardButton
           value={ntn_address.toLowerCase()}
           type={"NTN address"}
@@ -235,7 +234,9 @@ const UserProfile = () => {
   );
 };
 
-const CopyToClipboardButton = ({ value, type }) => {
+type CopyToClipBoardProps = { value: string; type: string };
+
+const CopyToClipboardButton = ({ value, type }: CopyToClipBoardProps) => {
   const { hasCopied, onCopy } = useClipboard(value);
 
   return (
