@@ -2,7 +2,10 @@
   "canisters": {
     "neuron_pylon": {
       "id": "6jvpj-sqaaa-aaaaj-azwnq-cai",
-      "type": "pull"
+      "type": "pull",
+      "declarations": {
+        "output": "src/neuron_pylon_ui_frontend/src/declarations/neuron_pylon"
+      }
     },
     "neuron_pylon_ui_frontend": {
       "dependencies": ["neuron_pylon"],
@@ -13,7 +16,10 @@
         "src/neuron_pylon_ui_frontend/assets",
         "dist/neuron_pylon_ui_frontend/"
       ],
-      "type": "assets"
+      "type": "assets",
+      "declarations": {
+        "output": "src/neuron_pylon_ui_frontend/src/declarations/neuron_pylon_ui_frontend"
+      }
     }
   },
   "defaults": {

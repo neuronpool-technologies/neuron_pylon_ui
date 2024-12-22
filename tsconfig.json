@@ -1,10 +1,18 @@
 {
-    "compilerOptions": {
-        "target": "es2018",
-        "lib": ["ES2018", "DOM"],
-        "allowJs": true,
-        "jsx": "react"
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/neuron_pylon_ui_frontend/src/*"]
     },
-    "include": ["src/**/*"]
-  }
-  
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "strict": false,
+    "outDir": "./dist"
+  },
+  "include": ["./src/**/*", "declaration.d.ts"]
+}
