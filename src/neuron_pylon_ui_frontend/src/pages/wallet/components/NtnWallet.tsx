@@ -47,6 +47,7 @@ import {
   lightBorderColor,
   lightColorBox,
   lightGrayColorBox,
+  lightGrayTokenBg,
 } from "@/colors";
 import { Auth } from "@/components";
 import { showToast } from "@/tools/toast";
@@ -67,7 +68,7 @@ const NtnWallet = () => {
         <ChakraImage
           src={NtnLogo}
           alt="NTN logo"
-          bg={colorMode === "light" ? "#edf2f6" : ""}
+          bg={colorMode === "light" ? lightGrayTokenBg : ""}
           borderRadius="full"
           h={45}
           mr={3}

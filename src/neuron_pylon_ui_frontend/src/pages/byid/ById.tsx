@@ -16,18 +16,20 @@ import {
   lightColorBox,
   lightBorderColor,
   darkBorderColor,
-} from "../../colors";
+} from "@/colors";
 import { useParams, NavLink } from "react-router-dom";
-import { startNeuronPylonClient } from "../../client/Client";
-import { LoadingBox, NotFoundBox } from "./icpvector/components";
-import IcpNeuronVector from "./icpvector/IcpVector";
+import { startNeuronPylonClient } from "@/client/Client";
+import { LoadingBox, NotFoundBox } from "./vectoroverview/components";
+import VectorOverview from "./vectoroverview/VectorOverview";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const ById = () => {
   const { id } = useParams();
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [icpvector, setIcpVector] = useState<NodeShared | null>(null);
+  const [icpneuronvector, setIcpNeuronVector] = useState<NodeShared | null>(
+    null
+  );
 
   const loadVector = async () => {
     const pylon = await startNeuronPylonClient();
@@ -35,8 +37,8 @@ const ById = () => {
     const module = nodeRes[0][0]?.custom[0];
 
     if (module && "devefi_jes1_icpneuron" in module) {
-      setIcpVector(nodeRes[0][0]);
-    };
+      setIcpNeuronVector(nodeRes[0][0]);
+    }
 
     setLoaded(true);
   };
@@ -81,9 +83,11 @@ const ById = () => {
         }
         bg={colorMode === "light" ? lightColorBox : darkColorBox}
       >
-        {loaded && icpvector ? <IcpNeuronVector icpvector={icpvector} /> : null}
+        {loaded && icpneuronvector ? (
+          <VectorOverview vector={icpneuronvector} />
+        ) : null}
         {!loaded ? <LoadingBox /> : null}
-        {loaded && !icpvector ? <NotFoundBox id={id} /> : null}
+        {loaded && !icpneuronvector ? <NotFoundBox id={id} /> : null}
       </Box>
     </Container>
   );

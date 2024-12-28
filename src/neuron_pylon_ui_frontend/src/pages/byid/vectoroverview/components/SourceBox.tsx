@@ -4,7 +4,6 @@ import {
   VStack,
   useColorMode,
   Flex,
-  Spacer,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -59,15 +58,14 @@ const SourceBox = ({ source }: SourceBoxProps) => {
             {e8sToIcp(Number(source.balance)).toFixed(4)} ICP
           </Text>
         </VStack>
-        <Spacer />
-        <CopyAddress address={sourceAddress} />
       </Flex>
       <Box
         bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
         borderRadius="md"
         p={3}
       >
-        <Text noOfLines={3}>{sourceAddress}</Text>
+        <Text>{sourceAddress}</Text>
+        <CopyAddress address={sourceAddress} />
       </Box>
     </Box>
   );

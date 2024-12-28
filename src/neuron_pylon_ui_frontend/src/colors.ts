@@ -9,3 +9,5 @@ export const lightGrayColorBox = "#f7fafb";
 export const darkGrayColorBox = "#333b43";
 export const lightGrayTextColor = "gray.600";
 export const darkGrayTextColor = "gray.400";
+
+export const lightGrayTokenBg = "#edf2f6"

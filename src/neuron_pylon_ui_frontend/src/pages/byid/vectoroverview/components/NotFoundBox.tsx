@@ -10,7 +10,7 @@ const NotFoundBox = ({ id }: NotFoundBoxProps) => {
       <VStack>
         <Hashicon value={id} size={45} />
         <Heading textAlign="center" size={["sm", null, "md"]}>
-          Vector not found :(
+          Neuron vector not found :(
         </Heading>
         <Text maxW="sm" textAlign="center" color="gray.500">
           Please try another vector

@@ -1,7 +1,14 @@
 import React from "react";
 import { Nav, Footer } from "./components";
 import { Flex, Box } from "@chakra-ui/react";
-import { Create, Wallet, ById, ByController, ErrorPage } from "./pages";
+import {
+  Create,
+  Wallet,
+  ById,
+  ByController,
+  ErrorPage,
+  NeuronOverview,
+} from "./pages";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,7 +24,7 @@ const App = () => {
           <Route index element={<Create />} />
           <Route path="/controller/:controller" element={<ByController />} />
           <Route path="/id/:id" element={<ById />} />
-          <Route path="/id/:id/:neuronid" element={<p>neuron overview</p>} />
+          <Route path="/id/:id/:neuronid" element={<NeuronOverview />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>

@@ -2,30 +2,39 @@ import React from "react";
 import { VStack, Flex, Spacer, Text, Badge } from "@chakra-ui/react";
 import "../../../../assets/main.css";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { DestinationBox, SourceBox } from "./components";
+import {
+  DestinationBox,
+  SourceBox,
+  NeuronPreview,
+  ControllersBox,
+} from "./components";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
-type IcpNeuronVectorProps = {
-  icpvector: NodeShared;
+type VectorProps = {
+  vector: NodeShared;
 };
 
-const IcpNeuronVector = ({ icpvector }: IcpNeuronVectorProps) => {
+const VectorOverview = ({ vector }: VectorProps) => {
+  const neuronId = vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
+    ? vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
+    : null;
+
   return (
     <>
       <Flex align="center" w="100%">
         <Flex mr={3}>
-          <Hashicon value={icpvector.id.toString()} size={45} />
+          <Hashicon value={vector.id.toString()} size={45} />
         </Flex>
         <VStack align="start" spacing="0">
           <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
-            Vector #{icpvector.id}
+            Vector #{vector.id}
           </Text>
           <Text fontSize={"sm"} color="gray.500">
             ICP Neuron Vector
           </Text>
         </VStack>
         <Spacer />
-        {icpvector.active && !icpvector.billing.frozen ? (
+        {vector.active && !vector.billing.frozen ? (
           <Badge
             variant="outline"
             colorScheme="green"
@@ -40,12 +49,18 @@ const IcpNeuronVector = ({ icpvector }: IcpNeuronVectorProps) => {
         )}
       </Flex>
       <Flex direction="column" mt={3} gap={3}>
-        <SourceBox source={icpvector.sources[0]} />
-        <DestinationBox destination={icpvector.destinations[0]} />
-        <DestinationBox destination={icpvector.destinations[1]} />
+        {neuronId ? (
+          <NeuronPreview
+            vectorid={vector.id.toString()}
+            module={vector.custom[0]}
+          />
+        ) : null}
+        <SourceBox source={vector.sources[0]} />
+        <DestinationBox destinations={vector.destinations} />
+        <ControllersBox controllers={vector.controllers} />
       </Flex>
     </>
   );
 };
 
-export default IcpNeuronVector;
+export default VectorOverview;
