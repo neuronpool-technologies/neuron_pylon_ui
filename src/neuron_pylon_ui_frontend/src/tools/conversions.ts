@@ -54,7 +54,7 @@ export function convertSecondsToDaysOrHours(seconds: number): string {
   }
 }
 
-export function deepConvertToString(obj : Record<string, any>) {
+export function deepConvertToString(obj: Record<string, any>) {
   // Base case: if obj is already a primitive type
   if (obj === null || typeof obj !== "object") {
     return String(obj);
@@ -77,3 +77,30 @@ export function deepConvertToString(obj : Record<string, any>) {
 
   return newObj;
 }
+
+export const daysToMonthsAndYears = (days: number): string => {
+  const daysPerYear = 365.2425; // Average Gregorian year length
+  const daysPerMonth = daysPerYear / 12; // Approx. 30.436875 days per month
+
+  const years = Math.floor(days / daysPerYear);
+  const remainingDaysAfterYears = days % daysPerYear;
+
+  const months = Math.floor(remainingDaysAfterYears / daysPerMonth);
+  const remainingDays = Math.round(remainingDaysAfterYears % daysPerMonth);
+
+  let result = "";
+
+  if (years > 0) {
+    result += `${years} year${years > 1 ? "s" : ""}, `;
+  }
+
+  if (months > 0) {
+    result += `${months} month${months > 1 ? "s" : ""}, `;
+  }
+
+  if (remainingDays > 0) {
+    result += `${remainingDays} day${remainingDays > 1 ? "s" : ""}`;
+  }
+
+  return result.replace(/,\s*$/, "");
+};

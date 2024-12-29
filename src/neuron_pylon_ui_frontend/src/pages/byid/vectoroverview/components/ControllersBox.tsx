@@ -4,7 +4,6 @@ import {
   VStack,
   useColorMode,
   Flex,
-  Spacer,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -34,12 +33,9 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
       p={3}
     >
       <Flex align="center" mb={3}>
-        <VStack align="start" spacing="0">
           <Text fontSize={"sm"} color="gray.500">
             Controllers
           </Text>
-        </VStack>
-        <Spacer />
       </Flex>
       <Flex w="100%" direction="column" gap={3}>
         {controllers.map((controller, index) => {

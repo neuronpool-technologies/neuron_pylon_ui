@@ -13,12 +13,14 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { NavLink } from "react-router-dom";
 import {
   darkBorderColor,
+  darkGrayColorBox,
   lightBorderColor,
   lightColorBox,
+  lightGrayColorBox,
   lightGrayTokenBg,
 } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { e8sToIcp } from "@/tools/conversions";
+import { daysToMonthsAndYears, e8sToIcp } from "@/tools/conversions";
 
 type NeuronPreviewProps = {
   vectorid: string;
@@ -33,6 +35,19 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
     module.devefi_jes1_icpneuron.cache.cached_neuron_stake_e8s[0]
   );
 
+  const dissolveDelaySeconds =
+    module.devefi_jes1_icpneuron.cache.dissolve_delay_seconds[0];
+
+  const dissolveDelay = daysToMonthsAndYears(
+    Number(dissolveDelaySeconds) / (60 * 60 * 24)
+  );
+
+  let neuronStatus: string;
+  if ("Locked" in module.devefi_jes1_icpneuron.variables.dissolve_status) {
+    neuronStatus = "Locked";
+  } else {
+    neuronStatus = "Dissolving";
+  }
   return (
     <NavLink
       to={`/id/${vectorid}/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
@@ -69,14 +84,40 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
             <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
               {e8sToIcp(neuronStake).toFixed(4)} ICP
             </Text>
-            <Text fontSize={"sm"} color="gray.500">
-              Neuron: {`${neuronId.substring(0, 5)}...`}
+            <Text fontSize={"sm"} color="gray.500" noOfLines={1}>
+            Neuron: {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
             </Text>
           </VStack>
           <Spacer />
-          <Text fontSize="sm" color="gray.500">
-            See more <ChevronRightIcon />
-          </Text>
+          <ChevronRightIcon boxSize={8} color="gray.500" />
+        </Flex>
+        <Flex align="center" mt={3} gap={3} direction={"row"}>
+          <VStack align="start" spacing={3} w="100%">
+            <Text fontSize={"sm"} color="gray.500">
+              Dissolve delay
+            </Text>
+            <Box
+              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
+              borderRadius="md"
+              p={3}
+              w="100%"
+            >
+              <Text>{dissolveDelay}</Text>
+            </Box>
+          </VStack>
+          <VStack align="start" spacing={3} w="100%">
+            <Text fontSize={"sm"} color="gray.500">
+              Neuron status
+            </Text>
+            <Box
+              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
+              borderRadius="md"
+              p={3}
+              w="100%"
+            >
+              <Text>{neuronStatus}</Text>
+            </Box>
+          </VStack>
         </Flex>
       </Box>
     </NavLink>
