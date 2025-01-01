@@ -20,7 +20,7 @@ const VectorOverview = ({ vector }: VectorProps) => {
     : null;
 
   return (
-    <>
+    <Flex direction="column" gap={3} w="100%">
       <Flex align="center" w="100%">
         <Flex mr={3}>
           <Hashicon value={vector.id.toString()} size={45} />
@@ -48,18 +48,16 @@ const VectorOverview = ({ vector }: VectorProps) => {
           </Badge>
         )}
       </Flex>
-      <Flex direction="column" mt={3} gap={3}>
-        {neuronId ? (
-          <NeuronPreview
-            vectorid={vector.id.toString()}
-            module={vector.custom[0]}
-          />
-        ) : null}
-        <SourceBox source={vector.sources[0]} />
-        <DestinationBox destinations={vector.destinations} />
-        <ControllersBox controllers={vector.controllers} />
-      </Flex>
-    </>
+      {neuronId ? (
+        <NeuronPreview
+          vectorid={vector.id.toString()}
+          module={vector.custom[0]}
+        />
+      ) : null}
+      <SourceBox source={vector.sources[0]} />
+      <DestinationBox destinations={vector.destinations} />
+      <ControllersBox controllers={vector.controllers} />
+    </Flex>
   );
 };
 

@@ -7,7 +7,7 @@ import {
   ById,
   ByController,
   ErrorPage,
-  NeuronOverview,
+  ByNeuron,
 } from "./pages";
 import {
   BrowserRouter as Router,
@@ -24,7 +24,7 @@ const App = () => {
           <Route index element={<Create />} />
           <Route path="/controller/:controller" element={<ByController />} />
           <Route path="/id/:id" element={<ById />} />
-          <Route path="/id/:id/:neuronid" element={<NeuronOverview />} />
+          <Route path="/id/:id/neuron/:neuron" element={<ByNeuron />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>

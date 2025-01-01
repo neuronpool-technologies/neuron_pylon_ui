@@ -43,14 +43,17 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
   );
 
   let neuronStatus: string;
-  if ("Locked" in module.devefi_jes1_icpneuron.variables.dissolve_status) {
+  if (module.devefi_jes1_icpneuron.cache.state[0] === 1) {
     neuronStatus = "Locked";
+  } else if (module.devefi_jes1_icpneuron.cache.state[0] === 3) {
+    neuronStatus = "Unlocked";
   } else {
     neuronStatus = "Dissolving";
   }
+
   return (
     <NavLink
-      to={`/id/${vectorid}/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
+      to={`/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
     >
       <Box
         w="100%"
@@ -69,7 +72,7 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
         borderRadius="md"
         p={3}
       >
-        <Flex align="center" w="100%s">
+        <Flex align="center" w="100%">
           <ChakraImage
             src={IcLogo}
             alt="ICP logo"
@@ -85,7 +88,7 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
               {e8sToIcp(neuronStake).toFixed(4)} ICP
             </Text>
             <Text fontSize={"sm"} color="gray.500" noOfLines={1}>
-            Neuron: {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
+              Neuron: {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
             </Text>
           </VStack>
           <Spacer />
