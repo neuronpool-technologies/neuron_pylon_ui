@@ -1,16 +1,8 @@
 import React from "react";
-import {
-  Box,
-  useColorMode,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
-import {
-  lightBorderColor,
-  darkBorderColor,
-  lightGrayColorBox,
-  darkGrayColorBox,
-} from "@/colors";
+import { Box, useColorMode, Flex, Text, Avatar } from "@chakra-ui/react";
+import { ExternalLinkIcon, Spacer } from "@chakra-ui/icons";
+import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
+import { NavLink } from "react-router-dom";
 import { Controller } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 
@@ -22,19 +14,11 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Box
-      border={
-        colorMode === "light"
-          ? `solid ${lightBorderColor} 1px`
-          : `solid ${darkBorderColor} 1px`
-      }
-      borderRadius="md"
-      p={3}
-    >
+    <Box>
       <Flex align="center" mb={3}>
-          <Text fontSize={"sm"} color="gray.500">
-            Controllers
-          </Text>
+        <Text fontSize={"sm"} color="gray.500">
+          Controllers
+        </Text>
       </Flex>
       <Flex w="100%" direction="column" gap={3}>
         {controllers.map((controller, index) => {
@@ -44,14 +28,34 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
           });
 
           return (
-            <Box
-              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-              borderRadius="md"
-              p={3}
-              key={index}
-            >
-              <Text>{controllerAccount}</Text>
-            </Box>
+            <NavLink to={`/controller/${controllerAccount}`} key={index}>
+              <Flex
+                bg={
+                  colorMode === "light" ? lightGrayColorBox : darkGrayColorBox
+                }
+                borderRadius="md"
+                p={3}
+                align={"center"}
+                _hover={{
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
+                gap={2}
+              >
+                <Avatar
+                  size="xs"
+                  src={`https://identicons.github.com/${controllerAccount.slice(
+                    0,
+                    3
+                  )}.png`}
+                  name={controllerAccount}
+                  ignoreFallback
+                />
+                <Text>{controllerAccount}</Text>
+                <Spacer />
+                <ExternalLinkIcon />
+              </Flex>
+            </NavLink>
           );
         })}
       </Flex>

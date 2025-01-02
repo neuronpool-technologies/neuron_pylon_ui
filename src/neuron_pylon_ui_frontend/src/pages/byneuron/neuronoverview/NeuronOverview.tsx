@@ -5,12 +5,17 @@ import {
   Text,
   Image as ChakraImage,
   VStack,
+  Divider,
 } from "@chakra-ui/react";
 import IcLogo from "../../../../assets/ic-logo.png";
 import { lightColorBox, lightGrayTokenBg } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { e8sToIcp } from "@/tools/conversions";
-import { RecentActivity, VariablesAndCache } from "./components";
+import {
+  RecentActivity,
+  SpawningMaturity,
+  VariablesAndCache,
+} from "./components";
 
 type NeuronProps = {
   module: Shared;
@@ -46,7 +51,9 @@ const NeuronOverview = ({ module }: NeuronProps) => {
           </Text>
         </VStack>
       </Flex>
+      <Divider />
       <VariablesAndCache module={module} />
+      <SpawningMaturity module={module} />
       <RecentActivity module={module} />
     </Flex>
   );

@@ -1,17 +1,6 @@
 import React from "react";
-import {
-  Box,
-  VStack,
-  useColorMode,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
-import {
-  lightBorderColor,
-  darkBorderColor,
-  lightGrayColorBox,
-  darkGrayColorBox,
-} from "@/colors";
+import { Box, VStack, useColorMode, Flex, Text } from "@chakra-ui/react";
+import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
 import { e8sToIcp } from "@/tools/conversions";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import CopyAddress from "./CopyAddress";
@@ -32,15 +21,7 @@ const SourceBox = ({ source }: SourceBoxProps) => {
   });
 
   return (
-    <Box
-      border={
-        colorMode === "light"
-          ? `solid ${lightBorderColor} 1px`
-          : `solid ${darkBorderColor} 1px`
-      }
-      borderRadius="md"
-      p={3}
-    >
+    <Box>
       <Flex align="center" gap={6} mb={3}>
         <VStack align="start" spacing="0">
           <Text fontSize={"sm"} color="gray.500">

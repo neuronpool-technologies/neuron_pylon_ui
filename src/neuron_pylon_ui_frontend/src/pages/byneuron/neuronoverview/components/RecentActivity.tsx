@@ -8,14 +8,11 @@ import {
   Th,
   Tbody,
   Td,
+  Box,
+  Text,
 } from "@chakra-ui/react";
 import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
-import {
-  lightBorderColor,
-  darkBorderColor,
-  lightGrayTextColor,
-  darkGrayTextColor,
-} from "@/colors";
+import { lightGrayTextColor, darkGrayTextColor } from "@/colors";
 import {
   Shared,
   Activity,
@@ -32,68 +29,63 @@ const RecentActivity = ({ module }: RecentActivityProps) => {
   const logs = module.devefi_jes1_icpneuron.log.reverse();
 
   return (
-    <TableContainer
-      w="100%"
-      h="100%"
-      border={
-        colorMode === "light"
-          ? `solid ${lightBorderColor} 1px`
-          : `solid ${darkBorderColor} 1px`
-      }
-      borderRadius="md"
-      p={3}
-    >
-      <Table variant="unstyled">
-        <Thead>
-          <Tr>
-            <Th
-              px={3}
-              color={
-                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-              }
-              fontWeight={500}
-              fontSize="md"
-              textTransform="none"
-              letterSpacing="none"
-              textAlign="start"
-            >
-              Timestamp
-            </Th>
-            <Th
-              px={3}
-              color={
-                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-              }
-              fontWeight={500}
-              fontSize="md"
-              textTransform="none"
-              letterSpacing="none"
-              textAlign="start"
-            >
-              Activity
-            </Th>
-            <Th
-              px={3}
-              color={
-                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-              }
-              fontWeight={500}
-              fontSize="md"
-              textTransform="none"
-              letterSpacing="none"
-              textAlign="end"
-            >
-              Result
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {logs.map((activity, index) => {
-            return <ActivityBox key={index} activity={activity} />;
-          })}
-        </Tbody>
-      </Table>
-    </TableContainer>
+    <Box>
+      <Text fontWeight="bold" fontSize={"md"} mb={3}>
+        Recent activity
+      </Text>
+      <TableContainer w="100%" h="100%">
+        <Table variant="unstyled">
+          <Thead>
+            <Tr>
+              <Th
+                px={3}
+                color={
+                  colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+                }
+                fontWeight={500}
+                fontSize="md"
+                textTransform="none"
+                letterSpacing="none"
+                textAlign="start"
+              >
+                Timestamp
+              </Th>
+              <Th
+                px={3}
+                color={
+                  colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+                }
+                fontWeight={500}
+                fontSize="md"
+                textTransform="none"
+                letterSpacing="none"
+                textAlign="start"
+              >
+                Activity
+              </Th>
+              <Th
+                px={3}
+                color={
+                  colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+                }
+                fontWeight={500}
+                fontSize="md"
+                textTransform="none"
+                letterSpacing="none"
+                textAlign="end"
+              >
+                Result
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {logs.map((activity, index) => {
+              return <ActivityBox key={index} activity={activity} />;
+            })}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 

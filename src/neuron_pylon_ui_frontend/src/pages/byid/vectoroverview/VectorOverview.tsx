@@ -1,5 +1,5 @@
 import React from "react";
-import { VStack, Flex, Spacer, Text, Badge } from "@chakra-ui/react";
+import { VStack, Flex, Spacer, Text, Badge, Divider } from "@chakra-ui/react";
 import "../../../../assets/main.css";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
@@ -38,7 +38,7 @@ const VectorOverview = ({ vector }: VectorProps) => {
           <Badge
             variant="outline"
             colorScheme="green"
-            animation="pulse 2s infinite"
+            animation="pulse_green 2s infinite"
           >
             Active
           </Badge>
@@ -48,6 +48,7 @@ const VectorOverview = ({ vector }: VectorProps) => {
           </Badge>
         )}
       </Flex>
+      <Divider />
       {neuronId ? (
         <NeuronPreview
           vectorid={vector.id.toString()}

@@ -1,11 +1,6 @@
 import React from "react";
 import { Box, useColorMode, Flex, VStack, Text } from "@chakra-ui/react";
-import {
-  lightBorderColor,
-  darkBorderColor,
-  lightGrayColorBox,
-  darkGrayColorBox,
-} from "@/colors";
+import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import {
   convertNanosecondsToElapsedTime,
@@ -45,6 +40,10 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
     Number(module.devefi_jes1_icpneuron.cache.created_timestamp_seconds[0])
   );
 
+  const maturity = `${e8sToIcp(
+    Number(module.devefi_jes1_icpneuron.cache.maturity_e8s_equivalent[0])
+  ).toFixed(4)} ICP`;
+
   let lastUpdated: string;
   if ("Init" in module.devefi_jes1_icpneuron.internals.updating) {
     lastUpdated = "Init";
@@ -72,23 +71,15 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
     followeeId =
       module.devefi_jes1_icpneuron.variables.followee.FolloweeId.toString();
   }
-
   return (
-    <Box
-      border={
-        colorMode === "light"
-          ? `solid ${lightBorderColor} 1px`
-          : `solid ${darkBorderColor} 1px`
-      }
-      borderRadius="md"
-      p={3}
-    >
+    <Box>
       <Flex direction="column" w="100%" gap={3}>
         <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Dissolve Delay" data={dissolveDelay} />
           <LabelBox label="Neuron Status" data={neuronStatus} />
         </Flex>
         <LabelBox label="Followee" data={followeeId} />
+        <LabelBox label="Available maturity" data={maturity} />
         <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Voting power (VP)" data={votingPower} />
           <LabelBox label="VP refreshed" data={votingPowerRefreshed} />

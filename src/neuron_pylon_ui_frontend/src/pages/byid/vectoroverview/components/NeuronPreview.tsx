@@ -59,10 +59,8 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
         w="100%"
         transition="transform 0.3s"
         _hover={{
-          boxShadow:
-            colorMode === "light"
-              ? `0px 0px 5px ${lightGrayTokenBg}`
-              : `0px 0px 5px ${lightColorBox}`,
+          transform: "translateY(-2px)",
+          cursor: "pointer",
         }}
         border={
           colorMode === "light"

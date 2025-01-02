@@ -1,11 +1,6 @@
 import React from "react";
 import { Box, VStack, useColorMode, Flex, Text } from "@chakra-ui/react";
-import {
-  lightBorderColor,
-  darkBorderColor,
-  lightGrayColorBox,
-  darkGrayColorBox,
-} from "@/colors";
+import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { DestinationEndpointResp } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
@@ -17,15 +12,7 @@ const DestinationBox = ({ destinations }: DestinationBoxProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Box
-      border={
-        colorMode === "light"
-          ? `solid ${lightBorderColor} 1px`
-          : `solid ${darkBorderColor} 1px`
-      }
-      borderRadius="md"
-      p={3}
-    >
+    <Box>
       <Flex w="100%" direction="column" gap={3}>
         {destinations.map((destination, index) => {
           if (!("ic" in destination.endpoint)) return;

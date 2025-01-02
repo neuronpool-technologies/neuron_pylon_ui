@@ -169,7 +169,7 @@ const UserProfile = () => {
         <Flex align="center" gap={2}>
           <Avatar
             size="xs"
-            src={`https://identicons.github.com/${principal[0]}.png`}
+            src={`https://identicons.github.com/${principal.slice(0, 3)}.png`}
             name={principal}
             ignoreFallback
           />
@@ -186,7 +186,7 @@ const UserProfile = () => {
         <Flex align="center" m={3} gap={2}>
           <Avatar
             size="sm"
-            src={`https://identicons.github.com/${principal[0]}.png`}
+            src={`https://identicons.github.com/${principal.slice(0, 3)}.png`}
           />
           {principal
             ? principal.substring(0, 7) + "..." + principal.substring(57, 63)

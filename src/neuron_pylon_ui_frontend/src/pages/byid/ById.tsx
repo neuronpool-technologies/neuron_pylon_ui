@@ -32,12 +32,14 @@ const ById = () => {
   );
 
   const loadVector = async () => {
-    const pylon = await startNeuronPylonClient();
-    const nodeRes = await pylon.icrc55_get_nodes([{ id: Number(id) }]);
-    const module = nodeRes[0][0]?.custom[0];
+    if (Number.isFinite(Number(id))) {
+      const pylon = await startNeuronPylonClient();
+      const nodeRes = await pylon.icrc55_get_nodes([{ id: Number(id) }]);
+      const module = nodeRes[0][0]?.custom[0];
 
-    if (module && "devefi_jes1_icpneuron" in module) {
-      setIcpNeuronVector(nodeRes[0][0]);
+      if (module && "devefi_jes1_icpneuron" in module) {
+        setIcpNeuronVector(nodeRes[0][0]);
+      }
     }
 
     setLoaded(true);
