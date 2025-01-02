@@ -7,6 +7,7 @@ import {
   SourceBox,
   NeuronPreview,
   ControllersBox,
+  BillingBox,
 } from "./components";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
@@ -55,8 +56,13 @@ const VectorOverview = ({ vector }: VectorProps) => {
           module={vector.custom[0]}
         />
       ) : null}
+      <Divider />
       <SourceBox source={vector.sources[0]} />
+      <Divider />
       <DestinationBox destinations={vector.destinations} />
+      <Divider />
+      <BillingBox vector={vector} />
+      <Divider />
       <ControllersBox controllers={vector.controllers} />
     </Flex>
   );

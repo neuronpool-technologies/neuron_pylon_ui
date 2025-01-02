@@ -53,7 +53,9 @@ const NeuronOverview = ({ module }: NeuronProps) => {
       </Flex>
       <Divider />
       <VariablesAndCache module={module} />
+      <Divider />
       <SpawningMaturity module={module} />
+      <Divider />
       <RecentActivity module={module} />
     </Flex>
   );

@@ -13,14 +13,13 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { NavLink } from "react-router-dom";
 import {
   darkBorderColor,
-  darkGrayColorBox,
   lightBorderColor,
   lightColorBox,
-  lightGrayColorBox,
   lightGrayTokenBg,
 } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { daysToMonthsAndYears, e8sToIcp } from "@/tools/conversions";
+import { LabelBox } from "@/components";
 
 type NeuronPreviewProps = {
   vectorid: string;
@@ -51,6 +50,13 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
     neuronStatus = "Dissolving";
   }
 
+  let followeeId: string;
+  if ("Default" in module.devefi_jes1_icpneuron.variables.followee) {
+    followeeId = "6914974521667616512";
+  } else {
+    followeeId =
+      module.devefi_jes1_icpneuron.variables.followee.FolloweeId.toString();
+  }
   return (
     <NavLink
       to={`/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
@@ -92,34 +98,11 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
           <Spacer />
           <ChevronRightIcon boxSize={8} color="gray.500" />
         </Flex>
-        <Flex align="center" mt={3} gap={3} direction={"row"}>
-          <VStack align="start" spacing={3} w="100%">
-            <Text fontSize={"sm"} color="gray.500">
-              Dissolve delay
-            </Text>
-            <Box
-              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-              borderRadius="md"
-              p={3}
-              w="100%"
-            >
-              <Text>{dissolveDelay}</Text>
-            </Box>
-          </VStack>
-          <VStack align="start" spacing={3} w="100%">
-            <Text fontSize={"sm"} color="gray.500">
-              Neuron status
-            </Text>
-            <Box
-              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-              borderRadius="md"
-              p={3}
-              w="100%"
-            >
-              <Text>{neuronStatus}</Text>
-            </Box>
-          </VStack>
+        <Flex align="center" my={3} gap={3} direction={"row"}>
+          <LabelBox label="Dissolve delay" data={dissolveDelay} />
+          <LabelBox label="Neuron status" data={neuronStatus} />
         </Flex>
+        <LabelBox label="Followee" data={followeeId} />
       </Box>
     </NavLink>
   );

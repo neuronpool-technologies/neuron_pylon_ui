@@ -9,6 +9,7 @@ import {
   Spacer,
   Badge,
 } from "@chakra-ui/react";
+import { TimeIcon } from "@chakra-ui/icons";
 import {
   Shared,
   SharedNeuronCache,
@@ -30,7 +31,7 @@ type SpawningMaturityProps = {
 };
 
 const SpawningMaturity = ({ module }: SpawningMaturityProps) => {
-    const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <Box>
@@ -38,7 +39,7 @@ const SpawningMaturity = ({ module }: SpawningMaturityProps) => {
         <Text fontWeight="bold" fontSize={"md"}>
           Spawning maturity
         </Text>
-        <HintPopover details="ICP amounts may vary by up to ±5% due to maturity modulation" />
+        <HintPopover details="ICP amounts may vary by up to ±5% due to maturity modulation and fees." />
       </Flex>
       <Flex gap={3} direction="column">
         {module.devefi_jes1_icpneuron.internals.spawning_neurons.length > 0 ? (
@@ -50,14 +51,14 @@ const SpawningMaturity = ({ module }: SpawningMaturityProps) => {
             )}
           </>
         ) : (
-            <Box
-              bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-              borderRadius="md"
-              p={3}
-              w="100%"
-            >
-              <Text>None</Text>
-            </Box>
+          <Box
+            bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
+            borderRadius="md"
+            p={3}
+            w="100%"
+          >
+            <Text>None</Text>
+          </Box>
         )}
       </Flex>
     </Box>
@@ -87,16 +88,29 @@ const SpawningNeuronProgress = ({
       p={3}
     >
       <Flex align="center" w="100%" h="100%">
-        <ChakraImage
-          src={IcLogo}
-          alt="ICP logo"
-          bg={colorMode === "light" ? lightGrayTokenBg : lightColorBox}
-          borderRadius="full"
-          p={1}
-          h={45}
-          mr={3}
-          w={45}
-        />
+        {spawningNeuron.state[0] === 4 ? (
+          <TimeIcon
+            h={45}
+            mr={3}
+            w={45}
+            bg={colorMode === "light" ? lightGrayTokenBg : lightColorBox}
+            color={"gray.500"}
+            borderRadius="full"
+            p={1}
+          />
+        ) : (
+          <ChakraImage
+            src={IcLogo}
+            alt="ICP logo"
+            bg={colorMode === "light" ? lightGrayTokenBg : lightColorBox}
+            borderRadius="full"
+            p={1}
+            h={45}
+            mr={3}
+            w={45}
+          />
+        )}
+
         <VStack align="start" spacing="0">
           <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
             {spawningNeuron.state[0] === 4

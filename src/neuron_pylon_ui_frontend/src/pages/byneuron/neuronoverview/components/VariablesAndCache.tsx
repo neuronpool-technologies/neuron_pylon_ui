@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, useColorMode, Flex, VStack, Text } from "@chakra-ui/react";
-import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
+import { Box, useColorMode, Flex } from "@chakra-ui/react";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import {
   convertNanosecondsToElapsedTime,
@@ -8,6 +7,7 @@ import {
   daysToMonthsAndYears,
   e8sToIcp,
 } from "@/tools/conversions";
+import { LabelBox } from "@/components";
 
 type NeuronProps = {
   module: Shared;
@@ -15,7 +15,6 @@ type NeuronProps = {
 
 const VariablesAndCache = ({ module }: NeuronProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
-
   const dissolveDelaySeconds =
     module.devefi_jes1_icpneuron.cache.dissolve_delay_seconds[0];
 
@@ -94,27 +93,3 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
 };
 
 export default VariablesAndCache;
-
-type LabelBoxProps = {
-  label: string;
-  data: string;
-};
-
-const LabelBox = ({ label, data }: LabelBoxProps) => {
-  const { colorMode, toggleColorMode } = useColorMode();
-  return (
-    <VStack align="start" spacing={3} w="100%">
-      <Text fontSize={"sm"} color="gray.500">
-        {label}
-      </Text>
-      <Box
-        bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-        borderRadius="md"
-        p={3}
-        w="100%"
-      >
-        <Text noOfLines={1}>{data}</Text>
-      </Box>
-    </VStack>
-  );
-};
