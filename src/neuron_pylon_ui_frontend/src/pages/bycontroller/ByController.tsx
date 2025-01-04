@@ -1,9 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  Heading,
-  Divider,
-  VStack,
   useColorMode,
   Flex,
   Spacer,
@@ -21,10 +18,50 @@ import {
   darkBorderColor,
 } from "@/colors";
 import { useParams, NavLink } from "react-router-dom";
+import ControllerOverview from "./controlleroverview/ControllerOverview";
+import { startNeuronPylonClient } from "@/client/Client";
+import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
+import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { LoadingBox, NotFoundBox } from "./controlleroverview/components";
 
 const ByController = () => {
-  const { id, controller } = useParams();
+  const { controller } = useParams();
   const { colorMode, toggleColorMode } = useColorMode();
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [icpneuronvectors, setIcpNeuronVectors] = useState<NodeShared[] | null>(
+    null
+  );
+
+  const loadControllerVectors = async () => {
+    try {
+      const pylon = await startNeuronPylonClient();
+
+      const accountController: IcrcAccount = decodeIcrcAccount(controller);
+
+      const nodes = await pylon.icrc55_get_controller_nodes({
+        id: {
+          owner: accountController.owner,
+          subaccount: accountController.subaccount
+            ? [accountController.subaccount]
+            : [],
+        },
+        start: 0,
+        length: 100,
+      });
+
+      setIcpNeuronVectors(nodes);
+      setLoaded(true);
+    } catch (error) {
+      setIcpNeuronVectors([]);
+      setLoaded(true);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    loadControllerVectors();
+  }, []);
+
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
@@ -61,14 +98,16 @@ const ByController = () => {
         }
         bg={colorMode === "light" ? lightColorBox : darkColorBox}
       >
-        <Flex align="center" mb={3}>
-          <Heading size={"md"} noOfLines={1}>
-            Controller
-          </Heading>
-        </Flex>
-        <VStack spacing={3} align="start">
-          <Divider />
-        </VStack>
+        {loaded && icpneuronvectors && icpneuronvectors.length > 0 ? (
+          <ControllerOverview
+            vectors={icpneuronvectors}
+            controller={controller}
+          />
+        ) : null}
+        {!loaded ? <LoadingBox /> : null}
+        {loaded && icpneuronvectors && icpneuronvectors.length === 0 ? (
+          <NotFoundBox controller={controller} />
+        ) : null}
       </Box>
     </Container>
   );

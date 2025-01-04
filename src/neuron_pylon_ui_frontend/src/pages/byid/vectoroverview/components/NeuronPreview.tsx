@@ -24,11 +24,16 @@ import { daysToMonthsAndYears, e8sToIcp } from "@/tools/conversions";
 import { LabelBox } from "@/components";
 
 type NeuronPreviewProps = {
+  controller: string;
   vectorid: string;
   module: Shared;
 };
 
-const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
+const NeuronPreview = ({
+  controller,
+  vectorid,
+  module,
+}: NeuronPreviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   const neuronId = module.devefi_jes1_icpneuron.cache.neuron_id[0].toString();
@@ -63,7 +68,7 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
 
   return (
     <NavLink
-      to={`/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
+      to={`/controller/${controller}/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
     >
       <Box
         w="100%"

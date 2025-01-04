@@ -20,13 +20,14 @@ import {
   darkGrayTextColor,
 } from "@/colors";
 import { useParams, NavLink } from "react-router-dom";
+import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
 import { startNeuronPylonClient } from "@/client/Client";
 import { LoadingBox, NotFoundBox } from "./vectoroverview/components";
 import VectorOverview from "./vectoroverview/VectorOverview";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const ById = () => {
-  const { id } = useParams();
+  const { controller, id } = useParams();
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuronvector, setIcpNeuronVector] = useState<NodeShared | null>(
@@ -34,17 +35,36 @@ const ById = () => {
   );
 
   const loadVector = async () => {
-    if (Number.isFinite(Number(id))) {
-      const pylon = await startNeuronPylonClient();
-      const nodeRes = await pylon.icrc55_get_nodes([{ id: Number(id) }]);
-      const module = nodeRes[0][0]?.custom[0];
+    try {
+      const accountController: IcrcAccount = decodeIcrcAccount(controller);
 
-      if (module && "devefi_jes1_icpneuron" in module) {
-        setIcpNeuronVector(nodeRes[0][0]);
+      if (Number.isFinite(Number(id))) {
+        const pylon = await startNeuronPylonClient();
+        const nodeRes = await pylon.icrc55_get_nodes([{ id: Number(id) }]);
+        const node = nodeRes[0][0];
+        const module = node?.custom[0];
+
+        node.controllers.some(
+          (controller) =>
+            controller.owner.toString() === accountController.owner.toString()
+        );
+        if (
+          module &&
+          "devefi_jes1_icpneuron" in module &&
+          node.controllers.some(
+            (controller) =>
+              controller.owner.toString() === accountController.owner.toString()
+          )
+        ) {
+          setIcpNeuronVector(nodeRes[0][0]);
+        }
       }
-    }
 
-    setLoaded(true);
+      setLoaded(true);
+    } catch (error) {
+      setIcpNeuronVector(null);
+      setLoaded(true);
+    }
   };
 
   useEffect(() => {
@@ -54,7 +74,7 @@ const ById = () => {
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
-        <NavLink to={`/`}>
+        <NavLink to={`/controller/${controller}`}>
           <IconButton
             aria-label="go back"
             icon={<ArrowBackIcon />}
@@ -78,6 +98,10 @@ const ById = () => {
             <NavLink to="/">Vectors</NavLink>
           </BreadcrumbItem>
 
+          <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
+            <NavLink to={`/controller/${controller}`}>Controller</NavLink>
+          </BreadcrumbItem>
+
           <BreadcrumbItem isCurrentPage>
             <BreadcrumbLink>ID</BreadcrumbLink>
           </BreadcrumbItem>
@@ -95,10 +119,12 @@ const ById = () => {
         bg={colorMode === "light" ? lightColorBox : darkColorBox}
       >
         {loaded && icpneuronvector ? (
-          <VectorOverview vector={icpneuronvector} />
+          <VectorOverview controller={controller} vector={icpneuronvector} />
         ) : null}
         {!loaded ? <LoadingBox /> : null}
-        {loaded && !icpneuronvector ? <NotFoundBox id={id} /> : null}
+        {loaded && !icpneuronvector ? (
+          <NotFoundBox id={id} controller={controller} />
+        ) : null}
       </Box>
     </Container>
   );

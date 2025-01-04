@@ -20,11 +20,12 @@ import {
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { darkGrayTextColor, lightGrayTextColor } from "@/colors";
 
-type VectorProps = {
+type VectorOverviewProps = {
+  controller: string;
   vector: NodeShared;
 };
 
-const VectorOverview = ({ vector }: VectorProps) => {
+const VectorOverview = ({ controller, vector }: VectorOverviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const neuronId = vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
     ? vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
@@ -67,6 +68,7 @@ const VectorOverview = ({ vector }: VectorProps) => {
       <Divider />
       {neuronId ? (
         <NeuronPreview
+          controller={controller}
           vectorid={vector.id.toString()}
           module={vector.custom[0]}
         />

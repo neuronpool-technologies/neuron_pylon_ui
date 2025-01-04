@@ -23,8 +23,11 @@ const App = () => {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Create />} />
           <Route path="/controller/:controller" element={<ByController />} />
-          <Route path="/id/:id" element={<ById />} />
-          <Route path="/id/:id/neuron/:neuron" element={<ByNeuron />} />
+          <Route path="/controller/:controller/id/:id" element={<ById />} />
+          <Route
+            path="/controller/:controller/id/:id/neuron/:neuron"
+            element={<ByNeuron />}
+          />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>

@@ -79,10 +79,10 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
         </Flex>
         <LabelBox label="Followee" data={followeeId} />
         <LabelBox label="Available maturity" data={maturity} />
-        <Flex align="center" gap={3} direction={"row"}>
+        {/* <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Voting power (VP)" data={votingPower} />
           <LabelBox label="VP refreshed" data={votingPowerRefreshed} />
-        </Flex>
+        </Flex> */}
         <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Created" data={created} />
           <LabelBox label="Last updated" data={lastUpdated} />

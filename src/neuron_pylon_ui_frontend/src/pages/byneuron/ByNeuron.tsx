@@ -26,7 +26,7 @@ import NeuronOverview from "./neuronoverview/NeuronOverview";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const ByNeuron = () => {
-  const { id, neuron } = useParams();
+  const { controller, id, neuron } = useParams();
   const { colorMode, toggleColorMode } = useColorMode();
 
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -55,7 +55,7 @@ const ByNeuron = () => {
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
-        <NavLink to={`/id/${id}`}>
+        <NavLink to={`/controller/${controller}/id/${id}`}>
           <IconButton
             aria-label="go back"
             icon={<ArrowBackIcon />}
@@ -80,7 +80,11 @@ const ByNeuron = () => {
           </BreadcrumbItem>
 
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to={`/id/${id}`}>ID</NavLink>
+            <NavLink to={`/controller/${controller}`}>Controller</NavLink>
+          </BreadcrumbItem>
+
+          <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
+            <NavLink to={`/controller/${controller}/id/${id}`}>ID</NavLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem isCurrentPage>
