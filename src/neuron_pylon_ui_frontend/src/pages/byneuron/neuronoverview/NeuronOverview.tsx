@@ -8,12 +8,16 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import IcLogo from "../../../../assets/ic-logo.png";
-import { lightColorBox, lightGrayTokenBg } from "@/colors";
+import {
+  darkGrayTextColor,
+  lightColorBox,
+  lightGrayTextColor,
+  lightGrayTokenBg,
+} from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { e8sToIcp } from "@/tools/conversions";
 import {
-  RecentActivity,
-  SpawningMaturity,
+  IncomingMaturity,
   VariablesAndCache,
 } from "./components";
 
@@ -46,7 +50,13 @@ const NeuronOverview = ({ module }: NeuronProps) => {
           <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
             {e8sToIcp(neuronStake).toFixed(4)} ICP
           </Text>
-          <Text fontSize={"sm"} color="gray.500" noOfLines={1}>
+          <Text
+            fontSize={"sm"}
+            color={
+              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+            }
+            noOfLines={1}
+          >
             Neuron: {neuronId}
           </Text>
         </VStack>
@@ -54,9 +64,7 @@ const NeuronOverview = ({ module }: NeuronProps) => {
       <Divider />
       <VariablesAndCache module={module} />
       <Divider />
-      <SpawningMaturity module={module} />
-      <Divider />
-      <RecentActivity module={module} />
+      <IncomingMaturity module={module} />
     </Flex>
   );
 };

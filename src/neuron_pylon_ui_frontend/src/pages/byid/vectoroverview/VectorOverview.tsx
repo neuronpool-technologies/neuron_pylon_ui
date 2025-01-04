@@ -1,5 +1,13 @@
 import React from "react";
-import { VStack, Flex, Spacer, Text, Badge, Divider } from "@chakra-ui/react";
+import {
+  VStack,
+  Flex,
+  Spacer,
+  Text,
+  Badge,
+  Divider,
+  useColorMode,
+} from "@chakra-ui/react";
 import "../../../../assets/main.css";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
@@ -10,12 +18,14 @@ import {
   BillingBox,
 } from "./components";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { darkGrayTextColor, lightGrayTextColor } from "@/colors";
 
 type VectorProps = {
   vector: NodeShared;
 };
 
 const VectorOverview = ({ vector }: VectorProps) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const neuronId = vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
     ? vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
     : null;
@@ -30,7 +40,12 @@ const VectorOverview = ({ vector }: VectorProps) => {
           <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
             Vector #{vector.id}
           </Text>
-          <Text fontSize={"sm"} color="gray.500">
+          <Text
+            fontSize={"sm"}
+            color={
+              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+            }
+          >
             ICP Neuron Vector
           </Text>
         </VStack>
@@ -56,7 +71,6 @@ const VectorOverview = ({ vector }: VectorProps) => {
           module={vector.custom[0]}
         />
       ) : null}
-      <Divider />
       <SourceBox source={vector.sources[0]} />
       <Divider />
       <DestinationBox destinations={vector.destinations} />

@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, VStack, useColorMode, Flex, Text } from "@chakra-ui/react";
-import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
+import { Box, useColorMode, Flex } from "@chakra-ui/react";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { DestinationEndpointResp } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { LabelBox } from "@/components";
 
 type DestinationBoxProps = {
   destinations: DestinationEndpointResp[];
@@ -25,27 +25,11 @@ const DestinationBox = ({ destinations }: DestinationBoxProps) => {
             : "None";
 
           return (
-            <Box key={index}>
-              <Flex align="center" mb={3}>
-                <VStack align="start" spacing="0">
-                  <Text fontSize={"sm"} color="gray.500">
-                    Destination
-                  </Text>
-                  <Text fontWeight="bold" fontSize={"md"}>
-                    {destination.name}
-                  </Text>
-                </VStack>
-              </Flex>
-              <Box
-                bg={
-                  colorMode === "light" ? lightGrayColorBox : darkGrayColorBox
-                }
-                borderRadius="md"
-                p={3}
-              >
-                <Text>{destinationAddress}</Text>
-              </Box>
-            </Box>
+            <LabelBox
+              key={index}
+              label={`${destination.name} destination`}
+              data={destinationAddress}
+            />
           );
         })}
       </Flex>

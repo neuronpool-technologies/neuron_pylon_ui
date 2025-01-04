@@ -1,17 +1,26 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Box, useColorMode, VStack, Text } from "@chakra-ui/react";
-import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
+import {
+  lightGrayColorBox,
+  darkGrayColorBox,
+  darkGrayTextColor,
+  lightGrayTextColor,
+} from "@/colors";
 
 type LabelBoxProps = {
   label: string;
-  data: string;
+  data?: string;
+  children?: ReactNode;
 };
 
-const LabelBox = ({ label, data }: LabelBoxProps) => {
+const LabelBox = ({ label, data, children }: LabelBoxProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <VStack align="start" spacing={3} w="100%">
-      <Text fontSize={"sm"} color="gray.500">
+      <Text
+        fontSize={"sm"}
+        color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
+      >
         {label}
       </Text>
       <Box
@@ -21,6 +30,7 @@ const LabelBox = ({ label, data }: LabelBoxProps) => {
         w="100%"
       >
         <Text noOfLines={1}>{data}</Text>
+        {children}
       </Box>
     </VStack>
   );

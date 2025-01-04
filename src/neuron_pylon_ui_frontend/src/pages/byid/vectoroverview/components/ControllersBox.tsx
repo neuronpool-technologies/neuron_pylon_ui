@@ -1,10 +1,10 @@
 import React from "react";
-import { Box, useColorMode, Flex, Text, Avatar } from "@chakra-ui/react";
+import { useColorMode, Flex, Text, Avatar } from "@chakra-ui/react";
 import { ExternalLinkIcon, Spacer } from "@chakra-ui/icons";
-import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
 import { NavLink } from "react-router-dom";
 import { Controller } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { LabelBox } from "@/components";
 
 type ControllersBoxProps = {
   controllers: Controller[];
@@ -14,12 +14,7 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Box>
-      <Flex align="center" mb={3}>
-        <Text fontSize={"sm"} color="gray.500">
-          Controllers
-        </Text>
-      </Flex>
+    <LabelBox label="Controllers">
       <Flex w="100%" direction="column" gap={3}>
         {controllers.map((controller, index) => {
           const controllerAccount = encodeIcrcAccount({
@@ -30,11 +25,6 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
           return (
             <NavLink to={`/controller/${controllerAccount}`} key={index}>
               <Flex
-                bg={
-                  colorMode === "light" ? lightGrayColorBox : darkGrayColorBox
-                }
-                borderRadius="md"
-                p={3}
                 align={"center"}
                 _hover={{
                   textDecoration: "underline",
@@ -59,7 +49,7 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
           );
         })}
       </Flex>
-    </Box>
+    </LabelBox>
   );
 };
 

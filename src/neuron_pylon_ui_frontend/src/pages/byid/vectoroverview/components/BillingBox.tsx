@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, useColorMode, Flex, Text, VStack } from "@chakra-ui/react";
-import { lightGrayColorBox, darkGrayColorBox } from "@/colors";
+import { useColorMode, Flex, Text } from "@chakra-ui/react";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { e8sToIcp } from "@/tools/conversions";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
@@ -20,41 +19,24 @@ const BillingBox = ({ vector }: BillingBoxProps) => {
   });
 
   return (
-    <Box>
-      <Flex align="center" gap={6} mb={3}>
-        <VStack align="start" spacing="0">
-          <Text fontSize={"sm"} color="gray.500">
-            Billing
-          </Text>
-          <Text fontWeight="bold" fontSize={"md"}>
-            Account
-          </Text>
-        </VStack>
-        <VStack align="start" spacing="0">
-          <Text fontSize={"sm"} color="gray.500">
-            Balance
-          </Text>
-          <Text fontWeight="bold" fontSize={"md"}>
-            {e8sToIcp(Number(vector.billing.current_balance)).toFixed(4)} NTN
-          </Text>
-        </VStack>
-      </Flex>
-      <Box
-        bg={colorMode === "light" ? lightGrayColorBox : darkGrayColorBox}
-        borderRadius="md"
-        p={3}
-        mb={3}
-      >
+    <Flex direction={"column"} gap={3}>
+      <LabelBox label="Billing account">
         <Text>{billingAddress}</Text>
         <CopyAddress address={billingAddress} />
-      </Box>
+      </LabelBox>
+      <LabelBox
+        label="Billing balance"
+        data={`${e8sToIcp(Number(vector.billing.current_balance)).toFixed(
+          4
+        )} NTN`}
+      />
       <LabelBox
         label="Billing option"
         data={
           vector.billing.billing_option ? "3.17 NTN per day" : "5% of Maturity"
         }
       />
-    </Box>
+    </Flex>
   );
 };
 

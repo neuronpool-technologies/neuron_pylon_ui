@@ -16,6 +16,8 @@ import {
   lightColorBox,
   lightBorderColor,
   darkBorderColor,
+  lightGrayTextColor,
+  darkGrayTextColor,
 } from "@/colors";
 import { useParams, NavLink } from "react-router-dom";
 import { startNeuronPylonClient } from "@/client/Client";
@@ -63,7 +65,14 @@ const ById = () => {
         <Spacer />
         <Breadcrumb
           spacing={{ base: 0.5, md: "8px" }}
-          separator={<ChevronRightIcon boxSize={5} color="gray.500" />}
+          separator={
+            <ChevronRightIcon
+              boxSize={5}
+              color={
+                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+              }
+            />
+          }
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
             <NavLink to="/">Vectors</NavLink>

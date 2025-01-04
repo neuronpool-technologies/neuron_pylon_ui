@@ -8,7 +8,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { InfoIcon } from "@chakra-ui/icons";
-import { darkColorBox, lightColorBox } from "@/colors";
+import { darkColorBox, darkGrayTextColor, lightColorBox, lightGrayTextColor } from "@/colors";
 
 type HintPopoverProps = {
   details: string;
@@ -21,7 +21,7 @@ const HintPopover = ({ details }: HintPopoverProps) => {
     <Popover trigger="hover">
       <PopoverTrigger>
         <InfoIcon
-          color="gray.500"
+          color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
           aria-label="Info icon"
           _hover={{
             cursor: "pointer",

@@ -13,8 +13,10 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { NavLink } from "react-router-dom";
 import {
   darkBorderColor,
+  darkGrayTextColor,
   lightBorderColor,
   lightColorBox,
+  lightGrayTextColor,
   lightGrayTokenBg,
 } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
@@ -50,13 +52,15 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
     neuronStatus = "Dissolving";
   }
 
-  let followeeId: string;
-  if ("Default" in module.devefi_jes1_icpneuron.variables.followee) {
-    followeeId = "6914974521667616512";
-  } else {
-    followeeId =
-      module.devefi_jes1_icpneuron.variables.followee.FolloweeId.toString();
-  }
+  const spawningTotal =
+    module.devefi_jes1_icpneuron.internals.spawning_neurons.reduce(
+      (accumulator, neuron) =>
+        accumulator +
+        Number(neuron.maturity_e8s_equivalent[0]) +
+        Number(neuron.cached_neuron_stake_e8s[0]),
+      0
+    );
+
   return (
     <NavLink
       to={`/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
@@ -91,18 +95,33 @@ const NeuronPreview = ({ vectorid, module }: NeuronPreviewProps) => {
             <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
               {e8sToIcp(neuronStake).toFixed(4)} ICP
             </Text>
-            <Text fontSize={"sm"} color="gray.500" noOfLines={1}>
+            <Text
+              fontSize={"sm"}
+              color={
+                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+              }
+              noOfLines={1}
+            >
               Neuron: {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
             </Text>
           </VStack>
           <Spacer />
-          <ChevronRightIcon boxSize={8} color="gray.500" />
+          <ChevronRightIcon
+            boxSize={8}
+            color={
+              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+            }
+          />
         </Flex>
         <Flex align="center" my={3} gap={3} direction={"row"}>
           <LabelBox label="Dissolve delay" data={dissolveDelay} />
           <LabelBox label="Neuron status" data={neuronStatus} />
         </Flex>
-        <LabelBox label="Followee" data={followeeId} />
+        <LabelBox label="Incoming maturity">
+          <Text noOfLines={1} color="green.500" as={"b"}>
+            +{e8sToIcp(spawningTotal).toFixed(4)} ICP
+          </Text>
+        </LabelBox>
       </Box>
     </NavLink>
   );
