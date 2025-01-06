@@ -2,7 +2,7 @@ import React from "react";
 import { Nav, Footer } from "./components";
 import { Flex, Box } from "@chakra-ui/react";
 import {
-  Create,
+  Vectors,
   Wallet,
   ById,
   ByController,
@@ -21,7 +21,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Create />} />
+          <Route index element={<Vectors />} />
           <Route path="/controller/:controller" element={<ByController />} />
           <Route path="/controller/:controller/id/:id" element={<ById />} />
           <Route

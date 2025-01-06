@@ -3,7 +3,6 @@ import {
   Box,
   useColorMode,
   Flex,
-  Spacer,
   Text,
   Image as ChakraImage,
   VStack,
@@ -98,7 +97,7 @@ const NeuronPreview = ({
           />
           <VStack align="start" spacing="0">
             <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
-              {e8sToIcp(neuronStake).toFixed(4)} ICP
+              Neuron {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
             </Text>
             <Text
               fontSize={"sm"}
@@ -107,26 +106,25 @@ const NeuronPreview = ({
               }
               noOfLines={1}
             >
-              Neuron: {`${neuronId.slice(0, 5)}...${neuronId.slice(-3)}`}
+              See more <ChevronRightIcon />
             </Text>
           </VStack>
-          <Spacer />
-          <ChevronRightIcon
-            boxSize={8}
-            color={
-              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-            }
+        </Flex>
+        <Flex align="center" my={3} gap={3} direction={"row"}>
+          <LabelBox
+            label="Staked"
+            data={`${e8sToIcp(neuronStake).toFixed(4)} ICP`}
           />
+          <LabelBox label="Incoming maturity">
+            <Text noOfLines={1} color="green.500" as={"b"}>
+              +{e8sToIcp(spawningTotal).toFixed(4)} ICP
+            </Text>
+          </LabelBox>
         </Flex>
         <Flex align="center" my={3} gap={3} direction={"row"}>
           <LabelBox label="Dissolve delay" data={dissolveDelay} />
           <LabelBox label="Neuron status" data={neuronStatus} />
         </Flex>
-        <LabelBox label="Incoming maturity">
-          <Text noOfLines={1} color="green.500" as={"b"}>
-            +{e8sToIcp(spawningTotal).toFixed(4)} ICP
-          </Text>
-        </LabelBox>
       </Box>
     </NavLink>
   );

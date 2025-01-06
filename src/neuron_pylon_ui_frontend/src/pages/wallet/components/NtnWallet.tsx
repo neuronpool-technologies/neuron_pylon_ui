@@ -41,16 +41,13 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { e8sToIcp, icpToE8s } from "@/tools/conversions";
 import { fetchWallet } from "@/state/ProfileSlice";
 import {
-  darkBorderColor,
   darkColorBox,
   darkGrayColorBox,
-  lightBorderColor,
   lightColorBox,
   lightGrayColorBox,
   lightGrayTokenBg,
 } from "@/colors";
 import { Auth } from "@/components";
-import { showToast } from "@/tools/toast";
 import InfoRow from "@/components/InfoRow";
 import { startNeuronPylonClient } from "@/client/Client";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
@@ -159,26 +156,20 @@ const ReceiveNtn = () => {
                 bg={
                   colorMode === "light" ? lightGrayColorBox : darkGrayColorBox
                 }
-                border={
-                  colorMode === "light"
-                    ? `solid ${lightBorderColor} 1px`
-                    : `solid ${darkBorderColor} 1px`
-                }
                 borderRadius="md"
                 p={3}
               >
                 <Text noOfLines={3}>{ntnAddress.toLowerCase()}</Text>
                 <Flex mt={3}>
                   <Spacer />
-                  <Button
+                  <IconButton
+                    aria-label="Copy address"
                     rounded="full"
                     boxShadow="base"
-                    rightIcon={hasCopied ? <CheckIcon /> : <CopyIcon />}
+                    icon={hasCopied ? <CheckIcon /> : <CopyIcon />}
                     size="sm"
                     onClick={onCopy}
-                  >
-                    {hasCopied ? "Copied" : "Copy"}
-                  </Button>
+                  />
                 </Flex>
               </Box>
             </FormControl>
@@ -208,11 +199,13 @@ const SendNtn = () => {
 
   const [sending, setSending] = useState<boolean>(false);
   const [sent, setSent] = useState<boolean>(false);
-  const [failed, setFailed] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   const Transfer = async () => {
     const amountConverted = icpToE8s(Number(amount));
     const ntn_fee = 10000n;
+    
+    setErrorMsg("");
 
     if (amountConverted > ntn_fee) {
       setSending(true);
@@ -257,16 +250,7 @@ const SendNtn = () => {
         setSent(true);
       } catch (error) {
         setSending(false);
-        setSent(true);
-        setFailed(true);
-
-        console.error(error);
-
-        showToast({
-          title: "Error sending NTN",
-          description: error.toString(),
-          status: "warning",
-        });
+        setErrorMsg(error.toString());
       }
     }
   };
@@ -274,6 +258,7 @@ const SendNtn = () => {
   const closeModal = () => {
     setAddress("");
     setAmount("");
+    setErrorMsg("");
     setSending(false);
     setSent(false);
     onClose();
@@ -337,25 +322,20 @@ const SendNtn = () => {
                   <InfoRow
                     title={"Wallet balance"}
                     stat={`${e8sToIcp(Number(ntn_balance))} NTN`}
-                    children={<></>}
                   />
                   <Divider />
-                  <InfoRow
-                    title={"Network fee"}
-                    stat={"0.0001 NTN"}
-                    children={<></>}
-                  />
+                  <InfoRow title={"Network fee"} stat={"0.0001 NTN"} />
                 </VStack>
+                {errorMsg ? (
+                  <Text mt={3} size="sm" color="red.500">
+                    <WarningIcon /> {errorMsg}
+                  </Text>
+                ) : null}
               </FormControl>
             ) : null}
-            {sent && !failed ? (
+            {sent && !errorMsg ? (
               <Center>
                 <Icon as={CheckCircleIcon} boxSize={100} />
-              </Center>
-            ) : null}
-            {sent && failed ? (
-              <Center>
-                <Icon as={WarningIcon} boxSize={100} />
               </Center>
             ) : null}
           </ModalBody>
@@ -373,8 +353,7 @@ const SendNtn = () => {
               }
             >
               {!sent ? "Send now" : null}
-              {sent && !failed ? "Transaction completed" : null}
-              {sent && failed ? "Transaction failed" : null}
+              {sent && !errorMsg ? "Transaction completed" : null}
             </Button>
           </ModalFooter>
         </ModalContent>

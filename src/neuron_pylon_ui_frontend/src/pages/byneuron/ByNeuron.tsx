@@ -19,7 +19,7 @@ import {
   lightGrayTextColor,
   darkGrayTextColor,
 } from "@/colors";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams, NavLink, useLocation } from "react-router-dom";
 import { startNeuronPylonClient } from "@/client/Client";
 import { LoadingBox, NotFoundBox } from "./neuronoverview/components";
 import NeuronOverview from "./neuronoverview/NeuronOverview";
@@ -27,12 +27,14 @@ import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const ByNeuron = () => {
   const { controller, id, neuron } = useParams();
+  const location = useLocation();
   const { colorMode, toggleColorMode } = useColorMode();
 
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuron, setIcpNeuron] = useState<Shared | null>(null);
 
   const loadVector = async () => {
+    setLoaded(false);
     const pylon = await startNeuronPylonClient();
     const nodeRes = await pylon.icrc55_get_nodes([{ id: Number(id) }]);
     const module = nodeRes[0][0]?.custom[0];
@@ -50,7 +52,7 @@ const ByNeuron = () => {
 
   useEffect(() => {
     loadVector();
-  }, []);
+  }, [location]);
 
   return (
     <Container maxW="xl" my={5}>

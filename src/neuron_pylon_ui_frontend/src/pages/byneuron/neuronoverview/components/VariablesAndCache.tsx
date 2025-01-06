@@ -14,7 +14,6 @@ type NeuronProps = {
 };
 
 const VariablesAndCache = ({ module }: NeuronProps) => {
-  const { colorMode, toggleColorMode } = useColorMode();
   const dissolveDelaySeconds =
     module.devefi_jes1_icpneuron.cache.dissolve_delay_seconds[0];
 
@@ -34,6 +33,10 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
         .voting_power_refreshed_timestamp_seconds
     )
   );
+
+  const neuronStake = `${e8sToIcp(
+    Number(module.devefi_jes1_icpneuron.cache.cached_neuron_stake_e8s[0])
+  ).toFixed(4)} ICP`;
 
   const created = convertSecondsToFormattedDate(
     Number(module.devefi_jes1_icpneuron.cache.created_timestamp_seconds[0])
@@ -74,11 +77,14 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
     <Box>
       <Flex direction="column" w="100%" gap={3}>
         <Flex align="center" gap={3} direction={"row"}>
+          <LabelBox label="Staked" data={neuronStake} />
+          <LabelBox label="Available maturity" data={maturity} />
+        </Flex>
+        <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Dissolve Delay" data={dissolveDelay} />
           <LabelBox label="Neuron Status" data={neuronStatus} />
         </Flex>
         <LabelBox label="Followee" data={followeeId} />
-        <LabelBox label="Available maturity" data={maturity} />
         {/* <Flex align="center" gap={3} direction={"row"}>
           <LabelBox label="Voting power (VP)" data={votingPower} />
           <LabelBox label="VP refreshed" data={votingPowerRefreshed} />

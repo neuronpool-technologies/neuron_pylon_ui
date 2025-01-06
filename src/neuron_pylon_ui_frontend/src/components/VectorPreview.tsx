@@ -14,14 +14,14 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import {
   darkBorderColor,
-  darkGrayColorBox,
   darkGrayTextColor,
   lightBorderColor,
-  lightGrayColorBox,
   lightGrayTextColor,
 } from "@/colors";
-import LabelBox from "./LabelBox";
 import { NavLink } from "react-router-dom";
+import { e8sToIcp } from "@/tools/conversions";
+import LabelBox from "./LabelBox";
+import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 
 type VectorPreviewProps = {
   vector: NodeShared;
@@ -30,6 +30,30 @@ type VectorPreviewProps = {
 
 const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
+
+  const module = vector.custom[0];
+
+  const neuronId = module.devefi_jes1_icpneuron.cache.neuron_id[0].toString();
+
+  const spawningTotal =
+    module.devefi_jes1_icpneuron.internals.spawning_neurons.reduce(
+      (accumulator, neuron) =>
+        accumulator +
+        Number(neuron.maturity_e8s_equivalent[0]) +
+        Number(neuron.cached_neuron_stake_e8s[0]),
+      0
+    );
+
+  const maturityDestination = vector.destinations[0];
+
+  if (!("ic" in maturityDestination.endpoint)) return;
+
+  const destinationAddress = maturityDestination.endpoint.ic.account[0]
+    ? encodeIcrcAccount({
+        owner: maturityDestination.endpoint.ic.account[0].owner,
+        subaccount: maturityDestination.endpoint.ic.account[0].subaccount[0],
+      })
+    : "None";
   return (
     <NavLink to={`/controller/${controller}/id/${vector.id}`}>
       <Box
@@ -61,22 +85,36 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
                 colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
               }
             >
-              ICP Neuron Vector
+              See more <ChevronRightIcon />
             </Text>
           </VStack>
           <Spacer />
-          <ChevronRightIcon
-            boxSize={8}
-            color={
-              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-            }
-          />
+          {vector.active && !vector.billing.frozen ? (
+            <Badge
+              variant="outline"
+              colorScheme="green"
+              animation="pulse_green 2s infinite"
+            >
+              Active
+            </Badge>
+          ) : (
+            <Badge variant="outline" colorScheme="red">
+              Frozen
+            </Badge>
+          )}
         </Flex>
-        {/* TODO add neuron snippet? */}
-        {/* <Flex align={"center"} width={"100%"} gap={3} mt={3}>
-          <LabelBox label={"Active"} data="Yes" />
-          <LabelBox label={"Billing balance"} data="0.0000 NTN" />
-        </Flex> */}
+        {neuronId ? (
+          <Flex mt={3} gap={3} w={"100%"} direction={"column"}>
+            <Flex align={"center"} width={"100%"} gap={3}>
+              <LabelBox label="Incoming maturity">
+                <Text noOfLines={1} color="green.500" as={"b"}>
+                  +{e8sToIcp(spawningTotal).toFixed(4)} ICP
+                </Text>
+              </LabelBox>
+              <LabelBox label="Maturity destination" data={destinationAddress} />
+            </Flex>
+          </Flex>
+        ) : null}
       </Box>
     </NavLink>
   );

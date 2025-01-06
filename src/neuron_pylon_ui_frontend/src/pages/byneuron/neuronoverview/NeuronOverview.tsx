@@ -15,11 +15,7 @@ import {
   lightGrayTokenBg,
 } from "@/colors";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { e8sToIcp } from "@/tools/conversions";
-import {
-  IncomingMaturity,
-  VariablesAndCache,
-} from "./components";
+import { IncomingMaturity, VariablesAndCache } from "./components";
 
 type NeuronProps = {
   module: Shared;
@@ -29,9 +25,6 @@ const NeuronOverview = ({ module }: NeuronProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   const neuronId = module.devefi_jes1_icpneuron.cache.neuron_id[0].toString();
-  const neuronStake = Number(
-    module.devefi_jes1_icpneuron.cache.cached_neuron_stake_e8s[0]
-  );
 
   return (
     <Flex direction="column" gap={3} w="100%">
@@ -48,7 +41,7 @@ const NeuronOverview = ({ module }: NeuronProps) => {
         />
         <VStack align="start" spacing="0">
           <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
-            {e8sToIcp(neuronStake).toFixed(4)} ICP
+            Neuron {neuronId}
           </Text>
           <Text
             fontSize={"sm"}
@@ -57,7 +50,7 @@ const NeuronOverview = ({ module }: NeuronProps) => {
             }
             noOfLines={1}
           >
-            Neuron: {neuronId}
+            ICP neuron
           </Text>
         </VStack>
       </Flex>

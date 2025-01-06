@@ -17,7 +17,7 @@ import {
   lightBorderColor,
   darkBorderColor,
 } from "@/colors";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams, NavLink, useLocation } from "react-router-dom";
 import ControllerOverview from "./controlleroverview/ControllerOverview";
 import { startNeuronPylonClient } from "@/client/Client";
 import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
@@ -26,6 +26,7 @@ import { LoadingBox, NotFoundBox } from "./controlleroverview/components";
 
 const ByController = () => {
   const { controller } = useParams();
+  const location = useLocation()
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuronvectors, setIcpNeuronVectors] = useState<NodeShared[] | null>(
@@ -34,6 +35,7 @@ const ByController = () => {
 
   const loadControllerVectors = async () => {
     try {
+      setLoaded(false)
       const pylon = await startNeuronPylonClient();
 
       const accountController: IcrcAccount = decodeIcrcAccount(controller);
@@ -60,7 +62,7 @@ const ByController = () => {
 
   useEffect(() => {
     loadControllerVectors();
-  }, []);
+  }, [location]);
 
   return (
     <Container maxW="xl" my={5}>

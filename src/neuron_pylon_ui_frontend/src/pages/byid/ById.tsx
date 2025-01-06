@@ -19,7 +19,7 @@ import {
   lightGrayTextColor,
   darkGrayTextColor,
 } from "@/colors";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams, NavLink, useLocation } from "react-router-dom";
 import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
 import { startNeuronPylonClient } from "@/client/Client";
 import { LoadingBox, NotFoundBox } from "./vectoroverview/components";
@@ -28,6 +28,7 @@ import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 const ById = () => {
   const { controller, id } = useParams();
+    const location = useLocation()
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuronvector, setIcpNeuronVector] = useState<NodeShared | null>(
@@ -36,6 +37,7 @@ const ById = () => {
 
   const loadVector = async () => {
     try {
+      setLoaded(false);
       const accountController: IcrcAccount = decodeIcrcAccount(controller);
 
       if (Number.isFinite(Number(id))) {
@@ -69,7 +71,7 @@ const ById = () => {
 
   useEffect(() => {
     loadVector();
-  }, []);
+  }, [location]);
 
   return (
     <Container maxW="xl" my={5}>

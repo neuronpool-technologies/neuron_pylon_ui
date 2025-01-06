@@ -1,15 +1,25 @@
 import { startNeuronPylonClient } from "../Client";
 import { Principal } from "@dfinity/principal";
-import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import {
+  encodeIcrcAccount,
+  decodeIcrcAccount,
+  IcrcAccount,
+} from "@dfinity/ledger-icrc";
 import { showToast } from "@/tools/toast";
+import { deepConvertToString } from "@/tools/conversions";
 
 type InitWalletResp = {
-  ntn_address: string,
-  ntn_balance: string,
-  ntn_ledger: string,
+  ntn_address: string;
+  ntn_balance: string;
+  ntn_ledger: string;
+  vectors: Array<any>;
 };
 
-export const InitWallet = async ({ principal }: { principal: string }) : Promise<InitWalletResp> => {
+export const InitWallet = async ({
+  principal,
+}: {
+  principal: string;
+}): Promise<InitWalletResp> => {
   try {
     const pylon = await startNeuronPylonClient();
 
@@ -18,10 +28,23 @@ export const InitWallet = async ({ principal }: { principal: string }) : Promise
       subaccount: [],
     });
 
-    if(!("ic" in endpoint)){
+    if (!("ic" in endpoint)) {
       throw new Error('"ic" property is missing from the endpoint object.');
-    };
-    
+    }
+
+    const accountController: IcrcAccount = decodeIcrcAccount(principal);
+
+    const nodes = await pylon.icrc55_get_controller_nodes({
+      id: {
+        owner: accountController.owner,
+        subaccount: accountController.subaccount
+          ? [accountController.subaccount]
+          : [],
+      },
+      start: 0,
+      length: 100,
+    });
+
     return {
       ntn_address: encodeIcrcAccount({
         owner: endpoint.ic.account.owner,
@@ -29,6 +52,7 @@ export const InitWallet = async ({ principal }: { principal: string }) : Promise
       }),
       ntn_balance: balance.toString(),
       ntn_ledger: endpoint.ic.ledger.toString(),
+      vectors: deepConvertToString(nodes),
     };
   } catch (error) {
     console.error(error);
@@ -43,6 +67,7 @@ export const InitWallet = async ({ principal }: { principal: string }) : Promise
       ntn_address: "",
       ntn_balance: "",
       ntn_ledger: "",
+      vectors: [],
     };
   }
 };

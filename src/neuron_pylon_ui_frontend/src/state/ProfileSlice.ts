@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { InitWallet } from "../client/data/InitWallet";
+import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 type ProfileState = {
   logged_in: boolean;
@@ -7,6 +8,7 @@ type ProfileState = {
   ntn_address: string;
   ntn_balance: string;
   ntn_ledger: string;
+  vectors : Array<any>;
   status: string;
   error: string | null;
 };
@@ -17,6 +19,7 @@ const initialState: ProfileState = {
   ntn_address: "",
   ntn_balance: "",
   ntn_ledger: "",
+  vectors : [],
   status: "idle",
   error: null,
 };
@@ -43,6 +46,7 @@ const ProfileSlice = createSlice({
         state.ntn_address = action.payload.ntn_address;
         state.ntn_balance = action.payload.ntn_balance;
         state.ntn_ledger = action.payload.ntn_ledger;
+        state.vectors = action.payload.vectors;
       })
       .addCase(fetchWallet.rejected, (state, action) => {
         state.status = "failed";
