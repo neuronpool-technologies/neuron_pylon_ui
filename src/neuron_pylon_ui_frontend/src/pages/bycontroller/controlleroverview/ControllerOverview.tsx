@@ -42,6 +42,7 @@ const ControllerOverview = ({
               colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
             }
             noOfLines={1}
+            fontWeight={500}
           >
             Controller
           </Text>

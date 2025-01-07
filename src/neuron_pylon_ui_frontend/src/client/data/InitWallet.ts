@@ -23,27 +23,33 @@ export const InitWallet = async ({
   try {
     const pylon = await startNeuronPylonClient();
 
-    let [{ balance, endpoint }] = await pylon.icrc55_accounts({
-      owner: Principal.fromText(principal),
-      subaccount: [],
-    });
+    // Decode the principal for reuse
+    const accountController: IcrcAccount = decodeIcrcAccount(principal);
+
+    // Run both requests in parallel
+    const [icrcRes, nodes] = await Promise.all([
+      pylon.icrc55_accounts({
+        owner: Principal.fromText(principal),
+        subaccount: [],
+      }),
+      pylon.icrc55_get_controller_nodes({
+        id: {
+          owner: accountController.owner,
+          subaccount: accountController.subaccount
+            ? [accountController.subaccount]
+            : [],
+        },
+        start: 0,
+        length: 100,
+      }),
+    ]);
+
+    // Extract the relevant data
+    const [{ balance, endpoint }] = icrcRes;
 
     if (!("ic" in endpoint)) {
       throw new Error('"ic" property is missing from the endpoint object.');
     }
-
-    const accountController: IcrcAccount = decodeIcrcAccount(principal);
-
-    const nodes = await pylon.icrc55_get_controller_nodes({
-      id: {
-        owner: accountController.owner,
-        subaccount: accountController.subaccount
-          ? [accountController.subaccount]
-          : [],
-      },
-      start: 0,
-      length: 100,
-    });
 
     return {
       ntn_address: encodeIcrcAccount({

@@ -46,6 +46,7 @@ const VectorOverview = ({ controller, vector }: VectorOverviewProps) => {
             color={
               colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
             }
+            fontWeight={500}
           >
             ICP Neuron Vector
           </Text>

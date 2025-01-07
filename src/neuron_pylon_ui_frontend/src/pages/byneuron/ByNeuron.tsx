@@ -21,15 +21,15 @@ import {
 } from "@/colors";
 import { useParams, NavLink, useLocation } from "react-router-dom";
 import { startNeuronPylonClient } from "@/client/Client";
-import { LoadingBox, NotFoundBox } from "./neuronoverview/components";
+import { NotFoundBox } from "./neuronoverview/components";
 import NeuronOverview from "./neuronoverview/NeuronOverview";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { LoadingBox } from "@/components";
 
 const ByNeuron = () => {
   const { controller, id, neuron } = useParams();
   const location = useLocation();
   const { colorMode, toggleColorMode } = useColorMode();
-
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuron, setIcpNeuron] = useState<Shared | null>(null);
 
@@ -57,7 +57,10 @@ const ByNeuron = () => {
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
-        <NavLink to={`/controller/${controller}/id/${id}`}>
+        <NavLink
+          to={`/controller/${controller}/id/${id}`}
+          state={{ from: location.state?.from }}
+        >
           <IconButton
             aria-label="go back"
             icon={<ArrowBackIcon />}
@@ -76,14 +79,17 @@ const ByNeuron = () => {
               }
             />
           }
+          fontWeight={500}
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
             <NavLink to="/">Vectors</NavLink>
           </BreadcrumbItem>
 
-          <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to={`/controller/${controller}`}>Controller</NavLink>
-          </BreadcrumbItem>
+          {location.state?.from !== "/" ? (
+            <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
+              <NavLink to={`/controller/${controller}`}>Controller</NavLink>
+            </BreadcrumbItem>
+          ) : null}
 
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
             <NavLink to={`/controller/${controller}/id/${id}`}>ID</NavLink>

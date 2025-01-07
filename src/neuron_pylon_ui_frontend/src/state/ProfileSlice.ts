@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { InitWallet } from "../client/data/InitWallet";
-import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 type ProfileState = {
   logged_in: boolean;

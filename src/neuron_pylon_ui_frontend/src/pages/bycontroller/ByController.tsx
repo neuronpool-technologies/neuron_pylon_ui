@@ -16,17 +16,20 @@ import {
   lightColorBox,
   lightBorderColor,
   darkBorderColor,
+  lightGrayTextColor,
+  darkGrayTextColor,
 } from "@/colors";
 import { useParams, NavLink, useLocation } from "react-router-dom";
 import ControllerOverview from "./controlleroverview/ControllerOverview";
 import { startNeuronPylonClient } from "@/client/Client";
 import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { LoadingBox, NotFoundBox } from "./controlleroverview/components";
+import { NotFoundBox } from "./controlleroverview/components";
+import { LoadingBox } from "@/components";
 
 const ByController = () => {
   const { controller } = useParams();
-  const location = useLocation()
+  const location = useLocation();
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuronvectors, setIcpNeuronVectors] = useState<NodeShared[] | null>(
@@ -35,7 +38,7 @@ const ByController = () => {
 
   const loadControllerVectors = async () => {
     try {
-      setLoaded(false)
+      setLoaded(false);
       const pylon = await startNeuronPylonClient();
 
       const accountController: IcrcAccount = decodeIcrcAccount(controller);
@@ -78,7 +81,15 @@ const ByController = () => {
         <Spacer />
         <Breadcrumb
           spacing={{ base: 0.5, md: "8px" }}
-          separator={<ChevronRightIcon boxSize={5} color={darkBorderColor} />}
+          separator={
+            <ChevronRightIcon
+              boxSize={5}
+              color={
+                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+              }
+            />
+          }
+          fontWeight={500}
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
             <NavLink to="/">Vectors</NavLink>

@@ -49,6 +49,7 @@ const NeuronOverview = ({ module }: NeuronProps) => {
               colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
             }
             noOfLines={1}
+            fontWeight={500}
           >
             ICP neuron
           </Text>

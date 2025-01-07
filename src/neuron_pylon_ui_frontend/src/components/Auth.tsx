@@ -106,7 +106,7 @@ const Auth = () => {
   useEffect(() => {
     initAuth();
     fetchData();
-  }, []);
+  }, [logged_in]);
 
   return (
     <>
@@ -192,6 +192,7 @@ const UserProfile = () => {
             ? principal.substring(0, 7) + "..." + principal.substring(57, 63)
             : null}
         </Flex>
+        <CopyToClipboardButton value={principal} type={"Principal ID"} />
         <CopyToClipboardButton
           value={ntn_address.toLowerCase()}
           type={"NTN address"}

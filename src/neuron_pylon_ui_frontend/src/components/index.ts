@@ -5,5 +5,6 @@ export { default as LabelBox } from "./LabelBox";
 export { default as VectorPreview } from "./VectorPreview";
 export { default as InfoRow } from "./InfoRow";
 export { default as HintPopover } from "./HintPopover";
+export { default as LoadingBox } from "./LoadingBox";
 export { default as WalletFaq } from "./faqs/WalletFaq";
 export { default as Footer } from "./Footer";

@@ -68,28 +68,46 @@ export function convertSecondsToDaysOrHours(seconds: number): string {
   }
 }
 
-export function deepConvertToString(obj: Record<string, any>) {
-  // Base case: if obj is already a primitive type
-  if (obj === null || typeof obj !== "object") {
-    return String(obj);
+export function deepConvertToString(obj: Record<string, any>): any {
+  // 1. Handle null
+  if (obj === null) {
+    return null;
   }
 
-  if (obj && obj._isPrincipal) {
-    return obj.toString();
-  }
-
-  // Special case: Array
+  // 2. Handle Arrays
   if (Array.isArray(obj)) {
     return obj.map(deepConvertToString);
   }
 
-  // Recursive case: object
-  const newObj = {};
-  for (const [key, value] of Object.entries(obj)) {
-    newObj[key] = deepConvertToString(value);
+  // 3. Handle Principal-like objects
+  if (obj && obj._isPrincipal) {
+    return obj.toString();
   }
 
-  return newObj;
+  // 4. Check the type
+  const typeOfObj = typeof obj;
+
+  // 5. Convert known non-serializable primitives to strings
+  //    BigInt, function, symbol
+  if (
+    typeOfObj === "bigint" ||
+    typeOfObj === "function" ||
+    typeOfObj === "symbol"
+  ) {
+    return String(obj);
+  }
+
+  // 6. Recurse into plain objects
+  if (typeOfObj === "object") {
+    const newObj: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      newObj[key] = deepConvertToString(value);
+    }
+    return newObj;
+  }
+
+  // 7. Return booleans, numbers, strings as-is
+  return obj;
 }
 
 export const daysToMonthsAndYears = (days: number): string => {

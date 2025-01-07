@@ -22,13 +22,14 @@ import {
 import { useParams, NavLink, useLocation } from "react-router-dom";
 import { decodeIcrcAccount, IcrcAccount } from "@dfinity/ledger-icrc";
 import { startNeuronPylonClient } from "@/client/Client";
-import { LoadingBox, NotFoundBox } from "./vectoroverview/components";
+import { NotFoundBox } from "./vectoroverview/components";
 import VectorOverview from "./vectoroverview/VectorOverview";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { LoadingBox } from "@/components";
 
 const ById = () => {
   const { controller, id } = useParams();
-    const location = useLocation()
+  const location = useLocation();
   const { colorMode, toggleColorMode } = useColorMode();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [icpneuronvector, setIcpNeuronVector] = useState<NodeShared | null>(
@@ -76,7 +77,9 @@ const ById = () => {
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
-        <NavLink to={`/controller/${controller}`}>
+        <NavLink
+          to={location.state?.from === "/" ? `/` : `/controller/${controller}`}
+        >
           <IconButton
             aria-label="go back"
             icon={<ArrowBackIcon />}
@@ -95,14 +98,17 @@ const ById = () => {
               }
             />
           }
+          fontWeight={500}
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
             <NavLink to="/">Vectors</NavLink>
           </BreadcrumbItem>
 
-          <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to={`/controller/${controller}`}>Controller</NavLink>
-          </BreadcrumbItem>
+          {location.state?.from !== "/" ? (
+            <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
+              <NavLink to={`/controller/${controller}`}>Controller</NavLink>
+            </BreadcrumbItem>
+          ) : null}
 
           <BreadcrumbItem isCurrentPage>
             <BreadcrumbLink>ID</BreadcrumbLink>

@@ -18,10 +18,11 @@ import {
   lightBorderColor,
   lightGrayTextColor,
 } from "@/colors";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { e8sToIcp } from "@/tools/conversions";
 import LabelBox from "./LabelBox";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { Principal } from "@dfinity/principal";
 
 type VectorPreviewProps = {
   vector: NodeShared;
@@ -30,6 +31,7 @@ type VectorPreviewProps = {
 
 const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const location = useLocation();
 
   const module = vector.custom[0];
 
@@ -50,73 +52,85 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
 
   const destinationAddress = maturityDestination.endpoint.ic.account[0]
     ? encodeIcrcAccount({
-        owner: maturityDestination.endpoint.ic.account[0].owner,
+        owner: Principal.fromText(
+          maturityDestination.endpoint.ic.account[0].owner.toString()
+        ),
         subaccount: maturityDestination.endpoint.ic.account[0].subaccount[0],
       })
     : "None";
+
   return (
-    <NavLink to={`/controller/${controller}/id/${vector.id}`}>
-      <Box
-        w="100%"
-        transition="transform 0.3s"
-        _hover={{
-          transform: "translateY(-2px)",
-          cursor: "pointer",
-        }}
-        border={
-          colorMode === "light"
-            ? `solid ${lightBorderColor} 1px`
-            : `solid ${darkBorderColor} 1px`
-        }
-        borderRadius="md"
-        p={3}
+    <Box w="100%">
+      <NavLink
+        to={`/controller/${controller}/id/${vector.id}`}
+        state={{ from: location.pathname }}
       >
-        <Flex width={"100%"} align={"center"}>
-          <Flex mr={3}>
-            <Hashicon value={vector.id.toString()} size={45} />
-          </Flex>
-          <VStack align="start" spacing="0">
-            <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
-              Vector #{vector.id}
-            </Text>
-            <Text
-              fontSize={"sm"}
-              color={
-                colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
-              }
-            >
-              See more <ChevronRightIcon />
-            </Text>
-          </VStack>
-          <Spacer />
-          {vector.active && !vector.billing.frozen ? (
-            <Badge
-              variant="outline"
-              colorScheme="green"
-              animation="pulse_green 2s infinite"
-            >
-              Active
-            </Badge>
-          ) : (
-            <Badge variant="outline" colorScheme="red">
-              Frozen
-            </Badge>
-          )}
-        </Flex>
-        {neuronId ? (
-          <Flex mt={3} gap={3} w={"100%"} direction={"column"}>
-            <Flex align={"center"} width={"100%"} gap={3}>
-              <LabelBox label="Incoming maturity">
-                <Text noOfLines={1} color="green.500" as={"b"}>
-                  +{e8sToIcp(spawningTotal).toFixed(4)} ICP
-                </Text>
-              </LabelBox>
-              <LabelBox label="Maturity destination" data={destinationAddress} />
+        <Box
+          w="100%"
+          transition="transform 0.3s"
+          _hover={{
+            transform: "translateY(-2px)",
+            cursor: "pointer",
+          }}
+          border={
+            colorMode === "light"
+              ? `solid ${lightBorderColor} 1px`
+              : `solid ${darkBorderColor} 1px`
+          }
+          borderRadius="md"
+          p={3}
+        >
+          <Flex w="100%" align={"center"}>
+            <Flex mr={3}>
+              <Hashicon value={vector.id.toString()} size={45} />
             </Flex>
+            <VStack align="start" spacing="0">
+              <Text fontWeight="bold" fontSize={{ base: "sm", md: "lg" }}>
+                Vector #{vector.id}
+              </Text>
+              <Text
+                fontSize={"sm"}
+                color={
+                  colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+                }
+                fontWeight={500}
+              >
+                See more <ChevronRightIcon />
+              </Text>
+            </VStack>
+            <Spacer />
+            {vector.active && !vector.billing.frozen ? (
+              <Badge
+                variant="outline"
+                colorScheme="green"
+                animation="pulse_green 2s infinite"
+              >
+                Active
+              </Badge>
+            ) : (
+              <Badge variant="outline" colorScheme="red">
+                Frozen
+              </Badge>
+            )}
           </Flex>
-        ) : null}
-      </Box>
-    </NavLink>
+          {neuronId ? (
+            <Flex mt={3} gap={3} w="100%" direction={"column"}>
+              <Flex align={"center"} width={"100%"} gap={3}>
+                <LabelBox label="Incoming maturity">
+                  <Text noOfLines={1} color="green.500" as={"b"}>
+                    +{e8sToIcp(spawningTotal).toFixed(4)} ICP
+                  </Text>
+                </LabelBox>
+                <LabelBox
+                  label="Maturity destination"
+                  data={destinationAddress}
+                />
+              </Flex>
+            </Flex>
+          ) : null}
+        </Box>
+      </NavLink>
+    </Box>
   );
 };
 

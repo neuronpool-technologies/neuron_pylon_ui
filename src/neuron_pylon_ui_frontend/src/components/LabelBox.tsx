@@ -20,6 +20,7 @@ const LabelBox = ({ label, data, children }: LabelBoxProps) => {
       <Text
         fontSize={"sm"}
         color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
+        fontWeight={500}
       >
         {label}
       </Text>
@@ -29,7 +30,9 @@ const LabelBox = ({ label, data, children }: LabelBoxProps) => {
         p={3}
         w="100%"
       >
-        <Text noOfLines={1}>{data}</Text>
+        <Text noOfLines={1} fontWeight={500}>
+          {data}
+        </Text>
         {children}
       </Box>
     </VStack>
