@@ -81,7 +81,7 @@ const NtnWallet = () => {
         </VStack>
         <Spacer />
         <Heading size={{ base: "sm", md: "md" }} noOfLines={1}>
-          {logged_in ? e8sToIcp(Number(ntn_balance)).toFixed(4) : "0.0000"}
+          {logged_in ? e8sToIcp(Number(ntn_balance)).toFixed(2) : "0.00"}
         </Heading>
         <Refresh principal={principal} logged_in={logged_in} />
       </Flex>

@@ -1,14 +1,22 @@
 import React from "react";
-import { useColorMode, Flex, Text } from "@chakra-ui/react";
+import { useColorMode, Flex, Text, Button } from "@chakra-ui/react";
 import { lightGrayTextColor, darkGrayTextColor } from "@/colors";
-import { useTypedSelector } from "@/hooks/hooks";
-import { LoadingBox, VectorPreview } from "@/components";
+import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
+import { Auth, VectorPreview } from "@/components";
+import { fetchWallet } from "@/state/ProfileSlice";
 
 const YourVectors = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { principal, vectors, status } = useTypedSelector(
+  const { principal, logged_in, vectors, status } = useTypedSelector(
     (state) => state.Profile
   );
+
+  const dispatch = useTypedDispatch();
+
+  const fetchProfile = async () => {
+    dispatch(fetchWallet({ principal }));
+  };
+
   return (
     <>
       {vectors.length > 0 ? (
@@ -18,13 +26,12 @@ const YourVectors = () => {
           ))}
         </Flex>
       ) : null}
-      {status === "loading" ? <LoadingBox /> : null}
-      {status !== "loading" && !vectors.length ? (
+      {!vectors.length ? (
         <Flex
           w="100%"
           align="center"
           justify="center"
-          h="200px"
+          h="150px"
           direction="column"
         >
           <Text
@@ -32,11 +39,25 @@ const YourVectors = () => {
             color={
               colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
             }
+            fontWeight={500}
           >
             No vectors detected.
           </Text>
         </Flex>
       ) : null}
+      {logged_in ? (
+        <Button
+          w="100%"
+          rounded="full"
+          boxShadow="base"
+          isLoading={status === "loading"}
+          onClick={fetchProfile}
+        >
+          Resync
+        </Button>
+      ) : (
+        <Auth />
+      )}
     </>
   );
 };

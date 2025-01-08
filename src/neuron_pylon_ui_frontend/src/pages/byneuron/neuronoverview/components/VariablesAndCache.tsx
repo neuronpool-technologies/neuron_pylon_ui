@@ -36,7 +36,7 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
 
   const neuronStake = `${e8sToIcp(
     Number(module.devefi_jes1_icpneuron.cache.cached_neuron_stake_e8s[0])
-  ).toFixed(4)} ICP`;
+  ).toFixed(2)} ICP`;
 
   const created = convertSecondsToFormattedDate(
     Number(module.devefi_jes1_icpneuron.cache.created_timestamp_seconds[0])
@@ -44,7 +44,7 @@ const VariablesAndCache = ({ module }: NeuronProps) => {
 
   const maturity = `${e8sToIcp(
     Number(module.devefi_jes1_icpneuron.cache.maturity_e8s_equivalent[0])
-  ).toFixed(4)} ICP`;
+  ).toFixed(2)} ICP`;
 
   let lastUpdated: string;
   if ("Init" in module.devefi_jes1_icpneuron.internals.updating) {

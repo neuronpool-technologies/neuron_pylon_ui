@@ -107,7 +107,6 @@ const Search = () => {
         rounded="full"
         boxShadow="base"
         w="100%"
-        variant="outline"
         leftIcon={<SearchIcon />}
       >
         Search

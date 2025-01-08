@@ -8,8 +8,8 @@ import {
 type MetaState = {
   name: string;
   governed_by: string;
-  billing: BillingPylon | string;
-  modules: ModuleMeta[] | string;
+  billing: BillingPylon | {};
+  modules: ModuleMeta[] | [];
   status: string;
   error: string | null;
 };
@@ -20,7 +20,7 @@ const MetaSlice = createSlice({
     name: "",
     governed_by: "",
     billing: "",
-    modules: "",
+    modules: [],
     status: "idle",
     error: null,
   } as MetaState,

@@ -6,8 +6,8 @@ import { BillingPylon, ModuleMeta } from "@/declarations/neuron_pylon/neuron_pyl
 type InitMetaResp = {
   name: string;
   governed_by: string;
-  billing: BillingPylon | string;
-  modules: ModuleMeta[] | string;
+  billing: BillingPylon | {};
+  modules: ModuleMeta[] | [];
 };
 
 export const InitMeta = async (): Promise<InitMetaResp> => {
@@ -34,8 +34,8 @@ export const InitMeta = async (): Promise<InitMetaResp> => {
     return {
       name: "",
       governed_by: "",
-      billing: "",
-      modules: "",
+      billing: {},
+      modules: [],
     };
   }
 };

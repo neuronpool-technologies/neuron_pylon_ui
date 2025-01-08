@@ -118,7 +118,7 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
               <Flex align={"center"} width={"100%"} gap={3}>
                 <LabelBox label="Incoming maturity">
                   <Text noOfLines={1} color="green.500" as={"b"}>
-                    +{e8sToIcp(spawningTotal).toFixed(4)} ICP
+                    +{e8sToIcp(spawningTotal).toFixed(2)} ICP
                   </Text>
                 </LabelBox>
                 <LabelBox

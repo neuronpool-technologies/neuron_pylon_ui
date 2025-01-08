@@ -15,7 +15,7 @@ import {
   darkBorderColor,
 } from "@/colors";
 import { useTypedSelector } from "@/hooks/hooks";
-import { Create, CreateProfile } from "./create";
+import { Create, CreateInfo, CreateProfile } from "./create";
 import { YourVectors, YourVectorsProfile } from "./yourvectors";
 
 const Vectors = () => {
@@ -45,6 +45,7 @@ const Vectors = () => {
         <VStack spacing={3} align="start">
           <Divider />
           <Create />
+          <CreateInfo />
         </VStack>
       </Box>
       {logged_in ? <YourVectorsProfile /> : null}

@@ -49,7 +49,7 @@ const WalletBalance = () => {
           </Text>
           <Flex align="center" gap={1}>
             <Text fontWeight={500}>
-              {e8sToIcp(Number(ntnBalance)).toFixed(4)}
+              {e8sToIcp(Number(ntnBalance)).toFixed(2)}
             </Text>
             <Text
               fontWeight={500}

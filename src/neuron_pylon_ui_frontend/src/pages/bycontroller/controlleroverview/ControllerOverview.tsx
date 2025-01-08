@@ -44,7 +44,11 @@ const ControllerOverview = ({
             noOfLines={1}
             fontWeight={500}
           >
-            Controller
+            {controller === "fi3zi-fyaaa-aaaaq-aachq-cai"
+              ? "Sneed DAO"
+              : controller === "eqsml-lyaaa-aaaaq-aacdq-cai"
+              ? "Neutrinite DAO"
+              : "Controller"}
           </Text>
         </VStack>
       </Flex>

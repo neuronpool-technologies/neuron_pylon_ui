@@ -21,6 +21,7 @@ const LabelBox = ({ label, data, children }: LabelBoxProps) => {
         fontSize={"sm"}
         color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
         fontWeight={500}
+        noOfLines={1}
       >
         {label}
       </Text>

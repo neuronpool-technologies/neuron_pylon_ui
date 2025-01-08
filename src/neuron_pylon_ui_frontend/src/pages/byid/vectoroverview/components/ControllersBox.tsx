@@ -41,7 +41,7 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
                   name={controllerAccount}
                   ignoreFallback
                 />
-                <Text>{controllerAccount}</Text>
+                <Text fontWeight={500} noOfLines={1}>{controllerAccount}</Text>
                 <Spacer />
                 <ExternalLinkIcon />
               </Flex>

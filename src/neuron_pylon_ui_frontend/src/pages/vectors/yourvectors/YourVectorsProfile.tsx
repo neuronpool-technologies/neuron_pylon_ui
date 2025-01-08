@@ -51,8 +51,8 @@ const YourVectorsProfile = () => {
           <Flex gap={3} align="center">
             <Tooltip
               hasArrow
-              label="Available withdrawals"
-              aria-label="Available withdrawals tooltip"
+              label="Active vectors"
+              aria-label="Active vectors tooltip"
             >
               <Flex align="center" gap={1.5}>
                 <CheckCircleIcon color="green.500" />
@@ -79,8 +79,8 @@ const YourVectorsProfile = () => {
             />
             <Tooltip
               hasArrow
-              label="Pending withdrawals"
-              aria-label="Pending withdrawals tooltip"
+              label="Frozen vectors"
+              aria-label="Frozen vectors tooltip"
             >
               <Flex align="center" gap={1.5}>
                 <WarningTwoIcon color="red.500" />

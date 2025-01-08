@@ -1,5 +1,5 @@
 import React from "react";
-import { useColorMode, Text, Flex } from "@chakra-ui/react";
+import { useColorMode, Text, Flex, Spacer, Tooltip } from "@chakra-ui/react";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import CopyAddress from "./CopyAddress";
 import { SourceEndpointResp } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
@@ -23,12 +23,23 @@ const SourceBox = ({ source }: SourceBoxProps) => {
   return (
     <Flex w={"100%"} direction={"column"} gap={3}>
       <LabelBox label={`${source.name} source`}>
-        <Text>{sourceAddress}</Text>
-        <CopyAddress address={sourceAddress} />
+        <Flex align={"center"}>
+          <Tooltip
+            label={sourceAddress}
+            hasArrow
+            aria-label="Vector stake source"
+          >
+            <Text fontWeight={500} noOfLines={1}>
+              {sourceAddress}
+            </Text>
+          </Tooltip>
+          <Spacer />
+          <CopyAddress address={sourceAddress} />
+        </Flex>
       </LabelBox>
       <LabelBox
         label="Source balance"
-        data={`${e8sToIcp(Number(source.balance)).toFixed(4)} ICP`}
+        data={`${e8sToIcp(Number(source.balance)).toFixed(2)} ICP`}
       />
     </Flex>
   );
