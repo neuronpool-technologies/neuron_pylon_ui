@@ -4,50 +4,33 @@ import {
   Heading,
   Divider,
   VStack,
+  Text,
+  Spacer,
   useColorMode,
   Flex,
   Container,
 } from "@chakra-ui/react";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 import {
   darkColorBox,
   lightColorBox,
   lightBorderColor,
   darkBorderColor,
+  lightGrayTextColor,
+  darkGrayTextColor,
 } from "@/colors";
+import { NavLink } from "react-router-dom";
 import { useTypedSelector } from "@/hooks/hooks";
-import { Create, CreateInfo, CreateProfile } from "./create";
-import { YourVectors, YourVectorsProfile } from "./yourvectors";
+import { YourVectors, YourVectorsProfile } from "./components";
 
 const Vectors = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { logged_in } = useTypedSelector((state) => state.Profile);
+  const { logged_in, vectors, principal } = useTypedSelector(
+    (state) => state.Profile
+  );
 
   return (
     <Container maxW="xl" my={5}>
-      {logged_in ? <CreateProfile /> : null}
-      <Box
-        boxShadow="md"
-        borderRadius="lg"
-        p={3}
-        mb={6}
-        border={
-          colorMode === "light"
-            ? `solid ${lightBorderColor} 1px`
-            : `solid ${darkBorderColor} 1px`
-        }
-        bg={colorMode === "light" ? lightColorBox : darkColorBox}
-      >
-        <Flex align="center" mb={3}>
-          <Heading size={"md"} noOfLines={1}>
-            Create
-          </Heading>
-        </Flex>
-        <VStack spacing={3} align="start">
-          <Divider />
-          <Create />
-          <CreateInfo />
-        </VStack>
-      </Box>
       {logged_in ? <YourVectorsProfile /> : null}
       <Box
         boxShadow="md"
@@ -65,6 +48,21 @@ const Vectors = () => {
           <Heading size={"md"} noOfLines={1}>
             Your vectors
           </Heading>
+          <Spacer />
+          {logged_in && vectors.length > 0 ? (
+            <NavLink to={`/vectors/${principal}`}>
+              <Text
+                textAlign={"end"}
+                fontSize={"sm"}
+                color={
+                  colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+                }
+                fontWeight={500}
+              >
+                See all <ChevronRightIcon />
+              </Text>
+            </NavLink>
+          ) : null}
         </Flex>
         <VStack spacing={3} align="start">
           <Divider />

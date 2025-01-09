@@ -41,7 +41,7 @@ const Search = () => {
 
       if (dao) {
         setSearchText(dao);
-        navigate(`/controller/${dao}`);
+        navigate(`/vectors/${dao}`);
       }
 
       if (searchText && Number.isFinite(Number(searchText))) {
@@ -58,7 +58,7 @@ const Search = () => {
             subaccount: node.controllers[0].subaccount[0],
           });
 
-          navigate(`/controller/${controllerAccount}/id/${node.id}`);
+          navigate(`/vectors/${controllerAccount}/${node.id}`);
         } else {
           throw new Error("Vector ID not found!");
         }
@@ -79,7 +79,7 @@ const Search = () => {
         });
 
         if (nodes.length > 0) {
-          navigate(`/controller/${searchText}`);
+          navigate(`/vectors/${searchText}`);
         } else {
           throw new Error("Vector controller not found!");
         }

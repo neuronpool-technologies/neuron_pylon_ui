@@ -58,7 +58,7 @@ const ByNeuron = () => {
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
         <NavLink
-          to={`/controller/${controller}/id/${id}`}
+          to={`/vectors/${controller}/${id}`}
           state={{ from: location.state?.from }}
         >
           <IconButton
@@ -82,17 +82,22 @@ const ByNeuron = () => {
           fontWeight={500}
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to="/">Vectors</NavLink>
+            <NavLink to="/vectors">Vectors</NavLink>
           </BreadcrumbItem>
 
-          {location.state?.from !== "/" ? (
+          {location.state?.from !== "/vectors" ? (
             <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-              <NavLink to={`/controller/${controller}`}>Controller</NavLink>
+              <NavLink to={`/vectors/${controller}`}>Controller</NavLink>
             </BreadcrumbItem>
           ) : null}
 
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to={`/controller/${controller}/id/${id}`}>ID</NavLink>
+            <NavLink
+              to={`/vectors/${controller}/${id}`}
+              state={{ from: location.state?.from }}
+            >
+              ID
+            </NavLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem isCurrentPage>

@@ -8,23 +8,22 @@ import {
   Flex,
   Container,
 } from "@chakra-ui/react";
-import { NtnWallet, WalletBalance } from "./components";
 import {
   darkColorBox,
   lightColorBox,
   lightBorderColor,
   darkBorderColor,
 } from "@/colors";
-import { WalletFaq } from "@/components";
 import { useTypedSelector } from "@/hooks/hooks";
+import { CreateVector, CreateInfo, CreateProfile } from "./components";
 
-const Wallet = () => {
+const Create = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const logged_in = useTypedSelector((state) => state.Profile.logged_in);
+  const { logged_in } = useTypedSelector((state) => state.Profile);
 
   return (
     <Container maxW="xl" my={5}>
-      {logged_in ? <WalletBalance /> : null}
+      {logged_in ? <CreateProfile /> : null}
       <Box
         boxShadow="md"
         borderRadius="lg"
@@ -39,17 +38,17 @@ const Wallet = () => {
       >
         <Flex align="center" mb={3}>
           <Heading size={"md"} noOfLines={1}>
-            Wallet
+            Create
           </Heading>
         </Flex>
         <VStack spacing={3} align="start">
           <Divider />
-          <NtnWallet />
+          <CreateVector />
+          <CreateInfo />
         </VStack>
       </Box>
-      <WalletFaq />
     </Container>
   );
 };
 
-export default Wallet;
+export default Create;

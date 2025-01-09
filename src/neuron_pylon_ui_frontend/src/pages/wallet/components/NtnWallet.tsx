@@ -38,7 +38,12 @@ import {
 import NtnLogo from "../../../../assets/ntn-logo.png";
 import { Principal } from "@dfinity/principal";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
-import { e8sToIcp, icpToE8s } from "@/tools/conversions";
+import {
+  e8sToIcp,
+  icpToE8s,
+  isAccountOkay,
+  isNtnAmountInvalid,
+} from "@/tools/conversions";
 import { fetchWallet } from "@/state/ProfileSlice";
 import {
   darkColorBox,
@@ -204,7 +209,7 @@ const SendNtn = () => {
   const Transfer = async () => {
     const amountConverted = icpToE8s(Number(amount));
     const ntn_fee = 10000n;
-    
+
     setErrorMsg("");
 
     if (amountConverted > ntn_fee) {
@@ -285,6 +290,7 @@ const SendNtn = () => {
                   mb={3}
                   placeholder="Destination address"
                   isDisabled={sending}
+                  isInvalid={address !== "" && !isAccountOkay(address)}
                   value={address}
                   onChange={(event) => setAddress(event.target.value)}
                 />
@@ -294,10 +300,7 @@ const SendNtn = () => {
                     placeholder="Amount"
                     value={amount}
                     isDisabled={sending}
-                    isInvalid={
-                      (amount !== "" && icpToE8s(Number(amount)) <= 10000) ||
-                      icpToE8s(Number(amount)) > Number(ntn_balance)
-                    }
+                    isInvalid={isNtnAmountInvalid(ntn_balance, amount)}
                     type="number"
                     onChange={(event) => setAmount(event.target.value)}
                   />
@@ -349,7 +352,9 @@ const SendNtn = () => {
               isLoading={sending}
               isDisabled={
                 icpToE8s(Number(amount)) <= 10000 ||
-                (!sent && icpToE8s(Number(amount)) > Number(ntn_balance))
+                (!sent && icpToE8s(Number(amount)) > Number(ntn_balance)) ||
+                (address !== "" && !isAccountOkay(address)) ||
+                address === ""
               }
             >
               {!sent ? "Send now" : null}

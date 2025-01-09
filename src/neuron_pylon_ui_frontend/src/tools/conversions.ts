@@ -1,4 +1,5 @@
 import moment from "moment";
+import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 
 export function e8sToIcp(x: number): number {
   if (!x) return 0;
@@ -180,3 +181,31 @@ export function convertNanosecondsToElapsedTime(
     return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
   }
 }
+
+export const isAccountOkay = (account: string): boolean => {
+  try {
+    decodeIcrcAccount(account);
+  } catch {
+    return false;
+  }
+
+  return true;
+};
+
+export const isDelayOkay = (delay: number): boolean => {
+  return delay >= 184 && delay <= 3000;
+};
+
+export const isNtnAmountInvalid = (
+  balance: string,
+  amount: string
+) => {
+  return (
+    (amount !== "" && icpToE8s(Number(amount)) <= 10_000) ||
+    icpToE8s(Number(amount)) > Number(balance)
+  );
+};
+
+export const e8sFeeToPercentage = (feeE8s: number): number => {
+  return (feeE8s / 100_000_000) * 100;
+};

@@ -20,7 +20,7 @@ import {
 } from "@/colors";
 import { NavLink, useLocation } from "react-router-dom";
 import { e8sToIcp } from "@/tools/conversions";
-import LabelBox from "./LabelBox";
+import { LabelBox } from "@/components";
 import { encodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { Principal } from "@dfinity/principal";
 
@@ -62,7 +62,7 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
   return (
     <Box w="100%">
       <NavLink
-        to={`/controller/${controller}/id/${vector.id}`}
+        to={`/vectors/${controller}/${vector.id}`}
         state={{ from: location.pathname }}
       >
         <Box

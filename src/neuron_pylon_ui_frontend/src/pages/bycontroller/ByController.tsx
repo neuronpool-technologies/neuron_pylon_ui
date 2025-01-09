@@ -70,7 +70,7 @@ const ByController = () => {
   return (
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
-        <NavLink to={`/`}>
+        <NavLink to={`/vectors`}>
           <IconButton
             aria-label="go back"
             icon={<ArrowBackIcon />}
@@ -92,7 +92,7 @@ const ByController = () => {
           fontWeight={500}
         >
           <BreadcrumbItem _hover={{ textDecoration: "underline" }}>
-            <NavLink to="/">Vectors</NavLink>
+            <NavLink to="/vectors">Vectors</NavLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem isCurrentPage>

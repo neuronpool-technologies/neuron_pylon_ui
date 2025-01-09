@@ -23,7 +23,7 @@ const ControllersBox = ({ controllers }: ControllersBoxProps) => {
           });
 
           return (
-            <NavLink to={`/controller/${controllerAccount}`} key={index}>
+            <NavLink to={`/vectors/${controllerAccount}`} key={index}>
               <Flex
                 align={"center"}
                 _hover={{

@@ -69,7 +69,7 @@ const NeuronPreview = ({
   return (
     <Box w="100%">
       <NavLink
-        to={`/controller/${controller}/id/${vectorid}/neuron/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
+        to={`/vectors/${controller}/${vectorid}/${module.devefi_jes1_icpneuron.cache.neuron_id[0]}`}
         state={{ from: location.state?.from }}
       >
         <Box

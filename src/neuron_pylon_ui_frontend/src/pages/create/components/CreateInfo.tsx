@@ -5,7 +5,7 @@ import { useTypedSelector } from "@/hooks/hooks";
 import { e8sToIcp } from "@/tools/conversions";
 
 const CreateInfo = () => {
-  const { billing, status, modules } = useTypedSelector((state) => state.Meta);
+  const { billing, status } = useTypedSelector((state) => state.Meta);
   return (
     <VStack align="start" p={3} gap={3} w="100%">
       <InfoRow

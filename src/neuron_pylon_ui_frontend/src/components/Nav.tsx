@@ -25,6 +25,7 @@ import {
   UpDownIcon,
   HamburgerIcon,
   CopyIcon,
+  PlusSquareIcon,
 } from "@chakra-ui/icons";
 import logo from "../../assets/logo.svg";
 import { NavLink } from "react-router-dom";
@@ -33,14 +34,19 @@ import Search from "./Search";
 
 const LinkItems = [
   {
-    name: "Vectors",
+    name: "Create",
     link: "/",
-    icon: <UpDownIcon transform="rotate(90deg)" />,
+    icon: <PlusSquareIcon />,
   },
   {
     name: "Wallet",
     link: "/wallet",
     icon: <CopyIcon transform="rotate(90deg)" />,
+  },
+  {
+    name: "Vectors",
+    link: "/vectors",
+    icon: <UpDownIcon transform="rotate(90deg)" />,
   },
 ];
 
