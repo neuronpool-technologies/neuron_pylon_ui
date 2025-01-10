@@ -36,13 +36,12 @@ import {
   RepeatIcon,
 } from "@chakra-ui/icons";
 import NtnLogo from "../../../../assets/ntn-logo.png";
-import { Principal } from "@dfinity/principal";
-import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import {
   e8sToIcp,
   icpToE8s,
   isAccountOkay,
   isNtnAmountInvalid,
+  stringToIcrcAccount,
 } from "@/tools/conversions";
 import { fetchWallet } from "@/state/ProfileSlice";
 import {
@@ -221,26 +220,18 @@ const SendNtn = () => {
         const transferArgs: BatchCommandRequest = {
           expire_at: [],
           request_id: [],
-          controller: { owner: Principal.fromText(principal), subaccount: [] },
+          controller: stringToIcrcAccount(principal),
           signature: [],
           commands: [
             {
               transfer: {
-                ledger: { ic: Principal.fromText(ntn_ledger) },
+                ledger: { ic: stringToIcrcAccount(ntn_ledger).owner },
                 from: {
-                  account: {
-                    owner: Principal.fromText(principal),
-                    subaccount: [],
-                  },
+                  account: stringToIcrcAccount(principal),
                 },
                 to: {
                   external_account: {
-                    ic: {
-                      owner: decodeIcrcAccount(address).owner,
-                      subaccount: decodeIcrcAccount(address).subaccount
-                        ? [decodeIcrcAccount(address).subaccount]
-                        : [],
-                    },
+                    ic: stringToIcrcAccount(address),
                   },
                 },
                 amount: amountConverted,

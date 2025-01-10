@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import {
   Button,
   InputGroup,
@@ -18,7 +18,6 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Box,
   VStack,
   Divider,
   Center,
@@ -29,48 +28,137 @@ import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import IcLogo from "../../../../assets/ic-logo.png";
 import NtnLogo from "../../../../assets/ntn-logo.png";
 import { Auth, InfoRow, LabelBox } from "@/components";
-import { useTypedSelector } from "@/hooks/hooks";
+import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
 import {
   daysToMonthsAndYears,
-  e8sFeeToPercentage,
   e8sToIcp,
   icpToE8s,
   isAccountOkay,
   isDelayOkay,
   isNtnAmountInvalid,
+  stringToIcrcAccount,
 } from "@/tools/conversions";
 import {
-  darkBorderColor,
   darkColorBox,
   darkGrayTextColor,
-  lightBorderColor,
   lightColorBox,
   lightGrayTextColor,
 } from "@/colors";
 import { initialCreateState, createReducer } from "./CreateReducer";
+import { startNeuronPylonClient } from "@/client/Client";
+import {
+  CommonCreateRequest,
+  CreateRequest,
+  BatchCommandResponse,
+} from "@/declarations/neuron_pylon/neuron_pylon.did";
+import { fetchWallet } from "@/state/ProfileSlice";
 
 const CreateVector = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { logged_in, ntn_balance } = useTypedSelector((state) => state.Profile);
+  const { logged_in, principal, ntn_balance } = useTypedSelector(
+    (state) => state.Profile
+  );
   const { billing } = useTypedSelector((state) => state.Meta);
+
+  const dispatch = useTypedDispatch();
 
   const createCost =
     billing && "min_create_balance" in billing
       ? e8sToIcp(Number(billing.min_create_balance))
       : 0;
 
+  const [creating, setCreating] = useState<boolean>(false);
+  const [created, setCreated] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [customDelay, setCustomDelay] = useState<boolean>(false);
+  const [customFollowee, setCustomFollowee] = useState<boolean>(false);
+
   const [createState, createDispatch] = useReducer(
     createReducer,
     initialCreateState
   );
 
-  // when create +theIntitialCreateBalance always
-  // when create if followee default do default otherwise input custom
-  // can just always use dissolve delay
+  const create = async () => {
+    try {
+      setErrorMsg("");
+      setCreating(true);
+
+      const pylon = await startNeuronPylonClient();
+
+      const commonCreateRequest: CommonCreateRequest = {
+        controllers: [stringToIcrcAccount(principal)],
+        destinations: [
+          [{ ic: stringToIcrcAccount(createState.maturityDestination) }],
+          [{ ic: stringToIcrcAccount(createState.disburseDestination) }],
+        ],
+        refund: stringToIcrcAccount(principal),
+        ledgers: [
+          {
+            ic: stringToIcrcAccount(
+              process.env.REACT_APP_ICP_LEDGER_CANISTER_ID
+            ).owner,
+          },
+        ],
+        sources: [],
+        extractors: [],
+        affiliate: [stringToIcrcAccount(process.env.REACT_APP_AFFILIATE)],
+        temporary: false,
+        billing_option: BigInt(createState.billingOption),
+        initial_billing_amount: [
+          icpToE8s(Number(createState.initialCreateBalance)) +
+            icpToE8s(Number(createCost)),
+        ],
+        temp_id: 0,
+      };
+
+      const createRequest: CreateRequest = {
+        devefi_jes1_icpneuron: {
+          variables: {
+            dissolve_delay:
+              createState.dissolveDelay === 184
+                ? { Default: null }
+                : { DelayDays: BigInt(createState.dissolveDelay) },
+            dissolve_status: { Locked: null },
+            followee:
+              createState.followee === "Default"
+                ? { Default: null }
+                : { FolloweeId: BigInt(createState.followee) },
+          },
+        },
+      };
+
+      const response: BatchCommandResponse = await pylon.icrc55_command({
+        expire_at: [],
+        request_id: [],
+        controller: stringToIcrcAccount(principal),
+        signature: [],
+        commands: [{ create_node: [commonCreateRequest, createRequest] }],
+      });
+
+      if ("ok" in response) {
+        dispatch(fetchWallet({ principal }));
+        setCreating(false);
+        setCreated(response.ok.id[0].toString());
+        createDispatch({ type: "RESET" });
+      } else {
+        setCreating(false);
+        setCreated("");
+        setErrorMsg(response.err.toString());
+        createDispatch({ type: "RESET" });
+      }
+    } catch (error) {
+      setCreating(false);
+      setCreated("");
+      setErrorMsg(error.toString());
+      createDispatch({ type: "RESET" });
+    }
+  };
 
   const closeModal = () => {
-    createDispatch({ type: "RESET" });
+    setCreating(false);
+    setCreated("");
+    setErrorMsg("");
     onClose();
   };
 
@@ -96,19 +184,22 @@ const CreateVector = () => {
           </InputLeftElement>
           <Input
             pl={10}
-            placeholder={"Principal, ICRC-1 (e.g., ntohy-uex..., ...)"}
+            placeholder={"Principal, ICRC (e.g., ntohy-uex..., ...)"}
             size="lg"
             value={createState.maturityDestination}
             isInvalid={
               createState.maturityDestination !== "" &&
               !isAccountOkay(createState.maturityDestination)
             }
-            isDisabled={createState.isCreating}
+            isDisabled={creating}
             type="text"
             onChange={(event) =>
               createDispatch({
-                type: "SET_MATURITY_DESTINATION",
-                payload: event.target.value,
+                type: "UPDATE_STATE",
+                payload: {
+                  key: "maturityDestination",
+                  value: event.target.value,
+                },
               })
             }
           />
@@ -132,19 +223,22 @@ const CreateVector = () => {
           </InputLeftElement>
           <Input
             pl={10}
-            placeholder={"Principal, ICRC-1 (e.g., ntohy-uex..., ..)"}
+            placeholder={"Principal, ICRC (e.g., ntohy-uex..., ..)"}
             size="lg"
             value={createState.disburseDestination}
             isInvalid={
               createState.disburseDestination !== "" &&
               !isAccountOkay(createState.disburseDestination)
             }
-            isDisabled={createState.isCreating}
+            isDisabled={creating}
             type="text"
             onChange={(event) =>
               createDispatch({
-                type: "SET_DISBURSE_DESTINATION",
-                payload: event.target.value,
+                type: "UPDATE_STATE",
+                payload: {
+                  key: "disburseDestination",
+                  value: event.target.value,
+                },
               })
             }
           />
@@ -160,19 +254,25 @@ const CreateVector = () => {
         <Select
           variant="outline"
           size={"lg"}
-          isDisabled={createState.isCreating}
+          isDisabled={creating}
           onChange={(event) => {
             switch (event.target.value) {
               case "6months":
-                createDispatch({ type: "SET_DISSOLVE_DELAY", payload: 184 });
-                createDispatch({ type: "SET_CUSTOM_DELAY", payload: false });
+                createDispatch({
+                  type: "UPDATE_STATE",
+                  payload: { key: "dissolveDelay", value: 184 },
+                });
+                setCustomDelay(false);
                 break;
               case "8years":
-                createDispatch({ type: "SET_DISSOLVE_DELAY", payload: 3000 });
-                createDispatch({ type: "SET_CUSTOM_DELAY", payload: false });
+                createDispatch({
+                  type: "UPDATE_STATE",
+                  payload: { key: "dissolveDelay", value: 3000 },
+                });
+                setCustomDelay(false);
                 break;
               default:
-                createDispatch({ type: "SET_CUSTOM_DELAY", payload: true });
+                setCustomDelay(true);
             }
           }}
         >
@@ -180,7 +280,7 @@ const CreateVector = () => {
           <option value={"8years"}>8 years</option>
           <option value={"custom"}>Custom</option>
         </Select>
-        {createState.customDelay ? (
+        {customDelay ? (
           <InputGroup>
             <InputLeftElement pointerEvents="none" h="100%">
               <LockIcon />
@@ -190,12 +290,15 @@ const CreateVector = () => {
               placeholder={"Days (e.g., 184, 2922, ...)"}
               size="lg"
               type="number"
-              isDisabled={createState.isCreating}
+              isDisabled={creating}
               isInvalid={!isDelayOkay(createState.dissolveDelay)}
               onChange={(event) =>
                 createDispatch({
-                  type: "SET_DISSOLVE_DELAY",
-                  payload: Number(event.target.value),
+                  type: "UPDATE_STATE",
+                  payload: {
+                    key: "dissolveDelay",
+                    value: Number(event.target.value),
+                  },
                 })
               }
             />
@@ -213,22 +316,25 @@ const CreateVector = () => {
         <Select
           variant="outline"
           size={"lg"}
-          isDisabled={createState.isCreating}
+          isDisabled={creating}
           onChange={(event) => {
             switch (event.target.value) {
               case "default":
-                createDispatch({ type: "SET_FOLLOWEE", payload: "Default" });
-                createDispatch({ type: "SET_CUSTOM_FOLLOWEE", payload: false });
+                createDispatch({
+                  type: "UPDATE_STATE",
+                  payload: { key: "followee", value: "Default" },
+                });
+                setCustomFollowee(false);
                 break;
               default:
-                createDispatch({ type: "SET_CUSTOM_FOLLOWEE", payload: true });
+                setCustomFollowee(true);
             }
           }}
         >
           <option value={"default"}>Rakeoff.io</option>
           <option value={"custom"}>Custom</option>
         </Select>
-        {createState.customFollowee ? (
+        {customFollowee ? (
           <InputGroup>
             <InputLeftElement pointerEvents="none" h="100%">
               <LockIcon />
@@ -238,12 +344,12 @@ const CreateVector = () => {
               placeholder={"Neuron ID (e.g., 6914974521667616512, ...)"}
               size="lg"
               type="number"
-              isDisabled={createState.isCreating}
+              isDisabled={creating}
               isInvalid={createState.followee === ""}
               onChange={(event) =>
                 createDispatch({
-                  type: "SET_FOLLOWEE",
-                  payload: event.target.value,
+                  type: "UPDATE_STATE",
+                  payload: { key: "followee", value: event.target.value },
                 })
               }
             />
@@ -260,17 +366,20 @@ const CreateVector = () => {
         <Select
           variant="outline"
           size={"lg"}
-          isDisabled={createState.isCreating}
+          isDisabled={creating}
           onChange={(event) => {
             createDispatch({
-              type: "SET_BILLING_OPTION",
-              payload: Number(event.target.value),
+              type: "UPDATE_STATE",
+              payload: {
+                key: "billingOption",
+                value: Number(event.target.value),
+              },
             });
 
             if (!Number(event.target.value)) {
               createDispatch({
-                type: "SET_INITIAL_CREATE_BALANCE",
-                payload: "",
+                type: "UPDATE_STATE",
+                payload: { key: "initialCreateBalance", value: "" },
               });
             }
           }}
@@ -288,20 +397,25 @@ const CreateVector = () => {
               placeholder={"Deposit NTN (e.g., 300, 5000, ...)"}
               size="lg"
               type="number"
-              isDisabled={createState.isCreating}
+              isDisabled={creating}
               value={createState.initialCreateBalance}
               isInvalid={
-                isNtnAmountInvalid(
-                  ntn_balance,
-                  createState.initialCreateBalance
-                ) ||
-                createCost + Number(createState.initialCreateBalance) >
-                  e8sToIcp(Number(ntn_balance))
+                logged_in
+                  ? isNtnAmountInvalid(
+                      ntn_balance,
+                      createState.initialCreateBalance
+                    ) ||
+                    createCost + Number(createState.initialCreateBalance) >
+                      e8sToIcp(Number(ntn_balance))
+                  : false
               }
               onChange={(event) =>
                 createDispatch({
-                  type: "SET_INITIAL_CREATE_BALANCE",
-                  payload: event.target.value,
+                  type: "UPDATE_STATE",
+                  payload: {
+                    key: "initialCreateBalance",
+                    value: event.target.value,
+                  },
                 })
               }
             />
@@ -312,12 +426,15 @@ const CreateVector = () => {
                 _hover={{ opacity: "0.8" }}
                 h="1.75rem"
                 size="sm"
-                isDisabled={createState.isCreating}
+                isDisabled={creating}
                 onClick={() => {
                   const newAmount = e8sToIcp(Number(ntn_balance)) - createCost;
                   createDispatch({
-                    type: "SET_INITIAL_CREATE_BALANCE",
-                    payload: newAmount.toString() || "",
+                    type: "UPDATE_STATE",
+                    payload: {
+                      key: "initialCreateBalance",
+                      value: newAmount.toString() || "",
+                    },
                   });
                 }}
               >
@@ -366,39 +483,43 @@ const CreateVector = () => {
               <ModalHeader sx={{ textAlign: "center" }}>
                 Create vector
               </ModalHeader>
-              {!createState.isCreating ? <ModalCloseButton /> : null}
+              {!creating ? <ModalCloseButton /> : null}
               <ModalBody>
-                {createState.isCreated ? (
+                {created ? (
                   <Fireworks autorun={{ speed: 3, duration: 3 }} />
                 ) : null}
-                {!createState.isCreated ? (
+                {!created ? (
                   <VStack align="start" p={3} gap={3}>
-                    <LabelBox
-                      label={"Maturity destination"}
-                      data={createState.maturityDestination}
-                    />
-                    <LabelBox
-                      label={"Disburse destination"}
-                      data={createState.disburseDestination}
-                    />
-                    <LabelBox
-                      label={"Dissolve delay"}
-                      data={
-                        createState.dissolveDelay === 184
-                          ? "6 months"
-                          : createState.dissolveDelay === 3000
-                          ? "8 years"
-                          : daysToMonthsAndYears(createState.dissolveDelay)
-                      }
-                    />
-                    <LabelBox
-                      label={"Followee"}
-                      data={
-                        createState.followee === "Default"
-                          ? "Rakeoff.io"
-                          : createState.followee
-                      }
-                    />
+                    <Flex align="center" gap={3}>
+                      <LabelBox
+                        label={"Maturity destination"}
+                        data={createState.maturityDestination}
+                      />
+                      <LabelBox
+                        label={"Disburse destination"}
+                        data={createState.disburseDestination}
+                      />
+                    </Flex>
+                    <Flex align="center" gap={3} w="100%">
+                      <LabelBox
+                        label={"Dissolve delay"}
+                        data={
+                          createState.dissolveDelay === 184
+                            ? "6 months"
+                            : createState.dissolveDelay === 3000
+                            ? "8 years"
+                            : daysToMonthsAndYears(createState.dissolveDelay)
+                        }
+                      />
+                      <LabelBox
+                        label={"Followee"}
+                        data={
+                          createState.followee === "Default"
+                            ? "Rakeoff.io"
+                            : createState.followee
+                        }
+                      />
+                    </Flex>
                     <LabelBox
                       label={"Billing option"}
                       data={
@@ -407,6 +528,8 @@ const CreateVector = () => {
                           : "5% of Maturity"
                       }
                     />
+                    <InfoRow title={"Network fees"} stat={`0.0001 NTN`} />
+                    <Divider />
                     <InfoRow
                       title={"Total create cost"}
                       stat={`${(
@@ -414,17 +537,29 @@ const CreateVector = () => {
                         Number(createState.initialCreateBalance)
                       ).toFixed(2)} NTN`}
                     />
-                    {createState.isError ? (
+                    {errorMsg ? (
                       <Text size="sm" color="red.500">
-                        <WarningIcon /> {createState.isError}
+                        <WarningIcon /> {errorMsg}
                       </Text>
                     ) : null}
                   </VStack>
                 ) : null}
-                {createState.isCreated && !createState.isError ? (
-                  <Center>
-                    <Icon as={CheckCircleIcon} boxSize={100} />
-                  </Center>
+                {created && !errorMsg ? (
+                <Flex direction={"column"} gap={3} w={"100%"} align="center">
+                  <Icon as={CheckCircleIcon} boxSize={100} />
+                  <Text
+                    fontSize={"sm"}
+                    color={
+                      colorMode === "light"
+                        ? lightGrayTextColor
+                        : darkGrayTextColor
+                    }
+                    fontWeight={500}
+                    noOfLines={1}
+                  >
+                    Vector #{created} created!
+                  </Text>
+                </Flex>
                 ) : null}
               </ModalBody>
 
@@ -434,21 +569,11 @@ const CreateVector = () => {
                   boxShadow="base"
                   w="100%"
                   colorScheme="blue"
-                  isLoading={createState.isCreating}
-                  onClick={
-                    createState.isCreated
-                      ? closeModal
-                      : () =>
-                          createDispatch({
-                            type: "SET_IS_ERROR",
-                            payload: "Can't create",
-                          })
-                  }
+                  isLoading={creating}
+                  onClick={created ? closeModal : create}
                 >
-                  {!createState.isCreated ? "Confirm vector" : null}
-                  {createState.isCreated && !createState.isError
-                    ? "Vector created"
-                    : null}
+                  {!created ? "Confirm vector" : null}
+                  {created && !errorMsg ? "Vector created" : null}
                 </Button>
               </ModalFooter>
             </ModalContent>

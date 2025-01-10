@@ -1,5 +1,6 @@
 import moment from "moment";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { Account } from "@/declarations/neuron_pylon/neuron_pylon.did";
 
 export function e8sToIcp(x: number): number {
   if (!x) return 0;
@@ -182,6 +183,15 @@ export function convertNanosecondsToElapsedTime(
   }
 }
 
+export const stringToIcrcAccount = (account: string): Account => {
+  const { owner, subaccount } = decodeIcrcAccount(account);
+  
+  return {
+    owner,
+    subaccount: subaccount ? [subaccount] : [],
+  };
+};
+
 export const isAccountOkay = (account: string): boolean => {
   try {
     decodeIcrcAccount(account);
@@ -196,10 +206,7 @@ export const isDelayOkay = (delay: number): boolean => {
   return delay >= 184 && delay <= 3000;
 };
 
-export const isNtnAmountInvalid = (
-  balance: string,
-  amount: string
-) => {
+export const isNtnAmountInvalid = (balance: string, amount: string) => {
   return (
     (amount !== "" && icpToE8s(Number(amount)) <= 10_000) ||
     icpToE8s(Number(amount)) > Number(balance)
