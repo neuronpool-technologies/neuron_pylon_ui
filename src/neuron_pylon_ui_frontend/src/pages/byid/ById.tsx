@@ -26,6 +26,7 @@ import { NotFoundBox } from "./vectoroverview/components";
 import VectorOverview from "./vectoroverview/VectorOverview";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { LoadingBox } from "@/components";
+import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 
 const ById = () => {
   const { controller, id } = useParams();
@@ -78,7 +79,11 @@ const ById = () => {
     <Container maxW="xl" my={5}>
       <Flex align="center" mb={3}>
         <NavLink
-          to={location.state?.from === "/vectors" ? `/vectors` : `/vectors/${controller}`}
+          to={
+            location.state?.from === "/vectors"
+              ? `/vectors`
+              : `/vectors/${controller}`
+          }
         >
           <IconButton
             aria-label="go back"
@@ -126,6 +131,9 @@ const ById = () => {
         }
         bg={colorMode === "light" ? lightColorBox : darkColorBox}
       >
+        {location.state.created ? (
+          <Fireworks autorun={{ speed: 3, duration: 3 }} />
+        ) : null}
         {loaded && icpneuronvector ? (
           <VectorOverview controller={controller} vector={icpneuronvector} />
         ) : null}

@@ -113,6 +113,9 @@ export function deepConvertToString(obj: Record<string, any>): any {
 }
 
 export const daysToMonthsAndYears = (days: number): string => {
+  if (days === 184) return "6 months";
+  if (days === 3000) return "8 years";
+
   const daysPerYear = 365.2425; // Average Gregorian year length
   const daysPerMonth = daysPerYear / 12; // Approx. 30.436875 days per month
 
@@ -185,7 +188,7 @@ export function convertNanosecondsToElapsedTime(
 
 export const stringToIcrcAccount = (account: string): Account => {
   const { owner, subaccount } = decodeIcrcAccount(account);
-  
+
   return {
     owner,
     subaccount: subaccount ? [subaccount] : [],

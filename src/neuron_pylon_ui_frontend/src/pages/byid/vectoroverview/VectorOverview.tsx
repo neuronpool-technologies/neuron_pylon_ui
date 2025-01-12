@@ -16,6 +16,7 @@ import {
   NeuronPreview,
   ControllersBox,
   BillingBox,
+  NoNeuronBox,
 } from "./components";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { darkGrayTextColor, lightGrayTextColor } from "@/colors";
@@ -27,9 +28,7 @@ type VectorOverviewProps = {
 
 const VectorOverview = ({ controller, vector }: VectorOverviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const neuronId = vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
-    ? vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0]
-    : null;
+  const neuronId = vector.custom[0].devefi_jes1_icpneuron.cache.neuron_id[0];
 
   return (
     <Flex direction="column" gap={3} w="100%">
@@ -73,7 +72,9 @@ const VectorOverview = ({ controller, vector }: VectorOverviewProps) => {
           vectorid={vector.id.toString()}
           module={vector.custom[0]}
         />
-      ) : null}
+      ) : (
+        <NoNeuronBox module={vector.custom[0]} />
+      )}
       <SourceBox source={vector.sources[0]} />
       <Divider />
       <DestinationBox destinations={vector.destinations} />

@@ -17,7 +17,7 @@ const LoadingBox = () => {
         color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
       />
       <Text
-        size="sm"
+        fontSize="sm"
         color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
         fontWeight={500}
       >

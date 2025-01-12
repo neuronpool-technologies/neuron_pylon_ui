@@ -1,4 +1,5 @@
 import React, { useReducer, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   InputGroup,
@@ -20,11 +21,9 @@ import {
   ModalFooter,
   VStack,
   Divider,
-  Center,
   Icon,
 } from "@chakra-ui/react";
-import { LockIcon, WarningIcon, CheckCircleIcon } from "@chakra-ui/icons";
-import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
+import { LockIcon, WarningIcon, StarIcon } from "@chakra-ui/icons";
 import IcLogo from "../../../../assets/ic-logo.png";
 import NtnLogo from "../../../../assets/ntn-logo.png";
 import { Auth, InfoRow, LabelBox } from "@/components";
@@ -62,6 +61,7 @@ const CreateVector = () => {
   const { billing } = useTypedSelector((state) => state.Meta);
 
   const dispatch = useTypedDispatch();
+  const navigate = useNavigate();
 
   const createCost =
     billing && "min_create_balance" in billing
@@ -69,7 +69,6 @@ const CreateVector = () => {
       : 0;
 
   const [creating, setCreating] = useState<boolean>(false);
-  const [created, setCreated] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [customDelay, setCustomDelay] = useState<boolean>(false);
   const [customFollowee, setCustomFollowee] = useState<boolean>(false);
@@ -136,20 +135,27 @@ const CreateVector = () => {
         commands: [{ create_node: [commonCreateRequest, createRequest] }],
       });
 
-      if ("ok" in response) {
+      if (
+        "ok" in response &&
+        "create_node" in response.ok.commands[0] &&
+        "ok" in response.ok.commands[0].create_node
+      ) {
         dispatch(fetchWallet({ principal }));
         setCreating(false);
-        setCreated(response.ok.id[0].toString());
         createDispatch({ type: "RESET" });
+        navigate(
+          `/vectors/${principal}/${response.ok.commands[0].create_node.ok.id}`,
+          {
+            state: { created: true, from: "/vectors" },
+          }
+        );
       } else {
         setCreating(false);
-        setCreated("");
-        setErrorMsg(response.err.toString());
+        setErrorMsg(response.toString());
         createDispatch({ type: "RESET" });
       }
     } catch (error) {
       setCreating(false);
-      setCreated("");
       setErrorMsg(error.toString());
       createDispatch({ type: "RESET" });
     }
@@ -157,7 +163,6 @@ const CreateVector = () => {
 
   const closeModal = () => {
     setCreating(false);
-    setCreated("");
     setErrorMsg("");
     onClose();
   };
@@ -337,7 +342,7 @@ const CreateVector = () => {
         {customFollowee ? (
           <InputGroup>
             <InputLeftElement pointerEvents="none" h="100%">
-              <LockIcon />
+              <StarIcon />
             </InputLeftElement>
             <Input
               pl={10}
@@ -485,82 +490,54 @@ const CreateVector = () => {
               </ModalHeader>
               {!creating ? <ModalCloseButton /> : null}
               <ModalBody>
-                {created ? (
-                  <Fireworks autorun={{ speed: 3, duration: 3 }} />
-                ) : null}
-                {!created ? (
-                  <VStack align="start" p={3} gap={3}>
-                    <Flex align="center" gap={3}>
-                      <LabelBox
-                        label={"Maturity destination"}
-                        data={createState.maturityDestination}
-                      />
-                      <LabelBox
-                        label={"Disburse destination"}
-                        data={createState.disburseDestination}
-                      />
-                    </Flex>
-                    <Flex align="center" gap={3} w="100%">
-                      <LabelBox
-                        label={"Dissolve delay"}
-                        data={
-                          createState.dissolveDelay === 184
-                            ? "6 months"
-                            : createState.dissolveDelay === 3000
-                            ? "8 years"
-                            : daysToMonthsAndYears(createState.dissolveDelay)
-                        }
-                      />
-                      <LabelBox
-                        label={"Followee"}
-                        data={
-                          createState.followee === "Default"
-                            ? "Rakeoff.io"
-                            : createState.followee
-                        }
-                      />
-                    </Flex>
+                <VStack align="start" p={3} gap={3}>
+                  <Flex align="center" gap={3}>
                     <LabelBox
-                      label={"Billing option"}
+                      label={"Maturity destination"}
+                      data={createState.maturityDestination}
+                    />
+                    <LabelBox
+                      label={"Disburse destination"}
+                      data={createState.disburseDestination}
+                    />
+                  </Flex>
+                  <Flex align="center" gap={3} w="100%">
+                    <LabelBox
+                      label={"Dissolve delay"}
+                      data={daysToMonthsAndYears(createState.dissolveDelay)}
+                    />
+                    <LabelBox
+                      label={"Followee"}
                       data={
-                        createState.billingOption
-                          ? "3.17 NTN per day"
-                          : "5% of Maturity"
+                        createState.followee === "Default"
+                          ? "Rakeoff.io"
+                          : createState.followee
                       }
                     />
-                    <InfoRow title={"Network fees"} stat={`0.0001 NTN`} />
-                    <Divider />
-                    <InfoRow
-                      title={"Total create cost"}
-                      stat={`${(
-                        Number(createCost) +
-                        Number(createState.initialCreateBalance)
-                      ).toFixed(2)} NTN`}
-                    />
-                    {errorMsg ? (
-                      <Text size="sm" color="red.500">
-                        <WarningIcon /> {errorMsg}
-                      </Text>
-                    ) : null}
-                  </VStack>
-                ) : null}
-                {created && !errorMsg ? (
-                <Flex direction={"column"} gap={3} w={"100%"} align="center">
-                  <Icon as={CheckCircleIcon} boxSize={100} />
-                  <Text
-                    fontSize={"sm"}
-                    color={
-                      colorMode === "light"
-                        ? lightGrayTextColor
-                        : darkGrayTextColor
+                  </Flex>
+                  <LabelBox
+                    label={"Billing option"}
+                    data={
+                      createState.billingOption
+                        ? "3.17 NTN per day"
+                        : "5% of Maturity"
                     }
-                    fontWeight={500}
-                    noOfLines={1}
-                  >
-                    Vector #{created} created!
-                  </Text>
-                </Flex>
-                ) : null}
+                  />
+                  <InfoRow title={"Network fees"} stat={`0.0001 NTN`} />
+                  <Divider />
+                  <InfoRow
+                    title={"Total create cost"}
+                    stat={`${(
+                      Number(createCost) +
+                      Number(createState.initialCreateBalance)
+                    ).toFixed(2)} NTN`}
+                  />
+                  {errorMsg ? (
+                    <Text size="sm" color="red.500">
+                      <WarningIcon /> {errorMsg}
+                    </Text>
+                  ) : null}
+                </VStack>
               </ModalBody>
 
               <ModalFooter>
@@ -570,10 +547,9 @@ const CreateVector = () => {
                   w="100%"
                   colorScheme="blue"
                   isLoading={creating}
-                  onClick={created ? closeModal : create}
+                  onClick={create}
                 >
-                  {!created ? "Confirm vector" : null}
-                  {created && !errorMsg ? "Vector created" : null}
+                  Confirm vector
                 </Button>
               </ModalFooter>
             </ModalContent>

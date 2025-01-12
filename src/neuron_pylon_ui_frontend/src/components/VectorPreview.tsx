@@ -35,8 +35,6 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
 
   const module = vector.custom[0];
 
-  const neuronId = module.devefi_jes1_icpneuron.cache.neuron_id[0].toString();
-
   const spawningTotal =
     module.devefi_jes1_icpneuron.internals.spawning_neurons.reduce(
       (accumulator, neuron) =>
@@ -113,21 +111,19 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
               </Badge>
             )}
           </Flex>
-          {neuronId ? (
-            <Flex mt={3} gap={3} w="100%" direction={"column"}>
-              <Flex align={"center"} width={"100%"} gap={3}>
-                <LabelBox label="Incoming maturity">
-                  <Text noOfLines={1} color="green.500" as={"b"}>
-                    +{e8sToIcp(spawningTotal).toFixed(2)} ICP
-                  </Text>
-                </LabelBox>
-                <LabelBox
-                  label="Maturity destination"
-                  data={destinationAddress}
-                />
-              </Flex>
+          <Flex mt={3} gap={3} w="100%" direction={"column"}>
+            <Flex align={"center"} width={"100%"} gap={3}>
+              <LabelBox label="Incoming maturity">
+                <Text noOfLines={1} color="green.500" as={"b"}>
+                  +{e8sToIcp(spawningTotal).toFixed(2)} ICP
+                </Text>
+              </LabelBox>
+              <LabelBox
+                label="Maturity destination"
+                data={destinationAddress}
+              />
             </Flex>
-          ) : null}
+          </Flex>
         </Box>
       </NavLink>
     </Box>
