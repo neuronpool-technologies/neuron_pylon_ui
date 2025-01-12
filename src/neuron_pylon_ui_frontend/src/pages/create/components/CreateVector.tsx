@@ -26,7 +26,7 @@ import {
 import { LockIcon, WarningIcon, StarIcon } from "@chakra-ui/icons";
 import IcLogo from "../../../../assets/ic-logo.png";
 import NtnLogo from "../../../../assets/ntn-logo.png";
-import { Auth, InfoRow, LabelBox } from "@/components";
+import { Auth, HintPopover, InfoRow, LabelBox } from "@/components";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
 import {
   daysToMonthsAndYears,
@@ -170,14 +170,19 @@ const CreateVector = () => {
   return (
     <>
       <Flex direction="column" gap={3} w="100%">
-        <Text
-          fontSize={"sm"}
-          color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
-          fontWeight={500}
-          noOfLines={1}
-        >
-          Maturity destination
-        </Text>
+        <Flex align="center" gap={1}>
+          <Text
+            fontSize={"sm"}
+            color={
+              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+            }
+            fontWeight={500}
+            noOfLines={1}
+          >
+            Maturity destination
+          </Text>
+          <HintPopover details="This principal or ICRC account will receive the neuron’s maturity." />
+        </Flex>
         <InputGroup>
           <InputLeftElement pointerEvents="none" h="100%">
             <ChakraImage
@@ -209,14 +214,19 @@ const CreateVector = () => {
             }
           />
         </InputGroup>
-        <Text
-          fontSize={"sm"}
-          color={colorMode === "light" ? lightGrayTextColor : darkGrayTextColor}
-          fontWeight={500}
-          noOfLines={1}
-        >
-          Disburse destination
-        </Text>
+        <Flex align="center" gap={1}>
+          <Text
+            fontSize={"sm"}
+            color={
+              colorMode === "light" ? lightGrayTextColor : darkGrayTextColor
+            }
+            fontWeight={500}
+            noOfLines={1}
+          >
+            Disburse destination
+          </Text>
+          <HintPopover details="If you dissolve your neuron, any disbursed ICP will be sent to this principal or ICRC account." />
+        </Flex>
         <InputGroup>
           <InputLeftElement pointerEvents="none" h="100%">
             <ChakraImage

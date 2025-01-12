@@ -22,6 +22,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { useTypedSelector } from "@/hooks/hooks";
 import { YourVectors, YourVectorsProfile } from "./components";
+import { VectorsFaq } from "@/components";
 
 const Vectors = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -69,6 +70,7 @@ const Vectors = () => {
           <YourVectors />
         </VStack>
       </Box>
+      <VectorsFaq />
     </Container>
   );
 };

@@ -16,6 +16,7 @@ import {
 } from "@/colors";
 import { useTypedSelector } from "@/hooks/hooks";
 import { CreateVector, CreateInfo, CreateProfile } from "./components";
+import { CreateFaq } from "@/components";
 
 const Create = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -47,6 +48,7 @@ const Create = () => {
           <CreateInfo />
         </VStack>
       </Box>
+      <CreateFaq />
     </Container>
   );
 };
