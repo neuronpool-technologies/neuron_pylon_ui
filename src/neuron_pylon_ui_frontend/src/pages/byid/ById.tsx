@@ -131,7 +131,7 @@ const ById = () => {
         }
         bg={colorMode === "light" ? lightColorBox : darkColorBox}
       >
-        {location.state.created ? (
+        {location.state?.created ? (
           <Fireworks autorun={{ speed: 3, duration: 3 }} />
         ) : null}
         {loaded && icpneuronvector ? (
