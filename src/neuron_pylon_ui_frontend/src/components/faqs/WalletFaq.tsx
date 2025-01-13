@@ -13,15 +13,15 @@ import FaqItem from "./FaqItem";
 const faqs = [
   {
     title: "What is a wallet?",
-    body: "A wallet is used to store, manage, and transact with your cryptocurrency tokens. This wallet currently supports NTN tokens, which are necessary for creating vectors.",
+    body: "A wallet is used to store, manage, and transact with your cryptocurrency tokens. This wallet currently supports NTN tokens, which are necessary for creating neuron vectors.",
   },
   {
     title: "What are NTN tokens?",
-    body: "NTN tokens are governance tokens used within the Neutrinite DAO.",
+    body: "NTN tokens are the SNS governance tokens used by the Neutrinite DAO.",
   },
   {
     title: "How do I get NTN tokens?",
-    body: "You can purchase NTN tokens on most ICP DEXes. Once you have the tokens, you can send them to your NeuronPool NTN address.",
+    body: "You can purchase NTN tokens on most ICP decentralized exchanges (DEXes). After acquiring them, you can send them to your NeuronPool NTN address or principal.",
   },
 ];
 

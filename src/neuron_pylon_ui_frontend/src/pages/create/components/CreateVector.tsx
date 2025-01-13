@@ -21,7 +21,6 @@ import {
   ModalFooter,
   VStack,
   Divider,
-  Icon,
 } from "@chakra-ui/react";
 import { LockIcon, WarningIcon, StarIcon } from "@chakra-ui/icons";
 import IcLogo from "../../../../assets/ic-logo.png";
