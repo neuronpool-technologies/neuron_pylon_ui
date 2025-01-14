@@ -279,7 +279,7 @@ const SendNtn = () => {
                 <Input
                   size="lg"
                   mb={3}
-                  placeholder="Destination address"
+                  placeholder={"Principal, ICRC (e.g., ntohy-uex..., ...)"}
                   isDisabled={sending}
                   isInvalid={address !== "" && !isAccountOkay(address)}
                   value={address}

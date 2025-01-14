@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   VStack,
   Flex,
@@ -27,9 +27,14 @@ import { Principal } from "@dfinity/principal";
 type VectorPreviewProps = {
   vector: NodeShared;
   controller: string;
+  children?: ReactNode;
 };
 
-const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
+const VectorPreview = ({
+  vector,
+  controller,
+  children,
+}: VectorPreviewProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const location = useLocation();
 
@@ -59,24 +64,22 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
 
   return (
     <Box w="100%">
-      <NavLink
-        to={`/vectors/${controller}/${vector.id}`}
-        state={{ from: location.pathname }}
+      <Box
+        w="100%"
+        _hover={{
+          cursor: "pointer",
+        }}
+        border={
+          colorMode === "light"
+            ? `solid ${lightBorderColor} 1px`
+            : `solid ${darkBorderColor} 1px`
+        }
+        borderRadius="md"
+        p={3}
       >
-        <Box
-          w="100%"
-          transition="transform 0.3s"
-          _hover={{
-            transform: "translateY(-2px)",
-            cursor: "pointer",
-          }}
-          border={
-            colorMode === "light"
-              ? `solid ${lightBorderColor} 1px`
-              : `solid ${darkBorderColor} 1px`
-          }
-          borderRadius="md"
-          p={3}
+        <NavLink
+          to={`/vectors/${controller}/${vector.id}`}
+          state={{ from: location.pathname }}
         >
           <Flex w="100%" align={"center"}>
             <Flex mr={3}>
@@ -124,8 +127,9 @@ const VectorPreview = ({ vector, controller }: VectorPreviewProps) => {
               />
             </Flex>
           </Flex>
-        </Box>
-      </NavLink>
+        </NavLink>
+        {children}
+      </Box>
     </Box>
   );
 };

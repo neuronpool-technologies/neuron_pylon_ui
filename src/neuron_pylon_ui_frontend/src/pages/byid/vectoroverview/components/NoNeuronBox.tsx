@@ -38,6 +38,14 @@ const NoNeuronBox = ({ module }: NoNeuronBoxProps) => {
     dissolveDelay = daysToMonthsAndYears(184);
   }
 
+  let neuronStatus: string;
+  if (module.devefi_jes1_icpneuron.cache.state[0] === 1) {
+    neuronStatus = "Locked";
+  } else if (module.devefi_jes1_icpneuron.cache.state[0] === 3) {
+    neuronStatus = "Unlocked";
+  } else {
+    neuronStatus = "Dissolving";
+  }
   return (
     <Box
       position="relative" // So the absolute text can be placed relative to this container
@@ -89,7 +97,7 @@ const NoNeuronBox = ({ module }: NoNeuronBoxProps) => {
         </Flex>
         <Flex align="center" my={3} gap={3} direction={"row"}>
           <LabelBox label="Dissolve delay" data={dissolveDelay} />
-          <LabelBox label="Neuron status" data={"Locked"} />
+          <LabelBox label="Neuron status" data={neuronStatus} />
         </Flex>
       </Box>
 
@@ -112,8 +120,8 @@ const NoNeuronBox = ({ module }: NoNeuronBoxProps) => {
             fontWeight={500}
             textAlign={"center"}
           >
-            Send at least 20 ICP to the stake source account below to
-            stake a neuron.
+            Send at least 20 ICP to the stake source account below to stake a
+            neuron.
           </Text>
         </VStack>
       </Center>

@@ -74,9 +74,7 @@ const NeuronPreview = ({
       >
         <Box
           w="100%"
-          transition="transform 0.3s"
           _hover={{
-            transform: "translateY(-2px)",
             cursor: "pointer",
           }}
           border={

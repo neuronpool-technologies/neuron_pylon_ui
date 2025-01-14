@@ -532,7 +532,7 @@ const CreateVector = () => {
                         : "5% of Maturity"
                     }
                   />
-                  <InfoRow title={"Network fees"} stat={`0.0001 NTN`} />
+                  <InfoRow title={"Charged to"} stat={"Wallet"} />
                   <Divider />
                   <InfoRow
                     title={"Total create cost"}

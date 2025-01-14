@@ -1,9 +1,11 @@
 import React from "react";
-import { useColorMode, Flex, Text, Button } from "@chakra-ui/react";
+import { useColorMode, Flex, Text, Button, Divider } from "@chakra-ui/react";
 import { lightGrayTextColor, darkGrayTextColor } from "@/colors";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
 import { Auth, VectorPreview } from "@/components";
 import { fetchWallet } from "@/state/ProfileSlice";
+import EditVector from "./EditVector";
+import TransferVector from "./TransferVector";
 
 const YourVectors = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -22,7 +24,13 @@ const YourVectors = () => {
       {vectors.length > 0 ? (
         <Flex w="100%" direction="column" gap={3}>
           {vectors.map((vector, index) => (
-            <VectorPreview key={index} controller={principal} vector={vector} />
+            <VectorPreview key={index} controller={principal} vector={vector}>
+              <Divider my={3} />
+              <Flex w="100%" gap={3}>
+                <EditVector vector={vector} />
+                <TransferVector vector={vector} />
+              </Flex>
+            </VectorPreview>
           ))}
         </Flex>
       ) : null}
