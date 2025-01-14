@@ -99,14 +99,15 @@ const TransferVector = ({ vector }: TransferVectorProps) => {
   };
 
   const closeModal = () => {
+    if (transferred) {
+      dispatch(fetchWallet({ principal }));
+    };
+
     setNewOwner("");
     setErrorMsg("");
     setTransferring(false);
     setTransferred(false);
     onClose();
-
-    // update vectors on close
-    dispatch(fetchWallet({ principal }));
   };
 
   return (

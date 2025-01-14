@@ -420,16 +420,18 @@ const EditVector = ({ vector }: EditVectorProps) => {
 
           <ModalFooter>
             <Flex align="center" w="100%" gap={3}>
-              <Button
-                rounded="full"
-                boxShadow="base"
-                variant="outline"
-                w="100%"
-                isDisabled={editing}
-                onClick={closeModal}
-              >
-                Cancel
-              </Button>
+              {!edited ? (
+                <Button
+                  rounded="full"
+                  boxShadow="base"
+                  variant="outline"
+                  w="100%"
+                  isDisabled={editing}
+                  onClick={closeModal}
+                >
+                  Cancel
+                </Button>
+              ) : null}
               <Button
                 rounded="full"
                 boxShadow="base"
