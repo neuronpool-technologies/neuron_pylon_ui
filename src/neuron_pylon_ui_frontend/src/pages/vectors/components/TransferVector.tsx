@@ -125,7 +125,7 @@ const TransferVector = ({ vector }: TransferVectorProps) => {
               <FormControl>
                 <Input
                   size="lg"
-                  placeholder={"Principal, ICRC (e.g., ntohy-uex..., ...)"}
+                  placeholder={"New owner (e.g., ntohy-uex..., ...)"}
                   isDisabled={transferring}
                   isInvalid={newOwner !== "" && !isAccountOkay(newOwner)}
                   value={newOwner}

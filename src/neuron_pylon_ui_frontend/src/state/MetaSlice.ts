@@ -10,6 +10,9 @@ type MetaState = {
   governed_by: string;
   billing: BillingPylon | {};
   modules: ModuleMeta[] | [];
+  total_vectors: string;
+  total_stake: string;
+  total_maturity: string;
   status: string;
   error: string | null;
 };
@@ -21,6 +24,9 @@ const MetaSlice = createSlice({
     governed_by: "",
     billing: "",
     modules: [],
+    total_vectors: "",
+    total_stake: "",
+    total_maturity: "",
     status: "idle",
     error: null,
   } as MetaState,
@@ -36,6 +42,9 @@ const MetaSlice = createSlice({
         state.governed_by = action.payload.governed_by;
         state.billing = action.payload.billing;
         state.modules = action.payload.modules;
+        state.total_vectors = action.payload.total_vectors;
+        state.total_stake = action.payload.total_stake;
+        state.total_maturity = action.payload.total_maturity;
       })
       .addCase(fetchMetaInformation.rejected, (state, action) => {
         state.status = "failed";

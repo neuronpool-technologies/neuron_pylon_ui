@@ -15,7 +15,12 @@ import {
   darkBorderColor,
 } from "@/colors";
 import { useTypedSelector } from "@/hooks/hooks";
-import { CreateVector, CreateInfo, CreateProfile } from "./components";
+import {
+  CreateVector,
+  CreateInfo,
+  CreateProfile,
+  PylonStats,
+} from "./components";
 import { CreateFaq } from "@/components";
 
 const Create = () => {
@@ -48,6 +53,7 @@ const Create = () => {
           <CreateInfo />
         </VStack>
       </Box>
+      <PylonStats />
       <CreateFaq />
     </Container>
   );

@@ -33,6 +33,7 @@ import IcLogo from "../../assets/ic-logo.png";
 import { darkColorBox, lightColorBox } from "@/colors";
 import { startNeuronPylonClient } from "@/client/Client";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/hooks";
+import { Usergeek } from "usergeek-ic-js";
 
 const invalidateAgents = async () => {
   const actor = await startNeuronPylonClient();
@@ -59,6 +60,11 @@ const Auth = () => {
   const [client, setClient] = useState<AuthClient | null>(null);
 
   const initAuth = async () => {
+    Usergeek.init({
+      apiKey: process.env.REACT_APP_USERGEEK_KEY,
+      host: "https://lpfay-3aaaa-aaaal-qbupa-cai.raw.icp0.io",
+    });
+
     await invalidateAgents();
 
     const authClient = await AuthClient.create();
@@ -74,6 +80,8 @@ const Auth = () => {
       const principal = identity.getPrincipal();
       dispatch(setPrincipal(principal.toString()));
       dispatch(setLogin());
+      Usergeek.setPrincipal(principal);
+      Usergeek.trackSession();
     }
   };
 
@@ -96,6 +104,8 @@ const Auth = () => {
         const principal = identity.getPrincipal();
         dispatch(setPrincipal(principal.toString()));
         dispatch(setLogin());
+        Usergeek.setPrincipal(principal);
+        Usergeek.trackSession();
       },
       onError: (error) => {
         console.error("Authentication failed: ", error);
@@ -146,6 +156,7 @@ const UserProfile = () => {
     await invalidateAgents();
 
     dispatch(setLogout());
+    Usergeek.setPrincipal(undefined);
   };
 
   const fetchProfile = async () => {
@@ -192,7 +203,7 @@ const UserProfile = () => {
             ? principal.substring(0, 7) + "..." + principal.substring(57, 63)
             : null}
         </Flex>
-        <CopyToClipboardButton value={principal} type={"Principal ID"} />
+        {/* <CopyToClipboardButton value={principal} type={"Principal ID"} /> */}
         <CopyToClipboardButton
           value={ntn_address.toLowerCase()}
           type={"NTN address"}
