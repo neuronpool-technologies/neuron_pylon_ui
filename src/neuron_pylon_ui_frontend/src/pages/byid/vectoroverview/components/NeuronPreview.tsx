@@ -115,11 +115,19 @@ const NeuronPreview = ({
           <Flex align="center" my={3} gap={3} direction={"row"}>
             <LabelBox
               label="Staked"
-              data={`${e8sToIcp(neuronStake).toFixed(2)} ICP`}
+              data={`${e8sToIcp(neuronStake).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })} ICP`}
             />
             <LabelBox label="Incoming maturity">
               <Text noOfLines={1} color="green.500" as={"b"}>
-                +{e8sToIcp(spawningTotal).toFixed(2)} ICP
+                +
+                {e8sToIcp(spawningTotal).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                ICP
               </Text>
             </LabelBox>
           </Flex>

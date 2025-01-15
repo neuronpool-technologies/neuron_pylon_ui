@@ -49,7 +49,10 @@ const CreateProfile = () => {
           </Text>
           <Flex align="center" gap={1}>
             <Text fontWeight={500}>
-              {e8sToIcp(Number(ntn_balance)).toFixed(2)}
+              {e8sToIcp(Number(ntn_balance)).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </Text>
             <Text
               fontWeight={500}

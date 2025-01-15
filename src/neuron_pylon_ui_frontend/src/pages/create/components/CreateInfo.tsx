@@ -24,9 +24,12 @@ const CreateInfo = () => {
           status === "succeeded" ? (
             `${
               "min_create_balance" in billing
-                ? `${e8sToIcp(Number(billing.min_create_balance)).toFixed(
-                    2
-                  )} NTN`
+                ? `${e8sToIcp(
+                    Number(billing.min_create_balance)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} NTN`
                 : null
             }`
           ) : (

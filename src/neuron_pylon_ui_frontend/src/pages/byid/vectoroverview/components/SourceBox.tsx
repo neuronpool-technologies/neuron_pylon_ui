@@ -39,7 +39,10 @@ const SourceBox = ({ source }: SourceBoxProps) => {
       </LabelBox>
       <LabelBox
         label="Source balance"
-        data={`${e8sToIcp(Number(source.balance)).toFixed(2)} ICP`}
+        data={`${e8sToIcp(Number(source.balance)).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} ICP`}
       />
     </Flex>
   );

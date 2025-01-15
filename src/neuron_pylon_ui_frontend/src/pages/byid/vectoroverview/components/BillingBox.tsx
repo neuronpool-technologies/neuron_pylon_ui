@@ -38,9 +38,12 @@ const BillingBox = ({ vector }: BillingBoxProps) => {
       <Flex align="center" gap={3} w="100%">
         <LabelBox
           label="Billing balance"
-          data={`${e8sToIcp(Number(vector.billing.current_balance)).toFixed(
-            2
-          )} NTN`}
+          data={`${e8sToIcp(
+            Number(vector.billing.current_balance)
+          ).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })} NTN`}
         />
         <LabelBox
           label="Billing option"

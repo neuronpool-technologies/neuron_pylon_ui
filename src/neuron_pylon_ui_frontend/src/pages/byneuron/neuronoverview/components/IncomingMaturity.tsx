@@ -49,7 +49,12 @@ const IncomingMaturity = ({ module }: IncomingMaturityProps) => {
       <LabelBox label="Incoming maturity">
         <Flex align="center">
           <Text noOfLines={1} color="green.500" as={"b"}>
-            +{e8sToIcp(spawningTotal).toFixed(2)} ICP
+            +
+            {e8sToIcp(spawningTotal).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ICP
           </Text>
           <Spacer />
           <HintPopover details="ICP amounts may vary by up to ±5% due to maturity modulation and fees." />
@@ -170,10 +175,16 @@ const IncomingNeuron = ({ incomingNeuron }: IncomingNeuronProps) => {
           {incomingNeuron.state[0] === 4
             ? e8sToIcp(
                 Number(incomingNeuron.maturity_e8s_equivalent[0])
-              ).toFixed(2)
+              ).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
             : e8sToIcp(
                 Number(incomingNeuron.cached_neuron_stake_e8s[0])
-              ).toFixed(2)}
+              ).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
         </Text>
       </Td>
       <Td textAlign="end">

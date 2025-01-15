@@ -539,7 +539,10 @@ const CreateVector = () => {
                     stat={`${(
                       Number(createCost) +
                       Number(createState.initialCreateBalance)
-                    ).toFixed(2)} NTN`}
+                    ).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })} NTN`}
                   />
                   {errorMsg ? (
                     <Text size="sm" color="red.500">
