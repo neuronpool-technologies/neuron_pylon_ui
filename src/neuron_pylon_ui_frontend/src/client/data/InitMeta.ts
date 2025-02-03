@@ -20,7 +20,7 @@ export const InitMeta = async (): Promise<InitMetaResp> => {
   try {
     const pylon = await startNeuronPylonClient();
 
-    const idObjects = Array.from({ length: 201 }, (_, i) => ({ id: i }));
+    const idObjects = Array.from({ length: 5 }, (_, i) => ({ id: i }));
 
     // Run both requests in parallel
     const [{ name, governed_by, billing, modules }, nodes] = await Promise.all([
