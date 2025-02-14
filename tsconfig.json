@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "allowJs": true,
-    "strict": false,
+    "strict": true,
     "outDir": "./dist"
   },
   "include": ["./src/**/*", "declaration.d.ts"]

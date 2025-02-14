@@ -1,37 +1,29 @@
 import React from "react";
-import { Nav, Footer } from "./components";
-import { Flex, Box } from "@chakra-ui/react";
-import {
-  Create,
-  Wallet,
-  Vectors,
-  ById,
-  ByController,
-  ErrorPage,
-  ByNeuron,
-} from "./pages";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Outlet,
 } from "react-router-dom";
+import { Flex, Box } from "@chakra-ui/react";
+import { Nav } from "@/components/navbar";
+import { Home } from "@/pages";
+import { IdentityKitProvider, IdentityKitTheme } from "@nfid/identitykit/react";
+import {
+  IdentityKitAuthType,
+  NFIDW,
+  InternetIdentity,
+  OISY,
+} from "@nfid/identitykit";
+import { useColorMode } from "@/components/ui/color-mode";
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Create />} />
-          <Route path="/wallet" element={<Wallet />} />
-          <Route path="/vectors" element={<Vectors />} />
-          <Route path="/vectors/:controller" element={<ByController />} />
-          <Route path="/vectors/:controller/:id" element={<ById />} />
-          <Route
-            path="/vectors/:controller/:id/:neuron"
-            element={<ByNeuron />}
-          />
-          <Route path="*" element={<ErrorPage />} />
+          <Route index element={<Home />} />
+          <Route path="/vectors" element={<p>vectors</p>} />
         </Route>
       </Routes>
     </Router>
@@ -41,15 +33,29 @@ const App = () => {
 export default App;
 
 const AppLayout = () => {
-  // A layout component with navbar and footer
-  // Outlet renders all the sub routes
+  const { toggleColorMode, colorMode } = useColorMode();
   return (
-    <Flex direction="column" h="100vh">
-      <Box flex="1">
-        <Nav />
-        <Outlet />
-      </Box>
-      <Footer />
-    </Flex>
+    <IdentityKitProvider
+      authType={IdentityKitAuthType.DELEGATION}
+      signerClientOptions={{
+        targets: [process.env.REACT_APP_NEURON_PYLON_CANISTER_ID || ""],
+      }}
+      theme={
+        colorMode === "light" ? IdentityKitTheme.LIGHT : IdentityKitTheme.DARK
+      }
+      discoverExtensionSigners={false}
+      signers={[
+        { ...NFIDW, description: "Sign in with email" },
+        InternetIdentity,
+        OISY,
+      ]}
+    >
+      <Flex direction="column" h="100vh">
+        <Box flex="1">
+          <Nav />
+          <Outlet />
+        </Box>
+      </Flex>
+    </IdentityKitProvider>
   );
 };

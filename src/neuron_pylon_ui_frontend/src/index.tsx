@@ -1,30 +1,16 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { StyleFunctionProps } from "@chakra-ui/theme-tools";
-import { Provider } from "react-redux";
-import store from "./state/store";
-import { lightColor, darkColor } from "./colors";
 import App from "./App";
+import { Provider } from "@/components/ui/provider";
+import "@nfid/identitykit/react/styles.css";
 
-const theme = extendTheme({
-  config: {
-    initialColorMode: "dark",
-    useSystemColorMode: false,
-  },
-  styles: {
-    global: (props: StyleFunctionProps) => ({
-      body: {
-        bg: props.colorMode === "light" ? lightColor : darkColor,
-      },
-    }),
-  },
-});
+const rootElement = document.getElementById("root");
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <ChakraProvider theme={theme}>
-    <Provider store={store}>
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <Provider>
       <App />
     </Provider>
-  </ChakraProvider>
-);
+  );
+} else {
+  console.error("Root element not found");
+}
