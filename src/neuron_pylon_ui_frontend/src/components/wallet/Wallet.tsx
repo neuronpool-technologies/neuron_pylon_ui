@@ -1,0 +1,151 @@
+import { useEffect, useRef } from "react";
+import {
+  Button,
+  Text,
+  Flex,
+  IconButton,
+  Spacer,
+  Image as ChakraImage,
+  Separator,
+} from "@chakra-ui/react";
+import {
+  DrawerActionTrigger,
+  DrawerBackdrop,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { BiWallet, BiPowerOff, BiCollapse } from "react-icons/bi";
+import { useActors } from "@/hooks/useActors";
+import { Usergeek } from "usergeek-ic-js";
+import { useTypedDispatch, useTypedSelector } from "@/hooks/useRedux";
+import { refreshWallet, setCleanup } from "@/state/WalletSlice";
+import IcLogo from "../../../assets/ic-logo.png";
+import Token from "./Token";
+import { refreshMeta } from "@/state/MetaSlice";
+
+const Wallet = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { identity, isAuthenticated, login, logout, actors } = useActors();
+  const principal = identity?.getPrincipal().toString();
+
+  const dispatch = useTypedDispatch();
+  const { pylon_account, status } = useTypedSelector((state) => state.Wallet);
+
+  const setupWallet = async () => {
+    Usergeek.init({
+      apiKey: process.env.REACT_APP_USERGEEK_KEY ?? "",
+      host: "https://lpfay-3aaaa-aaaal-qbupa-cai.raw.icp0.io",
+    });
+
+    const principal = identity?.getPrincipal();
+    Usergeek.setPrincipal(principal);
+    Usergeek.trackSession();
+
+    dispatch(
+      refreshWallet({
+        principal: principal,
+        pylon: actors.neuronPylon,
+      })
+    );
+  };
+
+  const cleanupStats = async () => {
+    dispatch(setCleanup());
+    Usergeek.setPrincipal(undefined);
+    logout();
+  };
+
+  useEffect(() => {
+    if (actors.neuronPylon) {
+      dispatch(refreshMeta({ pylon: actors.neuronPylon }));
+
+      if (isAuthenticated) {
+        setupWallet();
+
+        const intervalId = setInterval(() => {
+          setupWallet();
+        }, 3000);
+
+        return () => clearInterval(intervalId);
+      }
+    }
+  }, [isAuthenticated, principal, actors]);
+
+  return !isAuthenticated ? (
+    <Button
+      variant="surface"
+      colorPalette="blue"
+      rounded="md"
+      boxShadow="xs"
+      loading={status === "loading"}
+      onClick={login}
+    >
+      <ChakraImage
+        src={IcLogo}
+        alt="Internet identity logo"
+        h={"20px"}
+        w={"auto"}
+      />
+      <Text hideBelow={"md"}>Connect Identity</Text>
+    </Button>
+  ) : (
+    <DrawerRoot>
+      <DrawerBackdrop />
+      <DrawerTrigger asChild>
+        <Button
+          variant="surface"
+          colorPalette="blue"
+          rounded="md"
+          boxShadow="xs"
+        >
+          <BiWallet />
+          <Text hideBelow={"md"}>
+            {principal.substring(0, 5) + "..." + principal.substring(60, 63)}
+          </Text>
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent offset="4" rounded="md" ref={contentRef}>
+        <DrawerHeader>
+          <DrawerTitle>
+            <Flex align="center" gap={1}>
+              <BiWallet />
+              {principal.substring(0, 7) + "..." + principal.substring(57, 63)}
+              <Spacer />
+              <IconButton
+                variant="ghost"
+                aria-label="logout"
+                onClick={cleanupStats}
+              >
+                <BiPowerOff />
+              </IconButton>
+            </Flex>
+          </DrawerTitle>
+          <Separator mt={3} />
+        </DrawerHeader>
+        <DrawerBody>
+          <Flex align="start" direction={"column"} gap={3}>
+            {pylon_account.map((account, index) => {
+              return (
+                <Token key={index} endpoint={account} portalRef={contentRef} />
+              );
+            })}
+          </Flex>
+        </DrawerBody>
+        <DrawerFooter>
+          <DrawerActionTrigger asChild>
+            <Button variant="surface" rounded="md" boxShadow="xs" w="100%">
+              <BiCollapse /> Close wallet
+            </Button>
+          </DrawerActionTrigger>
+        </DrawerFooter>
+      </DrawerContent>
+    </DrawerRoot>
+  );
+};
+
+export default Wallet;

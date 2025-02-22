@@ -58,7 +58,7 @@ type SocialIconLinkProps = {
 const SocialIconLink = ({ image, alt, link, xLogo }: SocialIconLinkProps) => {
   return (
     <a href={link} target="_blank" rel="noreferrer">
-      <IconButton variant="surface" rounded="md" boxShadow="xs">
+      <IconButton variant="surface" rounded="md" boxShadow="xs" aria-label={alt}>
         <ChakraImage h={"22px"} p={xLogo ? "3px" : 0} src={image} alt={alt} />
       </IconButton>
     </a>

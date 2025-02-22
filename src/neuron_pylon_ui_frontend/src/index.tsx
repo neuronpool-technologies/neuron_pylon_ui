@@ -1,14 +1,17 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { Provider } from "@/components/ui/provider";
-import "@nfid/identitykit/react/styles.css";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "./state/store";
 
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <Provider>
-      <App />
+      <ReduxProvider store={store}>
+        <App />
+      </ReduxProvider>
     </Provider>
   );
 } else {

@@ -20,10 +20,10 @@ import {
 import logoLight from "../../../assets/logo_horizontal_light.svg";
 import logoDark from "../../../assets/logo_horizontal_dark.svg";
 import { NavLink } from "react-router-dom";
-import Auth from "./Auth";
 import { BiHome, BiRefresh, BiMenu, BiMoon, BiSun } from "react-icons/bi";
 import Social from "../footer/Social";
 import { useColorMode } from "@/components/ui/color-mode";
+import Wallet from "../wallet/Wallet";
 
 const LinkItems = [
   {
@@ -65,7 +65,7 @@ const Nav = () => {
             ))}
           </Flex>
           <Spacer />
-          <Auth />
+          <Wallet />
           <Flex hideBelow="md">
             <ColorModeButton />
           </Flex>
@@ -79,19 +79,21 @@ export default Nav;
 
 const ColorModeButton = () => {
   const { toggleColorMode, colorMode } = useColorMode();
+
   return (
     <>
       <IconButton
-        onClick={toggleColorMode}
+        onClick={() => toggleColorMode()}
         variant="surface"
         rounded="md"
         boxShadow="xs"
         hideBelow={"md"}
+        aria-label="Color mode"
       >
         {colorMode === "light" ? <BiSun /> : <BiMoon />}
       </IconButton>
       <Button
-        onClick={toggleColorMode}
+        onClick={() => toggleColorMode()}
         variant="surface"
         rounded="md"
         boxShadow="xs"
@@ -125,13 +127,15 @@ const NavItem = ({ link, name, icon, setOpen }: NavItemProps) => {
     <NavLink to={link}>
       {({ isActive }) => (
         <Button
-          variant={isActive ? "subtle" : "ghost"}
+          variant={"plain"}
           rounded="md"
           fontWeight={"bold"}
-          boxShadow={isActive ? "xs" : ""}
           w="100%"
+          size="xl"
+          _hover={{ opacity: "0.8" }}
           justifyContent={"flex-start"}
           onClick={() => setOpen && setOpen(false)}
+          colorPalette={isActive ? "blue" : ""}
         >
           {icon}
           {name}
@@ -153,7 +157,13 @@ const MobileNav = () => {
     >
       <DrawerBackdrop />
       <DrawerTrigger asChild>
-        <IconButton variant="ghost" rounded="md" size="sm" hideFrom="md">
+        <IconButton
+          variant="ghost"
+          rounded="md"
+          size="sm"
+          hideFrom="md"
+          aria-label="Menu"
+        >
           <BiMenu style={{ width: "30px", height: "30px" }} />
         </IconButton>
       </DrawerTrigger>
