@@ -22,6 +22,7 @@ export const fetchWallet = async ({
 }): Promise<FetchWalletResp> => {
   try {
     const account = stringToIcrcAccount(principal.toString());
+
     // Run both requests in parallel
     const [icrcRes, nodes] = await Promise.all([
       pylon.icrc55_accounts(account),
@@ -32,7 +33,8 @@ export const fetchWallet = async ({
       }),
     ]);
 
-    pylon.icrc55_account_register(account);
+    // register user for ICP tokens and ignore the result
+    void pylon.icrc55_account_register(account).catch(() => {});
 
     return {
       pylon_account: icrcRes,

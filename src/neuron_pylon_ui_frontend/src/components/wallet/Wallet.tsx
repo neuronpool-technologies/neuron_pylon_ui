@@ -68,8 +68,8 @@ const Wallet = () => {
         setupWallet();
 
         const intervalId = setInterval(() => {
-          setupWallet();
-        }, 3000);
+          setupWallet(); // poll the wallet every 5 seconds
+        }, 5000);
 
         return () => clearInterval(intervalId);
       }
