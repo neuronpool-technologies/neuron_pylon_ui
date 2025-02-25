@@ -1,17 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 import Wallet from "./WalletSlice";
 import Meta from "./MetaSlice";
-import Stats from "./StatsSlice";
+import Vectors from "./VectorsSlice";
 
 const store = configureStore({
-  reducer: { Wallet, Meta, Stats },
+  reducer: { Wallet, Meta, Vectors },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredPaths: ["Wallet", "Meta"],
+        ignoredPaths: ["Wallet", "Meta", "Vectors"],
         ignoredActions: [
           "wallet/refreshWallet/fulfilled",
           "meta/refreshMeta/fulfilled",
+          "vectors/refreshVectors/fulfilled",
         ],
       },
     }),

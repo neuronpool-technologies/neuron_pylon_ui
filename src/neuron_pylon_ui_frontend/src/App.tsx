@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { refreshMeta } from "@/state/MetaSlice";
 import { useTypedDispatch } from "./hooks/useRedux";
 import { useActors } from "./hooks/useActors";
-import { refreshStats } from "./state/StatsSlice";
+import { refreshVectors } from "./state/VectorsSlice";
 
 const App = () => {
   return (
@@ -38,13 +38,20 @@ const AppLayout = () => {
 
   useEffect(() => {
     if (actors.neuronPylon) {
+      const refresh = () => {
+        dispatch(refreshVectors({ pylon: actors.neuronPylon }));
+      };
+      
       dispatch(refreshMeta({ pylon: actors.neuronPylon }));
-      dispatch(refreshStats({ pylon: actors.neuronPylon }));
+      refresh();
+      const interval = setInterval(refresh, 5000);
+
+      return () => clearInterval(interval);
     }
   }, [actors]);
 
   return (
-    <Flex direction="column" h="100vh">
+    <Flex direction="column" minH="100vh">
       <Box flex="1">
         <Nav />
         <Outlet />

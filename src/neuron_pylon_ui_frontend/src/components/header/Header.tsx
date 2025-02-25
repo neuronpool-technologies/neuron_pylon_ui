@@ -12,7 +12,7 @@ const Header = ({ children }: HeaderProps) => {
       h={"200px"}
       boxShadow="0px 4px 6px 0px rgba(0, 0, 0, 0.1)"
     >
-      <Container pt={8}>{children}</Container>
+      <Container py={8}>{children}</Container>
     </Box>
   );
 };

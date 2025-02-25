@@ -19,11 +19,11 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { balance, account } = endpointToBalanceAndAccount(endpoint);
   const { meta, status } = useTypedSelector((state) => state.Meta);
-
+  const [open, setOpen] = useState(false);
+  
   if (!("ic" in endpoint.endpoint)) return null;
   if (status !== "succeeded") return null;
 
-  const [open, setOpen] = useState(false);
 
   const walletLedger = endpoint.endpoint.ic.ledger.toString();
 

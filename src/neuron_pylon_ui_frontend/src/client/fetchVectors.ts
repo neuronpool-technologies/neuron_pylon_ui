@@ -2,25 +2,32 @@ import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
   Shared,
+  NodeShared,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { toaster } from "@/components/ui/toaster";
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "@/utils/TokenTools";
 
-type PylonStatsResp = {
-  total_icp_staked: string;
-  total_icp_maturity: string;
-  total_vectors: string;
-  total_controllers: string;
+type PylonVectorsResp = {
+  stats: {
+    total_icp_staked: string;
+    total_icp_maturity: string;
+    total_vectors: string;
+    total_controllers: string;
+  };
+  vectors: NodeShared[];
 };
 
-export const fetchStats = async ({
+export const fetchVectors = async ({
   pylon,
 }: {
   pylon: ActorSubclass<NeuronPylon>;
-}): Promise<PylonStatsResp | null> => {
+}): Promise<PylonVectorsResp | null> => {
   try {
-    const idObjects = Array.from({ length: 300 }, (_, i) => ({ id: i }));
+    const idObjects = Array.from(
+      { length: Number(process.env.REACT_APP_VECTORS_TO_FETCH) },
+      (_, i) => ({ id: i })
+    );
 
     const nodes = await pylon.icrc55_get_nodes(idObjects);
 
@@ -82,14 +89,17 @@ export const fetchStats = async ({
     const { totalVectors, totalStake, totalMaturity, uniqueOwners } = result;
 
     return {
-      total_icp_staked: Math.round(
-        e8sToIcp(Number(totalStake))
-      ).toLocaleString(),
-      total_icp_maturity: Math.round(
-        e8sToIcp(Number(totalMaturity))
-      ).toLocaleString(),
-      total_vectors: totalVectors.toLocaleString(),
-      total_controllers: uniqueOwners.size.toLocaleString(),
+      stats: {
+        total_icp_staked: Math.round(
+          e8sToIcp(Number(totalStake))
+        ).toLocaleString(),
+        total_icp_maturity: Math.round(
+          e8sToIcp(Number(totalMaturity))
+        ).toLocaleString(),
+        total_vectors: totalVectors.toLocaleString(),
+        total_controllers: uniqueOwners.size.toLocaleString(),
+      },
+      vectors: nodes.flatMap(node => node[0] ? [node[0]] : []),
     };
   } catch (error) {
     console.error(error);

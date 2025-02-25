@@ -3,8 +3,7 @@ import { Flex, Text, Separator, Icon, Skeleton } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiPlusCircle, BiUser } from "react-icons/bi";
 
 const Stats = () => {
-  const { stats, status } = useTypedSelector((state) => state.Stats);
-
+  const { stats } = useTypedSelector((state) => state.Vectors);
   return (
     <Flex
       bg="bg"
@@ -18,31 +17,31 @@ const Stats = () => {
           title="total staked"
           value={`${stats?.total_icp_staked} ICP`}
           icon={<BiLock />}
-          status={status}
+          ready={stats ? true : false}
         />
         <Separator />
         <StatBox
           title="spawning maturity"
           value={`${stats?.total_icp_maturity} ICP`}
           icon={<BiPlusCircle />}
-          status={status}
+          ready={stats ? true : false}
         />
       </Flex>
       <Separator orientation="vertical" my={3} hideBelow={"md"} />
-      <Separator mx={3} hideFrom={"md"}/>
+      <Separator mx={3} hideFrom={"md"} />
       <Flex direction={"column"} p={3} w="100%" gap={3}>
         <StatBox
           title="total vectors"
           value={`${stats?.total_vectors}`}
           icon={<BiRefresh />}
-          status={status}
+          ready={stats ? true : false}
         />
         <Separator />
         <StatBox
           title="Controllers"
           value={`${stats?.total_controllers}`}
           icon={<BiUser />}
-          status={status}
+          ready={stats ? true : false}
         />
       </Flex>
     </Flex>
@@ -55,12 +54,12 @@ const StatBox = ({
   title,
   value,
   icon,
-  status,
+  ready,
 }: {
   title: string;
   value: string;
   icon: React.ReactElement;
-  status: string;
+  ready: boolean;
 }) => {
   return (
     <Flex align="center">
@@ -76,7 +75,7 @@ const StatBox = ({
         >
           {title}
         </Text>
-        <Skeleton height="5" loading={status !== "succeeded"}>
+        <Skeleton height="5" loading={!ready}>
           <Text fontWeight={500} fontSize="md">
             {value}
           </Text>

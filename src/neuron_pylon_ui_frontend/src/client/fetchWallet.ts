@@ -4,13 +4,11 @@ import { stringToIcrcAccount } from "@/utils/AccountTools";
 import {
   _SERVICE as NeuronPylon,
   AccountsResponse,
-  NodeShared,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { toaster } from "@/components/ui/toaster";
 
 type FetchWalletResp = {
   pylon_account: AccountsResponse;
-  vectors: NodeShared[];
 };
 
 export const fetchWallet = async ({
@@ -24,21 +22,13 @@ export const fetchWallet = async ({
     const account = stringToIcrcAccount(principal.toString());
 
     // Run both requests in parallel
-    const [icrcRes, nodes] = await Promise.all([
-      pylon.icrc55_accounts(account),
-      pylon.icrc55_get_controller_nodes({
-        id: account,
-        start: 0,
-        length: 100,
-      }),
-    ]);
+    const [icrcRes] = await Promise.all([pylon.icrc55_accounts(account)]);
 
     // register user for ICP tokens and ignore the result
     void pylon.icrc55_account_register(account).catch(() => {});
 
     return {
       pylon_account: icrcRes,
-      vectors: nodes,
     };
   } catch (error) {
     console.error(error);
@@ -51,7 +41,6 @@ export const fetchWallet = async ({
 
     return {
       pylon_account: [],
-      vectors: [],
     };
   }
 };

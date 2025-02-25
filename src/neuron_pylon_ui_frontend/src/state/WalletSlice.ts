@@ -10,14 +10,12 @@ import {
 
 type WalletState = {
   pylon_account: AccountEndpoint[];
-  vectors: NodeShared[];
   status: string;
   error: string | null;
 };
 
 const initialState: WalletState = {
   pylon_account: [],
-  vectors: [],
   status: "idle",
   error: null,
 };
@@ -36,7 +34,6 @@ const WalletSlice = createSlice({
       .addCase(refreshWallet.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.pylon_account = action.payload.pylon_account;
-        state.vectors = action.payload.vectors;
       })
       .addCase(refreshWallet.rejected, (state, action) => {
         state.status = "failed";

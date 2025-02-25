@@ -1,6 +1,5 @@
 import { Flex, Box, Text } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
-import { useColorMode } from "@/components/ui/color-mode";
 
 type StatBoxProps = {
   title: string;
@@ -9,8 +8,6 @@ type StatBoxProps = {
 };
 
 const StatBox = ({ title, value, animation }: StatBoxProps) => {
-  const { toggleColorMode, colorMode } = useColorMode();
-  
   const pulseAnimation = keyframes`
     0% {
       border-color: #ccc;
@@ -25,9 +22,9 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
 
   return (
     <Box w="100%">
-      <Flex color="fg.muted" ml="30px" mb="-10px">
+      <Flex color="fg.muted" ml="10px" mb="-10px">
         <Text
-          bg={colorMode === "light" ? "bg" : "bg.subtle"}
+          bg={"bg.subtle"}
           fontSize="xs"
           display="inline-flex"
           px={2}
@@ -38,16 +35,18 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
       </Flex>
 
       <Flex
-        gap="1"
         border="1px dashed"
         fontSize="sm"
         borderColor="border.emphasized"
-        p={3}
+        py={2}
+        px={4}
         alignItems="center"
-        borderRadius="8px"
+        borderRadius="md"
         animation={animation ? `${pulseAnimation} 1s infinite` : ""}
       >
-        <Text lineClamp={1}>{value}</Text>
+        <Text lineClamp={1} fontSize="sm">
+          {value}
+        </Text>
       </Flex>
     </Box>
   );

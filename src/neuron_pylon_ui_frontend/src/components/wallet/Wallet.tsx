@@ -31,7 +31,7 @@ const Wallet = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { identity, isAuthenticated, login, logout, actors } = useActors();
   const principal = identity?.getPrincipal().toString();
-
+  
   const dispatch = useTypedDispatch();
   const { pylon_account, status } = useTypedSelector((state) => state.Wallet);
 

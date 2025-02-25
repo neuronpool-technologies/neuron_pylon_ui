@@ -1,7 +1,9 @@
-import { Heading, Highlight } from "@chakra-ui/react";
+import { Heading, Highlight, Flex } from "@chakra-ui/react";
 import Search from "./Search";
 import { Header } from "@/components";
 import Stats from "./Stats";
+import RecentVectors from "./RecentVectors";
+import RecentActivity from "./RecentActivity";
 
 const Home = () => {
   return (
@@ -12,7 +14,7 @@ const Home = () => {
           styles={{
             px: "1",
             py: "1",
-            color: "blue.solid",
+            color: "blue.fg",
           }}
         >
           Explore NeuronPool Vectors
@@ -20,6 +22,10 @@ const Home = () => {
       </Heading>
       <Search />
       <Stats />
+      <Flex direction={{ base: "column", md: "row" }} gap={3} w="100%">
+        <RecentVectors />
+        <RecentActivity />
+      </Flex>
     </Header>
   );
 };
