@@ -2,30 +2,13 @@ import { useState } from "react";
 import { Text, Flex, Image as ChakraImage, Spacer } from "@chakra-ui/react";
 import { MenuContent, MenuRoot, MenuTrigger } from "@/components/ui/menu";
 import { useColorMode } from "@/components/ui/color-mode";
-import IcLogo from "../../../assets/ic-logo.png";
-import NtnLogo from "../../../assets/ntn-logo.png";
-import SneedLogo from "../../../assets/sneed-logo.png";
 import { AccountEndpoint } from "@/declarations/neuron_pylon/neuron_pylon.did";
 import { endpointToBalanceAndAccount } from "@/utils/AccountTools";
 import { useTypedSelector } from "@/hooks/useRedux";
 import SendToken from "./SendToken";
 import RecieveToken from "./RecieveToken";
 import { e8sToIcp } from "@/utils/TokenTools";
-
-const tokens = [
-  {
-    src: NtnLogo,
-    symbol: "NTN",
-  },
-  {
-    src: IcLogo,
-    symbol: "ICP",
-  },
-  {
-    src: SneedLogo,
-    symbol: "SNEED",
-  },
-];
+import { tokensIcons } from "@/utils/TokensIcons";
 
 type TokenProps = {
   endpoint: AccountEndpoint;
@@ -50,7 +33,7 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
   });
 
   const image =
-    tokens.find((images) => images.symbol === token?.symbol) || tokens[1]; // default to ICP logo
+    tokensIcons.find((images) => images.symbol === token?.symbol) || tokensIcons[1]; // default to ICP logo
 
   if (!token) return null;
 

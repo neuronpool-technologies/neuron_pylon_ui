@@ -26,7 +26,6 @@ import { useTypedDispatch, useTypedSelector } from "@/hooks/useRedux";
 import { refreshWallet, setCleanup } from "@/state/WalletSlice";
 import IcLogo from "../../../assets/ic-logo.png";
 import Token from "./Token";
-import { refreshMeta } from "@/state/MetaSlice";
 
 const Wallet = () => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -54,25 +53,21 @@ const Wallet = () => {
     );
   };
 
-  const cleanupStats = async () => {
+  const cleanupWallet = async () => {
     dispatch(setCleanup());
     Usergeek.setPrincipal(undefined);
     logout();
   };
 
   useEffect(() => {
-    if (actors.neuronPylon) {
-      dispatch(refreshMeta({ pylon: actors.neuronPylon }));
+    if (actors.neuronPylon && isAuthenticated) {
+      setupWallet();
 
-      if (isAuthenticated) {
-        setupWallet();
+      const intervalId = setInterval(() => {
+        setupWallet(); // poll the wallet every 5 seconds
+      }, 5000);
 
-        const intervalId = setInterval(() => {
-          setupWallet(); // poll the wallet every 5 seconds
-        }, 5000);
-
-        return () => clearInterval(intervalId);
-      }
+      return () => clearInterval(intervalId);
     }
   }, [isAuthenticated, principal, actors]);
 
@@ -116,13 +111,11 @@ const Wallet = () => {
               <BiWallet />
               {principal.substring(0, 7) + "..." + principal.substring(57, 63)}
               <Spacer />
-              <IconButton
-                variant="ghost"
-                aria-label="logout"
-                onClick={cleanupStats}
-              >
-                <BiPowerOff />
-              </IconButton>
+              <DrawerActionTrigger asChild>
+                <IconButton variant="ghost" aria-label="close">
+                  <BiCollapse />
+                </IconButton>
+              </DrawerActionTrigger>
             </Flex>
           </DrawerTitle>
           <Separator mt={3} />
@@ -138,8 +131,14 @@ const Wallet = () => {
         </DrawerBody>
         <DrawerFooter>
           <DrawerActionTrigger asChild>
-            <Button variant="surface" rounded="md" boxShadow="xs" w="100%">
-              <BiCollapse /> Close wallet
+            <Button
+              variant="surface"
+              rounded="md"
+              boxShadow="xs"
+              w="100%"
+              onClick={cleanupWallet}
+            >
+              <BiPowerOff /> Disconnect
             </Button>
           </DrawerActionTrigger>
         </DrawerFooter>

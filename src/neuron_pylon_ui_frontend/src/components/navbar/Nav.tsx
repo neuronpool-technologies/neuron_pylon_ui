@@ -43,7 +43,7 @@ const Nav = () => {
 
   return (
     <>
-      <Box px={{ base: 3, md: 6 }}>
+      <Box px={{ base: 3, md: 6 }} bg="bg.subtle" w="100%">
         <Flex h={20} align="center" justify="center" gap={3}>
           <MobileNav />
           <Spacer hideFrom={"md"} />

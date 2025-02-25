@@ -1,12 +1,6 @@
-import React from "react";
 import {
-  Box,
-  Flex,
-  Button,
   Image as ChakraImage,
   IconButton,
-  Spacer,
-  Separator,
 } from "@chakra-ui/react";
 import xLogo from "../../../assets/x_logo.svg";
 import discordLogo from "../../../assets/discord_logo.svg";

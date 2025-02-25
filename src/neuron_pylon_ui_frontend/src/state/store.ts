@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import Wallet from "./WalletSlice";
 import Meta from "./MetaSlice";
+import Stats from "./StatsSlice";
 
 const store = configureStore({
-  reducer: { Wallet, Meta },
+  reducer: { Wallet, Meta, Stats },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
