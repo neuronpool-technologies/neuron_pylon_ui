@@ -6,7 +6,7 @@ const Stats = () => {
   const { stats } = useTypedSelector((state) => state.Vectors);
   return (
     <Flex
-      bg="bg"
+      bg="bg.subtle"
       boxShadow={"md"}
       mt={8}
       borderRadius={"md"}
@@ -63,7 +63,7 @@ const StatBox = ({
 }) => {
   return (
     <Flex align="center">
-      <Icon mr={3} fontSize={45} p={2} bg={"bg.muted"} borderRadius="full">
+      <Icon mr={3} fontSize={45} p={2} bg={"bg.emphasized"} borderRadius="full">
         {icon}
       </Icon>
       <Flex direction="column" gap={0}>

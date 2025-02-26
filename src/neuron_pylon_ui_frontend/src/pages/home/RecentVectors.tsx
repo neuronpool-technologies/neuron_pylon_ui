@@ -8,7 +8,7 @@ const RecentVectors = () => {
 
   return (
     <Flex
-      bg="bg"
+      bg="bg.subtle"
       boxShadow={"md"}
       mt={8}
       borderRadius={"md"}

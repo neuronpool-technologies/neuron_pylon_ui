@@ -67,11 +67,10 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
           <ChakraImage
             src={image.src}
             alt={image.symbol}
-            bg={"bg.muted"}
+            bg={"bg.emphasized"}
             borderRadius="full"
             h={45}
             mr={3}
-            p={0.5}
             w={45}
           />
           <Flex direction="column" gap={0}>

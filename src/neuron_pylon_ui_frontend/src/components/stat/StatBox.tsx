@@ -24,7 +24,7 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
     <Box w="100%">
       <Flex color="fg.muted" ml="10px" mb="-10px">
         <Text
-          bg={"bg.subtle"}
+          bg={"bg.muted"}
           fontSize="xs"
           display="inline-flex"
           px={2}
@@ -44,7 +44,7 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
         borderRadius="md"
         animation={animation ? `${pulseAnimation} 1s infinite` : ""}
       >
-        <Text lineClamp={1} fontSize="sm">
+        <Text lineClamp={1} fontSize="sm" fontWeight={500}>
           {value}
         </Text>
       </Flex>

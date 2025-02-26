@@ -10,10 +10,12 @@ import { e8sToIcp } from "@/utils/TokenTools";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { NavLink } from "react-router-dom";
 import { accountToString } from "@/utils/AccountTools";
+import { convertNanosecondsToElapsedTime } from "@/utils/Time";
 
 const VectorPreview = ({ vector }: { vector: NodeShared }) => {
   const { meta } = useTypedSelector((state) => state.Meta);
   const controller = accountToString(vector.controllers[0]);
+  const created = convertNanosecondsToElapsedTime(Number(vector.created));
 
   const { type, label, value } = match(vector.custom?.[0] as Shared)
     .with(
@@ -82,7 +84,7 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
         p={3}
         direction={"row"}
         align="center"
-        bg="bg.subtle"
+        bg="bg.muted"
         transition={"all 0.2s"}
         _hover={{
           cursor: "pointer",
@@ -91,7 +93,7 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
         }}
       >
         <Flex w={{ base: "65%", md: "80%" }} gap={3} align="center">
-          <Icon fontSize={45} p={2} bg={"bg.muted"} borderRadius="full">
+          <Icon fontSize={45} p={2} bg={"bg.emphasized"} borderRadius="full">
             <BiRefresh />
           </Icon>
           <Flex direction="column" gap={0}>
@@ -99,7 +101,7 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
               {type} #{vector.id}
             </Heading>
             <Text fontSize="sm" color="fg.muted" lineClamp={1}>
-              2 days ago
+              {created}
             </Text>
           </Flex>
         </Flex>
