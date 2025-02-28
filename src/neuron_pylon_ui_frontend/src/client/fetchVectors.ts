@@ -3,10 +3,12 @@ import {
   _SERVICE as NeuronPylon,
   Shared,
   NodeShared,
+  Activity,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { toaster } from "@/components/ui/toaster";
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "@/utils/TokenTools";
+import { extractAllLogs } from "@/utils/Node";
 
 type PylonVectorsResp = {
   stats: {
@@ -16,6 +18,7 @@ type PylonVectorsResp = {
     total_controllers: string;
   };
   vectors: NodeShared[];
+  latest_log: Array<{ log: Activity; node: NodeShared }>;
 };
 
 export const fetchVectors = async ({
@@ -85,6 +88,31 @@ export const fetchVectors = async ({
       }
     );
 
+    // Collect all logs from all nodes, sort by timestamp, and take the latest 6
+    const latestLogs = nodes
+      .flatMap((node) => {
+        if (!node[0]) return [];
+        // For each log in the node, return an object containing both the log and the node
+        return extractAllLogs(node[0]).map((log) => ({
+          log,
+          node: node[0] as NodeShared,
+        }));
+      })
+      // Sort by timestamp in descending order (most recent first)
+      .sort((a, b) => {
+        const timestampA =
+          "Ok" in a.log
+            ? Number(a.log.Ok.timestamp)
+            : Number(a.log.Err.timestamp);
+        const timestampB =
+          "Ok" in b.log
+            ? Number(b.log.Ok.timestamp)
+            : Number(b.log.Err.timestamp);
+        return timestampB - timestampA; // Higher timestamps (more recent) come first
+      })
+      // Take only the 6 most recent logs
+      .slice(0, 6);
+
     // Extract the computed values and determine the count of unique controllers
     const { totalVectors, totalStake, totalMaturity, uniqueOwners } = result;
 
@@ -99,13 +127,14 @@ export const fetchVectors = async ({
         total_vectors: totalVectors.toLocaleString(),
         total_controllers: uniqueOwners.size.toLocaleString(),
       },
-      vectors: nodes.flatMap(node => node[0] ? [node[0]] : []),
+      vectors: nodes.flatMap((node) => (node[0] ? [node[0]] : [])),
+      latest_log: latestLogs,
     };
   } catch (error) {
     console.error(error);
 
     toaster.create({
-      title: "Error fetching stats",
+      title: "Error fetching vectors",
       description: `${String(error).substring(0, 200)}...`,
       type: "warning",
     });

@@ -1,6 +1,8 @@
 import { useTypedSelector } from "@/hooks/useRedux";
-import { Flex, Heading, Separator } from "@chakra-ui/react";
+import { Flex, Heading, Separator, Text } from "@chakra-ui/react";
 import { VectorPreview } from "@/components";
+import { BiRightArrowAlt } from "react-icons/bi";
+import { NavLink } from "react-router-dom";
 
 const RecentVectors = () => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
@@ -13,15 +15,38 @@ const RecentVectors = () => {
       mt={8}
       borderRadius={"md"}
       direction={"column"}
-      p={3}
-      gap={3}
       w="100%"
     >
-      <Heading>Latest Vectors</Heading>
+      <Heading p={3}>Latest Vectors</Heading>
       <Separator />
-      {latestVectors.map((vector) => (
-        <VectorPreview key={vector.id} vector={vector} />
-      ))}
+      <Flex direction="column" w="100%" p={3} gap={3}>
+        {latestVectors.map((vector) => (
+          <VectorPreview key={vector.id} vector={vector} />
+        ))}
+      </Flex>
+      <NavLink to={`/vectors`}>
+        <Flex
+          borderTop={"1px solid"}
+          borderColor={"bg.emphasized"}
+          borderBottomRadius={"md"}
+          bg="bg.muted"
+          p={3}
+          align="center"
+          justify={"center"}
+          transition={"all 0.2s"}
+          _hover={{
+            cursor: "pointer",
+            color: "blue.fg",
+          }}
+          gap={1}
+          color="fg.muted"
+        >
+          <Text fontSize="sm" fontWeight={500} textTransform={"uppercase"}>
+            view all
+          </Text>
+          <BiRightArrowAlt />
+        </Flex>
+      </NavLink>
     </Flex>
   );
 };

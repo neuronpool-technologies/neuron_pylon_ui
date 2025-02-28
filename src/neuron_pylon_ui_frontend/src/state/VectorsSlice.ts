@@ -3,6 +3,7 @@ import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
   NodeShared,
+  Activity,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { fetchVectors } from "@/client/fetchVectors";
 
@@ -16,6 +17,7 @@ type PylonVectorsResp = {
 type VectorsState = {
   stats: PylonVectorsResp | null;
   vectors: NodeShared[];
+  latest_log: Array<{ log: Activity; node: NodeShared }>;
   status: string;
   error: string | null;
 };
@@ -23,6 +25,7 @@ type VectorsState = {
 const initialState: VectorsState = {
   stats: null,
   vectors: [],
+  latest_log: [],
   status: "idle",
   error: null,
 };
@@ -42,6 +45,7 @@ const VectorsSlice = createSlice({
         state.status = "succeeded";
         state.stats = action.payload?.stats ?? null;
         state.vectors = action.payload?.vectors ?? [];
+        state.latest_log = action.payload?.latest_log ?? [];
       })
       .addCase(refreshVectors.rejected, (state, action) => {
         state.status = "failed";

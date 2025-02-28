@@ -1,5 +1,6 @@
+import { StatIcon } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
-import { Flex, Text, Separator, Icon, Skeleton } from "@chakra-ui/react";
+import { Flex, Text, Separator, Skeleton } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiPlusCircle, BiUser } from "react-icons/bi";
 
 const Stats = () => {
@@ -62,10 +63,8 @@ const StatBox = ({
   ready: boolean;
 }) => {
   return (
-    <Flex align="center">
-      <Icon mr={3} fontSize={45} p={2} bg={"bg.emphasized"} borderRadius="full">
-        {icon}
-      </Icon>
+    <Flex align="center" gap={3}>
+      <StatIcon>{icon}</StatIcon>
       <Flex direction="column" gap={0}>
         <Text
           fontSize="sm"

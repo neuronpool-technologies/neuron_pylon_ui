@@ -14,11 +14,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BiSend } from "react-icons/bi";
-import StatRow from "../stat/StatRow";
 import { isAccountOkay, isBalanceOkay } from "@/utils/AccountTools";
 import { toaster } from "@/components/ui/toaster";
 import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
+import { StatRow } from "@/components";
 
 const SendToken = ({
   ledger,
