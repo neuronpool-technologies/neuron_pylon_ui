@@ -21,7 +21,7 @@ const App = () => {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Home />} />
           <Route path="/vectors" element={<Vectors />} />
-          <Route path="/vectors/:controller" element={<p>by controller</p>} />
+          <Route path="/vectors/:controller" element={<Vectors />} />
           <Route path="/vectors/:controller/:id" element={<p>by id</p>} />
           <Route path="*" element={<p>page not found</p>} />
         </Route>
@@ -41,7 +41,7 @@ const AppLayout = () => {
       const refresh = () => {
         dispatch(refreshVectors({ pylon: actors.neuronPylon }));
       };
-      
+
       dispatch(refreshMeta({ pylon: actors.neuronPylon }));
       refresh();
       const interval = setInterval(refresh, 5000);

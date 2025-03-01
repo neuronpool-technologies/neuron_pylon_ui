@@ -1,0 +1,239 @@
+import { VectorPreview } from "@/components";
+import { useActors } from "@/hooks/useActors";
+import { useTypedSelector } from "@/hooks/useRedux";
+import { Flex, Button, Separator, Spacer } from "@chakra-ui/react";
+import {
+  HiMiniArrowsUpDown,
+  HiMiniArrowSmallDown,
+  HiMiniArrowSmallUp,
+} from "react-icons/hi2";
+import { useState, useMemo, useEffect } from "react";
+import { extractNodeType } from "@/utils/Node";
+import { useParams, useNavigate } from "react-router-dom";
+import CreateVector from "./CreateVector";
+
+// Define sort types for better type safety
+type SortField = "created" | "staked";
+type SortDirection = "asc" | "desc";
+
+const VectorsTable = () => {
+  const { meta } = useTypedSelector((state) => state.Meta);
+  const { vectors } = useTypedSelector((state) => state.Vectors);
+  const { identity, isAuthenticated, login, logout, actors } = useActors();
+  const principal = identity?.getPrincipal().toString();
+  const { controller } = useParams();
+  const navigate = useNavigate();
+
+  // Determine active tab based on URL controller parameter
+  const [activeTab, setActiveTab] = useState<"all" | "my">(
+    controller && principal && controller === principal ? "my" : "all"
+  );
+
+  // Add state for sorting
+  const [sortField, setSortField] = useState<SortField>("created");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  // Sync tab state with URL parameter when controller changes
+  useEffect(() => {
+    if (controller && principal && controller === principal) {
+      setActiveTab("my");
+    } else if (!controller) {
+      setActiveTab("all");
+    }
+  }, [controller, principal]);
+
+  // Force re-render when authentication state changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // trigger re-render when auth state changes
+  }, [isAuthenticated]);
+
+  // Calculate user's vector count
+  const userVectorsCount = useMemo(() => {
+    if (!isAuthenticated || !principal) return 0;
+
+    return vectors.filter(
+      (vector) =>
+        vector.controllers &&
+        vector.controllers.some(
+          (controller) =>
+            controller.owner && controller.owner.toString() === principal
+        )
+    ).length;
+  }, [vectors, isAuthenticated, principal]);
+
+  const filteredVectors = useMemo(() => {
+    // Step 1: Filter by controller or tab
+    let result = vectors;
+
+    if (controller) {
+      // Filter by specific controller from URL
+      result = vectors.filter(
+        (vector) =>
+          vector.controllers &&
+          vector.controllers.some(
+            (ctrl) => ctrl.owner && ctrl.owner.toString() === controller
+          )
+      );
+    } else if (activeTab === "my" && isAuthenticated && principal) {
+      // Filter by user's principal if "my" tab is active but URL doesn't have controller
+      result = vectors.filter(
+        (vector) =>
+          vector.controllers &&
+          vector.controllers.some(
+            (ctrl) => ctrl.owner && ctrl.owner.toString() === principal
+          )
+      );
+    }
+
+    // Step 2: Sort by field and direction
+    return [...result].sort((a, b) => {
+      if (sortField === "created" || !meta) {
+        // Sort by creation timestamp
+        const valueA = a.created;
+        const valueB = b.created;
+        return sortDirection === "asc"
+          ? Number(valueA) - Number(valueB)
+          : Number(valueB) - Number(valueA);
+      } else {
+        try {
+          // Sort by staked amount using extractNodeType
+          const nodeA = extractNodeType(a, meta);
+          const nodeB = extractNodeType(b, meta);
+
+          const amountA = nodeA.amount
+            ? parseFloat(nodeA.amount.replace(/,/g, ""))
+            : -1;
+          const amountB = nodeB.amount
+            ? parseFloat(nodeB.amount.replace(/,/g, ""))
+            : -1;
+
+          return sortDirection === "asc"
+            ? amountA - amountB
+            : amountB - amountA;
+        } catch (error) {
+          console.error("Error sorting by stake:", error);
+          const valueA = a.created;
+          const valueB = b.created;
+          return sortDirection === "asc"
+            ? Number(valueA) - Number(valueB)
+            : Number(valueB) - Number(valueA);
+        }
+      }
+    });
+  }, [
+    vectors,
+    activeTab,
+    isAuthenticated,
+    principal,
+    controller,
+    sortField,
+    sortDirection,
+    meta,
+  ]);
+
+  const handleTabChange = (tab: "all" | "my") => {
+    if (tab === "my" && !isAuthenticated) {
+      // Optional: show login prompt or notification
+      return;
+    }
+
+    setActiveTab(tab);
+
+    // Update URL based on tab selection
+    if (tab === "my" && principal) {
+      navigate(`/vectors/${principal}`);
+    } else {
+      navigate("/vectors");
+    }
+  };
+
+  // Handle sort change
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field with default sort direction
+      setSortField(field);
+      setSortDirection("desc"); // Default to descending (newest or highest first)
+    }
+  };
+
+  // Get the appropriate icon based on current sort state
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <HiMiniArrowsUpDown />;
+    }
+    return sortDirection === "desc" ? (
+      <HiMiniArrowSmallDown />
+    ) : (
+      <HiMiniArrowSmallUp />
+    );
+  };
+
+  return (
+    <Flex
+      bg="bg.subtle"
+      boxShadow={"md"}
+      mt={6}
+      borderRadius={"md"}
+      direction={"column"}
+      w="100%"
+    >
+      <Flex align="center">
+        <Button
+          variant="ghost"
+          borderTopLeftRadius={"md"}
+          size="lg"
+          colorPalette={activeTab === "all" ? "blue" : ""}
+          bg={activeTab === "all" ? "bg.muted" : ""}
+          onClick={() => handleTabChange("all")}
+        >
+          All Vectors
+        </Button>
+        <Button
+          variant="ghost"
+          size="lg"
+          colorPalette={activeTab === "my" ? "blue" : ""}
+          bg={activeTab === "my" ? "bg.muted" : ""}
+          onClick={() => handleTabChange("my")}
+          disabled={!isAuthenticated}
+          opacity={!isAuthenticated ? 0.6 : 1}
+          key={isAuthenticated ? "auth" : "no-auth"} // Force re-render on auth change
+        >
+          My Vectors {isAuthenticated ? `(${userVectorsCount})` : ""}
+        </Button>
+      </Flex>
+      <Separator />
+      <Flex align="center" w="100%" bg="bg.muted">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleSortChange("created")}
+        >
+          Created {getSortIcon("created")}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleSortChange("staked")}
+          disabled={!meta}
+          title={!meta ? "Loading metadata..." : ""}
+        >
+          Staked {getSortIcon("staked")}
+        </Button>
+        <Spacer />
+        <CreateVector />
+      </Flex>
+      <Separator />
+      <Flex direction="column" w="100%" p={3} gap={3}>
+        {filteredVectors.map((vector) => (
+          <VectorPreview key={vector.id} vector={vector} />
+        ))}
+      </Flex>
+    </Flex>
+  );
+};
+
+export default VectorsTable;

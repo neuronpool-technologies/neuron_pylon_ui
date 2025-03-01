@@ -57,7 +57,6 @@ const VectorLog = ({
               size={{ base: "xs", md: "sm" }}
               variant="surface"
               colorPalette={isError ? "red" : "green"}
-              lineClamp={1}
             >
               {operation}
             </Code>

@@ -31,6 +31,8 @@ export const extractAllLogs = (node: NodeShared): Array<Activity> => {
 export type NodeTypeResult = {
   type: string;
   label: string;
+  symbol: string;
+  amount?: string;
   value: string;
   created: string;
   controller: string;
@@ -65,11 +67,17 @@ export const extractNodeType = (
       ({ devefi_jes1_icpneuron }) => ({
         type: "ICP Neuron",
         label: "Staked",
+        symbol: "ICP",
         value: `${Math.round(
           e8sToIcp(
             Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
           )
         ).toLocaleString()} ICP`,
+        amount: Math.round(
+          e8sToIcp(
+            Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
+          )
+        ).toLocaleString(),
         created,
         controller,
       })
@@ -77,8 +85,9 @@ export const extractNodeType = (
     .with(
       { devefi_jes1_snsneuron: P.not(P.nullish) },
       ({ devefi_jes1_snsneuron }) => ({
-        type: "SNS Neuron",
+        type: `${getTokenSymbol()} Neuron`,
         label: "Staked",
+        symbol: getTokenSymbol(),
         value: `${Math.round(
           e8sToIcp(
             Number(
@@ -86,6 +95,13 @@ export const extractNodeType = (
             )
           )
         ).toLocaleString()} ${getTokenSymbol()}`,
+        amount: Math.round(
+          e8sToIcp(
+            Number(
+              devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
+            )
+          )
+        ).toLocaleString(),
         created,
         controller,
       })
@@ -93,6 +109,7 @@ export const extractNodeType = (
     .with({ devefi_split: P.not(P.nullish) }, () => ({
       type: "Splitter",
       label: "Split",
+      symbol: getTokenSymbol(),
       value: getTokenSymbol(),
       created,
       controller,

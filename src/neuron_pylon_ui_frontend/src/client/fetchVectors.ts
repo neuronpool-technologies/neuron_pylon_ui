@@ -127,7 +127,7 @@ export const fetchVectors = async ({
         total_vectors: totalVectors.toLocaleString(),
         total_controllers: uniqueOwners.size.toLocaleString(),
       },
-      vectors: nodes.flatMap((node) => (node[0] ? [node[0]] : [])),
+      vectors: nodes.flatMap((node) => (node[0] ? [node[0]] : [])).reverse(),
       latest_log: latestLogs,
     };
   } catch (error) {

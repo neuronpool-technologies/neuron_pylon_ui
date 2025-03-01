@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 const RecentVectors = () => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const latestVectors = [...vectors].reverse().slice(0, 6);
+  const latestVectors = [...vectors].slice(0, 6);
 
   return (
     <Flex

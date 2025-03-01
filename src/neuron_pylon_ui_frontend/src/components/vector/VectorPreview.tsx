@@ -1,18 +1,20 @@
-import { Flex, Text, Heading } from "@chakra-ui/react";
-import { BiRefresh } from "react-icons/bi";
+import { Flex, Text, Heading, Image as ChakraImage } from "@chakra-ui/react";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { StatBox, StatIcon } from "@/components";
+import { StatBox } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { NavLink } from "react-router-dom";
 import { extractNodeType } from "@/utils/Node";
+import { tokensIcons } from "@/utils/TokensIcons";
 
 const VectorPreview = ({ vector }: { vector: NodeShared }) => {
   const { meta } = useTypedSelector((state) => state.Meta);
   if (!meta) return null;
-  const { type, label, value, created, controller } = extractNodeType(
+  const { type, label, symbol, value, created, controller } = extractNodeType(
     vector,
     meta
   );
+  const image =
+    tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
 
   return (
     <NavLink to={`/vectors/${controller}/${vector.id}`}>
@@ -31,9 +33,15 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
         }}
       >
         <Flex w={{ base: "65%", md: "80%" }} gap={3} align="center">
-          <StatIcon>
-            <BiRefresh />
-          </StatIcon>
+          <ChakraImage
+            src={image.src}
+            alt={image.symbol}
+            bg={"bg.emphasized"}
+            borderRadius="full"
+            p={2.5}
+            h={45}
+            w={45}
+          />
           <Flex direction="column" gap={0}>
             <Heading fontSize="sm" lineClamp={1} color="blue.fg">
               {type} #{vector.id}

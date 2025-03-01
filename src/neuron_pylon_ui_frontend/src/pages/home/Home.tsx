@@ -8,7 +8,7 @@ import RecentActivity from "./RecentActivity";
 const Home = () => {
   return (
     <Header>
-      <Heading letterSpacing="tight" mb={3}>
+      <Heading letterSpacing="tight" mb={3} size={{ base: "xl", md: "2xl" }}>
         <Highlight
           query="NeuronPool Vectors"
           styles={{
@@ -22,7 +22,11 @@ const Home = () => {
       </Heading>
       <Search />
       <Stats />
-      <Flex direction={{ base: "column", md: "row" }} gap={3} w="100%">
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        gap={{ base: 0, md: 3 }}
+        w="100%"
+      >
         <RecentVectors />
         <RecentActivity />
       </Flex>
