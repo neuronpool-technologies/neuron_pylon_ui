@@ -5,17 +5,20 @@ import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
   AccountEndpoint,
-  NodeShared,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 
 type WalletState = {
   pylon_account: AccountEndpoint[];
+  logged_in: boolean;
+  principal: string;
   status: string;
   error: string | null;
 };
 
 const initialState: WalletState = {
   pylon_account: [],
+  logged_in: false,
+  principal: "",
   status: "idle",
   error: null,
 };
@@ -34,6 +37,8 @@ const WalletSlice = createSlice({
       .addCase(refreshWallet.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.pylon_account = action.payload.pylon_account;
+        state.logged_in = action.payload.logged_in;
+        state.principal = action.payload.principal;
       })
       .addCase(refreshWallet.rejected, (state, action) => {
         state.status = "failed";

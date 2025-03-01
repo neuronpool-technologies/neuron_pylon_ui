@@ -30,8 +30,8 @@ import Token from "./Token";
 const Wallet = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { identity, isAuthenticated, login, logout, actors } = useActors();
-  const principal = identity?.getPrincipal().toString();
-  
+  const { principal } = useTypedSelector((state) => state.Wallet);
+
   const dispatch = useTypedDispatch();
   const { pylon_account, status } = useTypedSelector((state) => state.Wallet);
 
@@ -57,6 +57,7 @@ const Wallet = () => {
     dispatch(setCleanup());
     Usergeek.setPrincipal(undefined);
     logout();
+    window.location.reload();
   };
 
   useEffect(() => {

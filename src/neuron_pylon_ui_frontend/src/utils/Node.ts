@@ -32,10 +32,12 @@ export type NodeTypeResult = {
   type: string;
   label: string;
   symbol: string;
+  name: string;
   amount?: string;
   value: string;
   created: string;
   controller: string;
+  active: boolean;
 };
 
 export const extractNodeType = (
@@ -46,8 +48,11 @@ export const extractNodeType = (
   const created = convertNanosecondsToElapsedTime(Number(vector.created));
   const controller = accountToString(vector.controllers[0]);
 
-  // Helper function to get token symbol
-  const getTokenSymbol = () => {
+  // Calculate active status - true if node is active AND not frozen
+  const isActive = vector.active && !vector.billing.frozen;
+
+  // Helper function to get token info
+  const getTokenInfo = () => {
     const ledgerUsed =
       "ic" in vector.sources[0]?.endpoint
         ? vector.sources[0].endpoint.ic.ledger.toString()
@@ -58,16 +63,20 @@ export const extractNodeType = (
         "ic" in ledger?.ledger && ledger.ledger.ic.toString() === ledgerUsed
     );
 
-    return token?.symbol || "";
+    return {
+      symbol: token?.symbol || "",
+      name: token?.name || "",
+    };
   };
 
   return match(vector.custom?.[0] as Shared)
     .with(
       { devefi_jes1_icpneuron: P.not(P.nullish) },
       ({ devefi_jes1_icpneuron }) => ({
-        type: "ICP Neuron",
+        type: "Neuron",
         label: "Staked",
         symbol: "ICP",
+        name: "Internet Computer",
         value: `${Math.round(
           e8sToIcp(
             Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
@@ -80,40 +89,51 @@ export const extractNodeType = (
         ).toLocaleString(),
         created,
         controller,
+        active: isActive,
       })
     )
     .with(
       { devefi_jes1_snsneuron: P.not(P.nullish) },
-      ({ devefi_jes1_snsneuron }) => ({
-        type: `${getTokenSymbol()} Neuron`,
-        label: "Staked",
-        symbol: getTokenSymbol(),
-        value: `${Math.round(
-          e8sToIcp(
-            Number(
-              devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
+      ({ devefi_jes1_snsneuron }) => {
+        const { symbol, name } = getTokenInfo();
+        return {
+          type: "Neuron",
+          label: "Staked",
+          symbol,
+          name,
+          value: `${Math.round(
+            e8sToIcp(
+              Number(
+                devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
+              )
             )
-          )
-        ).toLocaleString()} ${getTokenSymbol()}`,
-        amount: Math.round(
-          e8sToIcp(
-            Number(
-              devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
+          ).toLocaleString()} ${symbol}`,
+          amount: Math.round(
+            e8sToIcp(
+              Number(
+                devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
+              )
             )
-          )
-        ).toLocaleString(),
+          ).toLocaleString(),
+          created,
+          controller,
+          active: isActive,
+        };
+      }
+    )
+    .with({ devefi_split: P.not(P.nullish) }, () => {
+      const { symbol, name } = getTokenInfo();
+      return {
+        type: "Splitter",
+        label: "Split",
+        symbol,
+        name,
+        value: symbol,
         created,
         controller,
-      })
-    )
-    .with({ devefi_split: P.not(P.nullish) }, () => ({
-      type: "Splitter",
-      label: "Split",
-      symbol: getTokenSymbol(),
-      value: getTokenSymbol(),
-      created,
-      controller,
-    }))
+        active: isActive,
+      };
+    })
     .exhaustive();
 };
 

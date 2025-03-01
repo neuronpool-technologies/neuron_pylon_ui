@@ -9,6 +9,8 @@ import { toaster } from "@/components/ui/toaster";
 
 type FetchWalletResp = {
   pylon_account: AccountsResponse;
+  logged_in: boolean;
+  principal: string;
 };
 
 export const fetchWallet = async ({
@@ -29,6 +31,8 @@ export const fetchWallet = async ({
 
     return {
       pylon_account: icrcRes,
+      logged_in: true,
+      principal: principal.toString(),
     };
   } catch (error) {
     console.error(error);
@@ -41,6 +45,8 @@ export const fetchWallet = async ({
 
     return {
       pylon_account: [],
+      logged_in: false,
+      principal: "",
     };
   }
 };

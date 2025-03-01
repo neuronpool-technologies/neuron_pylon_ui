@@ -1,7 +1,14 @@
-import { VectorPreview } from "@/components";
-import { useActors } from "@/hooks/useActors";
+import { Header, VectorPreview } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
-import { Flex, Button, Separator, Spacer } from "@chakra-ui/react";
+import {
+  Flex,
+  Button,
+  Separator,
+  Spacer,
+  Heading,
+  Highlight,
+  Text,
+} from "@chakra-ui/react";
 import {
   HiMiniArrowsUpDown,
   HiMiniArrowSmallDown,
@@ -19,8 +26,7 @@ type SortDirection = "asc" | "desc";
 const VectorsTable = () => {
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { identity, isAuthenticated, login, logout, actors } = useActors();
-  const principal = identity?.getPrincipal().toString();
+  const { logged_in, principal } = useTypedSelector((state) => state.Wallet);
   const { controller } = useParams();
   const navigate = useNavigate();
 
@@ -45,12 +51,11 @@ const VectorsTable = () => {
   // Force re-render when authentication state changes
   useEffect(() => {
     window.scrollTo(0, 0);
-    // trigger re-render when auth state changes
-  }, [isAuthenticated]);
+  }, []);
 
   // Calculate user's vector count
   const userVectorsCount = useMemo(() => {
-    if (!isAuthenticated || !principal) return 0;
+    if (!logged_in || !principal) return 0;
 
     return vectors.filter(
       (vector) =>
@@ -60,7 +65,7 @@ const VectorsTable = () => {
             controller.owner && controller.owner.toString() === principal
         )
     ).length;
-  }, [vectors, isAuthenticated, principal]);
+  }, [vectors, logged_in, principal]);
 
   const filteredVectors = useMemo(() => {
     // Step 1: Filter by controller or tab
@@ -75,7 +80,7 @@ const VectorsTable = () => {
             (ctrl) => ctrl.owner && ctrl.owner.toString() === controller
           )
       );
-    } else if (activeTab === "my" && isAuthenticated && principal) {
+    } else if (activeTab === "my" && logged_in && principal) {
       // Filter by user's principal if "my" tab is active but URL doesn't have controller
       result = vectors.filter(
         (vector) =>
@@ -124,7 +129,7 @@ const VectorsTable = () => {
   }, [
     vectors,
     activeTab,
-    isAuthenticated,
+    logged_in,
     principal,
     controller,
     sortField,
@@ -133,7 +138,7 @@ const VectorsTable = () => {
   ]);
 
   const handleTabChange = (tab: "all" | "my") => {
-    if (tab === "my" && !isAuthenticated) {
+    if (tab === "my" && !logged_in) {
       // Optional: show login prompt or notification
       return;
     }
@@ -173,66 +178,83 @@ const VectorsTable = () => {
   };
 
   return (
-    <Flex
-      bg="bg.subtle"
-      boxShadow={"md"}
-      mt={6}
-      borderRadius={"md"}
-      direction={"column"}
-      w="100%"
-    >
-      <Flex align="center">
-        <Button
-          variant="ghost"
-          borderTopLeftRadius={"md"}
-          size="lg"
-          colorPalette={activeTab === "all" ? "blue" : ""}
-          bg={activeTab === "all" ? "bg.muted" : ""}
-          onClick={() => handleTabChange("all")}
+    <Header>
+      <Heading letterSpacing="tight" mb={3} size={{ base: "xl", md: "2xl" }}>
+        <Highlight
+          query="Vectors"
+          styles={{
+            px: "1",
+            py: "1",
+            color: "blue.fg",
+          }}
         >
-          All Vectors
-        </Button>
-        <Button
-          variant="ghost"
-          size="lg"
-          colorPalette={activeTab === "my" ? "blue" : ""}
-          bg={activeTab === "my" ? "bg.muted" : ""}
-          onClick={() => handleTabChange("my")}
-          disabled={!isAuthenticated}
-          opacity={!isAuthenticated ? 0.6 : 1}
-          key={isAuthenticated ? "auth" : "no-auth"} // Force re-render on auth change
-        >
-          My Vectors {isAuthenticated ? `(${userVectorsCount})` : ""}
-        </Button>
+          NeuronPool Vectors
+        </Highlight>
+      </Heading>
+      <Text fontSize="md" color="fg.muted" fontWeight={500}>
+        Stake neurons and receive maturity directly to your destination
+      </Text>
+      <Flex
+        bg="bg.subtle"
+        boxShadow={"md"}
+        mt={6}
+        borderRadius={"md"}
+        direction={"column"}
+        w="100%"
+      >
+        <Flex align="center">
+          <Button
+            variant="ghost"
+            borderTopLeftRadius={"md"}
+            size="lg"
+            colorPalette={activeTab === "all" ? "blue" : ""}
+            bg={activeTab === "all" ? "bg.muted" : ""}
+            onClick={() => handleTabChange("all")}
+          >
+            All Vectors
+          </Button>
+          <Button
+            variant="ghost"
+            size="lg"
+            colorPalette={activeTab === "my" ? "blue" : ""}
+            bg={activeTab === "my" ? "bg.muted" : ""}
+            onClick={() => handleTabChange("my")}
+            disabled={!logged_in}
+            opacity={!logged_in ? 0.6 : 1}
+            key={logged_in ? "auth" : "no-auth"} // Force re-render on auth change
+          >
+            My Vectors {logged_in ? `(${userVectorsCount})` : ""}
+          </Button>
+        </Flex>
+        <Separator />
+        <Flex align="center" w="100%" bg="bg.muted">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("created")}
+          >
+            Created {getSortIcon("created")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSortChange("staked")}
+            disabled={!meta}
+            title={!meta ? "Loading metadata..." : ""}
+          >
+            Staked {getSortIcon("staked")}
+          </Button>
+          <Spacer />
+          <CreateVector />
+        </Flex>
+        <Separator />
+        <Flex direction="column" w="100%" p={3} gap={3}>
+          {filteredVectors.map((vector) => (
+            <VectorPreview key={vector.id} vector={vector} />
+          ))}
+        </Flex>
       </Flex>
-      <Separator />
-      <Flex align="center" w="100%" bg="bg.muted">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleSortChange("created")}
-        >
-          Created {getSortIcon("created")}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleSortChange("staked")}
-          disabled={!meta}
-          title={!meta ? "Loading metadata..." : ""}
-        >
-          Staked {getSortIcon("staked")}
-        </Button>
-        <Spacer />
-        <CreateVector />
-      </Flex>
-      <Separator />
-      <Flex direction="column" w="100%" p={3} gap={3}>
-        {filteredVectors.map((vector) => (
-          <VectorPreview key={vector.id} vector={vector} />
-        ))}
-      </Flex>
-    </Flex>
+    </Header>
   );
 };
 
