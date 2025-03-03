@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Flex, Button, Input } from "@chakra-ui/react";
+import { Flex, Button, Input, Image as ChakraImage } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
 import { MenuItem } from "@/components/ui/menu";
@@ -22,11 +22,16 @@ import { StatRow } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
 
 const SendToken = ({
+  image,
   ledger,
   tokenSymbol,
   tokenFee,
   balance,
 }: {
+  image: {
+    src: string;
+    symbol: string;
+  };
   ledger: string;
   tokenSymbol: string;
   tokenFee: number;
@@ -100,6 +105,16 @@ const SendToken = ({
             >
               <InputGroup
                 w="100%"
+                startElement={
+                  <ChakraImage
+                    src={image.src}
+                    alt={image.symbol}
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    h={"20px"}
+                    w={"20px"}
+                  />
+                }
                 endElement={
                   <Button
                     variant="surface"

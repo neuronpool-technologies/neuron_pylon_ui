@@ -1,13 +1,23 @@
-import { Flex, Box, Text } from "@chakra-ui/react";
+import { Flex, Box, Text, Spinner } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 
 type StatBoxProps = {
   title: string;
-  value: string;
+  value?: string;
   animation?: boolean;
+  bg: string;
+  fontSize?: string;
+  children?: React.ReactNode;
 };
 
-const StatBox = ({ title, value, animation }: StatBoxProps) => {
+const StatBox = ({
+  title,
+  value,
+  animation,
+  bg,
+  fontSize,
+  children,
+}: StatBoxProps) => {
   const pulseAnimation = keyframes`
     0% {
       border-color: #ccc;
@@ -23,14 +33,8 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
   return (
     <Box w="100%">
       <Flex color="fg.muted" ml="10px" mb="-10px">
-        <Text
-          bg={"bg.muted"}
-          fontSize="xs"
-          display="inline-flex"
-          px={2}
-          lineClamp={1}
-        >
-          {title}
+        <Text bg={bg} fontSize="xs" display="inline-flex" px={2} lineClamp={1}>
+          {animation ? <Spinner size="inherit" /> : title}
         </Text>
       </Flex>
 
@@ -42,11 +46,16 @@ const StatBox = ({ title, value, animation }: StatBoxProps) => {
         px={4}
         alignItems="center"
         borderRadius="md"
+        transition={"all 0.2s"}
         animation={animation ? `${pulseAnimation} 1s infinite` : ""}
       >
-        <Text lineClamp={1} fontSize="sm" fontWeight={500}>
-          {value}
-        </Text>
+        {children ? (
+          children
+        ) : (
+          <Text lineClamp={1} fontSize={fontSize} fontWeight={500}>
+            {value}
+          </Text>
+        )}
       </Flex>
     </Box>
   );

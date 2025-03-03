@@ -2,7 +2,12 @@ import IcLogo from "../../assets/ic-logo.png";
 import NtnLogo from "../../assets/ntn-logo.png";
 import SneedLogo from "../../assets/sneed-logo.png";
 
-export const tokensIcons = [
+interface TokenIcon {
+  src: string;
+  symbol: string;
+}
+
+export const tokensIcons: TokenIcon[] = [
   {
     src: NtnLogo,
     symbol: "NTN",

@@ -11,24 +11,50 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
-import { Header, StatVector } from "@/components";
+import { Header, StatBox } from "@/components";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { About, Activity, Faq, Deposit, Billing, Modify } from "./components";
+import { endpointToBalanceAndAccount } from "@/utils/AccountTools";
+import { e8sToIcp } from "@/utils/TokenTools";
 
 const VectorOverview = () => {
   const { controller, id, tab } = useParams();
   const navigate = useNavigate();
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { principal } = useTypedSelector((state) => state.Wallet);
+  const { principal, pylon_account } = useTypedSelector(
+    (state) => state.Wallet
+  );
   if (!meta) return null;
 
   const vector = vectors.find((v) => v.id.toString() === id);
   if (!vector) return null;
 
-  const { type, name, symbol, active, created } = extractNodeType(vector, meta);
+  const {
+    type,
+    name,
+    label,
+    symbol,
+    active,
+    created,
+    fee,
+    amount,
+    billingLedger,
+    refreshingStake,
+  } = extractNodeType(vector, meta);
+
+  const source = endpointToBalanceAndAccount(vector.sources[0]);
+
+  const w = pylon_account?.find((w) => {
+    const { ledger } = endpointToBalanceAndAccount(w);
+    return ledger === source.ledger;
+  });
+  if (!w) return null;
+
+  const wallet = endpointToBalanceAndAccount(w);
+
   const image =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
 
@@ -42,6 +68,7 @@ const VectorOverview = () => {
         direction={"column"}
         w="100%"
         p={3}
+        gap={3}
       >
         <Flex align="center" gap={3}>
           <ChakraImage
@@ -74,37 +101,46 @@ const VectorOverview = () => {
           fontWeight={500}
           color="fg.muted"
           textTransform={"uppercase"}
-          mt={3}
         >
           Vector #{id}
         </Text>
-        <Flex gap={3} mt={3} direction={{ base: "column", md: "row" }}>
-          <StatVector name={"Controller"}>
-            <Text fontSize="md" fontWeight={500} lineClamp={1} w="100%">
-              {controller}
-            </Text>
-            <ClipboardRoot value={controller}>
-              <ClipboardIconButton
-                variant="surface"
-                rounded="md"
-                boxShadow="xs"
-                size="2xs"
-              />
-            </ClipboardRoot>
-          </StatVector>
-          <Separator orientation="vertical" mt={3} hideBelow={"md"} />
-          <Flex w="100%" gap={3}>
-            <StatVector name={active ? "Active" : "Frozen"}>
-              <Icon size="lg" color={active ? "green.solid" : "red.solid"}>
-                {active ? <TiBatteryFull /> : <TiBatteryLow />}
-              </Icon>
-            </StatVector>
-            <Separator orientation="vertical" mt={3} hideBelow={"md"} />
-            <StatVector name={"Created"}>
-              <Text fontSize="md" fontWeight={500} lineClamp={1}>
-                {created}
+        <Flex gap={3} direction={{ base: "column", md: "row" }}>
+          <Flex w="fit-content">
+            <StatBox title={"Controller"} bg={"bg.subtle"}>
+              <Text lineClamp={1} fontSize="md" fontWeight={500}>
+                {controller}
               </Text>
-            </StatVector>
+              <ClipboardRoot value={controller}>
+                <ClipboardIconButton
+                  variant="surface"
+                  rounded="md"
+                  boxShadow="xs"
+                  size="2xs"
+                  ms={3}
+                />
+              </ClipboardRoot>
+            </StatBox>
+          </Flex>
+          <Separator orientation="vertical" mt={3} hideBelow={"md"} />
+          <Flex direction={{ base: "row", md: "row" }} gap={3}>
+            <Flex w="fit-content">
+              <StatBox title={active ? "Active" : "Frozen"} bg={"bg.subtle"}>
+                <Icon
+                  size="lg"
+                  color={active ? "green.solid" : "red.solid"}
+                  w="60px"
+                >
+                  {active ? <TiBatteryFull /> : <TiBatteryLow />}
+                </Icon>
+              </StatBox>
+            </Flex>
+            <Separator orientation="vertical" mt={3} hideBelow={"md"} />
+            <StatBox
+              title={"Created"}
+              value={created}
+              bg={"bg.subtle"}
+              fontSize="md"
+            />
           </Flex>
         </Flex>
       </Flex>
@@ -147,7 +183,35 @@ const VectorOverview = () => {
             </Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content value="deposit">
-            <Deposit />
+            <Deposit
+              vectorId={id ?? ""}
+              image={image}
+              ledger={source.ledger}
+              tokenSymbol={symbol}
+              tokenFee={e8sToIcp(Number(fee))}
+              walletBalance={wallet.balance}
+              sourceBalance={source.balance}
+              sourceAccount={source.account}
+              sourceName={label}
+              active={active}
+            >
+              {label === "Stake" ? (
+                <StatBox
+                  title={active ? "Neuron stake" : "Neuron frozen"}
+                  value={`${amount} ${symbol}`}
+                  bg={"bg.subtle"}
+                  fontSize="md"
+                  animation={refreshingStake && active}
+                />
+              ) : label === "Split" ? (
+                <StatBox
+                  title={active ? label : `${label} frozen`}
+                  value={`${symbol}`}
+                  bg={"bg.subtle"}
+                  fontSize="md"
+                />
+              ) : null}
+            </Deposit>
           </Tabs.Content>
           <Tabs.Content value="billing">
             <Billing />

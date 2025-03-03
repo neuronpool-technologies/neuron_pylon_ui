@@ -41,16 +41,17 @@ export const isBalanceOkay = (
 
 export const endpointToBalanceAndAccount = (
   endpoint: AccountEndpoint
-): { balance: number; account: string } => {
-  const account = match(endpoint.endpoint)
-    .with({ ic: P.select() }, (x) => x.account)
+): { balance: number; account: string; ledger: string } => {
+  const source = match(endpoint.endpoint)
+    .with({ ic: P.select() }, (x) => x)
     .otherwise(() => {
       throw new Error('"ic" property is missing from the endpoint object.');
     });
 
   return {
     balance: e8sToIcp(Number(endpoint.balance)),
-    account: accountToString(account),
+    account: accountToString(source.account),
+    ledger: source.ledger.toString(),
   };
 };
 

@@ -8,7 +8,7 @@ type StatRowProps = {
 
 const StatRow = ({ title, stat, children }: StatRowProps) => {
   return (
-    <Flex w="100%" gap={1} align="center">
+    <Flex w="100%" gap={1} align="center" fontSize="sm">
       <Text lineClamp={1} fontWeight={500}>
         {title}
       </Text>

@@ -20,10 +20,9 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
   const { balance, account } = endpointToBalanceAndAccount(endpoint);
   const { meta, status } = useTypedSelector((state) => state.Meta);
   const [open, setOpen] = useState(false);
-  
+
   if (!("ic" in endpoint.endpoint)) return null;
   if (status !== "succeeded") return null;
-
 
   const walletLedger = endpoint.endpoint.ic.ledger.toString();
 
@@ -33,7 +32,8 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
   });
 
   const image =
-    tokensIcons.find((images) => images.symbol === token?.symbol) || tokensIcons[1]; // default to ICP logo
+    tokensIcons.find((images) => images.symbol === token?.symbol) ||
+    tokensIcons[1]; // default to ICP logo
 
   if (!token) return null;
 
@@ -87,6 +87,7 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
       </MenuTrigger>
       <MenuContent portalRef={portalRef as React.RefObject<HTMLElement>}>
         <SendToken
+          image={image}
           ledger={walletLedger}
           tokenSymbol={token.symbol}
           tokenFee={e8sToIcp(Number(token.fee))}

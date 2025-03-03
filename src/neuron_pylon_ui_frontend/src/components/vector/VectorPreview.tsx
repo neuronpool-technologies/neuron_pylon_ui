@@ -52,7 +52,7 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
           </Flex>
         </Flex>
         <Flex w={{ base: "35%", md: "20%" }} align={"center"}>
-          <StatBox title={label} value={value} />
+          <StatBox title={label} value={value} bg="bg.muted" fontSize="sm" />
         </Flex>
       </Flex>
     </NavLink>

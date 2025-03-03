@@ -38,6 +38,9 @@ export type NodeTypeResult = {
   created: string;
   controller: string;
   active: boolean;
+  fee: number;
+  billingLedger: string;
+  refreshingStake?: boolean;
 };
 
 export const extractNodeType = (
@@ -66,6 +69,7 @@ export const extractNodeType = (
     return {
       symbol: token?.symbol || "",
       name: token?.name || "",
+      fee: token?.fee || 0,
     };
   };
 
@@ -74,7 +78,7 @@ export const extractNodeType = (
       { devefi_jes1_icpneuron: P.not(P.nullish) },
       ({ devefi_jes1_icpneuron }) => ({
         type: "Neuron",
-        label: "Staked",
+        label: "Stake",
         symbol: "ICP",
         name: "Internet Computer",
         value: `${Math.round(
@@ -82,23 +86,26 @@ export const extractNodeType = (
             Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
           )
         ).toLocaleString()} ICP`,
-        amount: Math.round(
-          e8sToIcp(
-            Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
-          )
-        ).toLocaleString(),
+        amount: e8sToIcp(
+          Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
+        )
+          .toFixed(4)
+          .toString(),
         created,
         controller,
         active: isActive,
+        fee: Number(getTokenInfo().fee),
+        billingLedger: meta.billing.ledger.toString(),
+        refreshingStake: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
       })
     )
     .with(
       { devefi_jes1_snsneuron: P.not(P.nullish) },
       ({ devefi_jes1_snsneuron }) => {
-        const { symbol, name } = getTokenInfo();
+        const { symbol, name, fee } = getTokenInfo();
         return {
           type: "Neuron",
-          label: "Staked",
+          label: "Stake",
           symbol,
           name,
           value: `${Math.round(
@@ -108,21 +115,25 @@ export const extractNodeType = (
               )
             )
           ).toLocaleString()} ${symbol}`,
-          amount: Math.round(
-            e8sToIcp(
-              Number(
-                devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
-              )
+          amount: e8sToIcp(
+            Number(
+              devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
             )
-          ).toLocaleString(),
+          )
+            .toFixed(4)
+            .toString(),
           created,
           controller,
           active: isActive,
+          fee: Number(fee),
+          billingLedger: meta.billing.ledger.toString(),
+          refreshingStake:
+            devefi_jes1_snsneuron.internals.refresh_idx.length > 0,
         };
       }
     )
     .with({ devefi_split: P.not(P.nullish) }, () => {
-      const { symbol, name } = getTokenInfo();
+      const { symbol, name, fee } = getTokenInfo();
       return {
         type: "Splitter",
         label: "Split",
@@ -132,6 +143,8 @@ export const extractNodeType = (
         created,
         controller,
         active: isActive,
+        fee: Number(fee),
+        billingLedger: meta.billing.ledger.toString(),
       };
     })
     .exhaustive();
