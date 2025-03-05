@@ -40,6 +40,7 @@ export type NodeTypeResult = {
   active: boolean;
   fee: number;
   refreshingStake?: boolean;
+  minimumStake?: string;
   billing: {
     transaction_percentage_fee_e8s: bigint;
     current_balance: bigint;
@@ -103,11 +104,9 @@ export const extractNodeType = (
         label: "Stake",
         symbol: "ICP",
         name: "Internet Computer",
-        value: `${Math.round(
-          e8sToIcp(
-            Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
-          )
-        ).toLocaleString()} ICP`,
+        value: `${e8sToIcp(
+          Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
+        ).toFixed(2)} ICP`,
         amount: e8sToIcp(
           Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
         )
@@ -119,6 +118,7 @@ export const extractNodeType = (
         fee: Number(getTokenInfo().fee),
         billingLedger: meta.billing.ledger.toString(),
         refreshingStake: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
+        minimumStake: "Minimum 20 ICP",
         billing: billingInfo,
       })
     )
@@ -131,13 +131,11 @@ export const extractNodeType = (
           label: "Stake",
           symbol,
           name,
-          value: `${Math.round(
-            e8sToIcp(
-              Number(
-                devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
-              )
+          value: `${e8sToIcp(
+            Number(
+              devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
             )
-          ).toLocaleString()} ${symbol}`,
+          ).toFixed(2)} ${symbol}`,
           amount: e8sToIcp(
             Number(
               devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
@@ -151,6 +149,12 @@ export const extractNodeType = (
           fee: Number(fee),
           refreshingStake:
             devefi_jes1_snsneuron.internals.refresh_idx.length > 0,
+          minimumStake: `Minimum ${e8sToIcp(
+            Number(
+              devefi_jes1_snsneuron.parameters_cache[0]
+                ?.neuron_minimum_stake_e8s
+            )
+          ).toFixed(4)} ${symbol}`,
           billing: billingInfo,
         };
       }

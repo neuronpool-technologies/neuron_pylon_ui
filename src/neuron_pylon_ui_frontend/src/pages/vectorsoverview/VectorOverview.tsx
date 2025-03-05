@@ -41,6 +41,7 @@ const VectorOverview = () => {
     amount,
     billing,
     refreshingStake,
+    minimumStake,
   } = extractNodeType(vector, meta);
 
   const source = endpointToBalanceAndAccount(vector.sources[0]);
@@ -208,7 +209,13 @@ const VectorOverview = () => {
             >
               {label === "Stake" ? (
                 <StatBox
-                  title={active ? "Neuron stake" : "Neuron frozen"}
+                  title={
+                    active
+                      ? amount !== undefined && Number(amount) > 0
+                        ? "Neuron stake"
+                        : minimumStake ?? "Neuron stake"
+                      : "Neuron frozen"
+                  }
                   value={`${amount} ${symbol}`}
                   bg={"bg.subtle"}
                   fontSize="md"
