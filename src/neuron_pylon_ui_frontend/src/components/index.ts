@@ -6,3 +6,4 @@ export { default as StatIcon } from "./stat/StatIcon";
 export { default as StatRow } from "./stat/StatRow";
 export { default as VectorPreview } from "./vector/VectorPreview";
 export { default as VectorLog } from "./vector/VectorLog";
+export { default as ConfirmDialog } from "./vector/ConfirmDialog";

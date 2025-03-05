@@ -7,23 +7,16 @@ import {
   Icon,
   Text,
 } from "@chakra-ui/react";
-import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
-import {
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { toaster } from "@/components/ui/toaster";
+import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { InputGroup } from "@/components/ui/input-group";
 import { Field } from "@/components/ui/field";
-import { StatBox, StatRow } from "@/components";
+import { ConfirmDialog, StatBox, StatRow } from "@/components";
 import { BiSend, BiRightArrowAlt, BiDownArrowAlt } from "react-icons/bi";
-import { isBalanceOkay } from "@/utils/AccountTools";
+import {
+  endpointToBalanceAndAccount,
+  isBalanceOkay,
+} from "@/utils/AccountTools";
 import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
@@ -34,7 +27,6 @@ const Deposit = ({
   ledger,
   tokenSymbol,
   tokenFee,
-  walletBalance,
   sourceBalance,
   sourceAccount,
   sourceName,
@@ -49,14 +41,15 @@ const Deposit = ({
   ledger: string;
   tokenSymbol: string;
   tokenFee: number;
-  walletBalance: number;
   sourceBalance: number;
   sourceAccount: string;
   sourceName: string;
   active: boolean;
   children: React.ReactNode;
 }) => {
-  const { logged_in, principal } = useTypedSelector((state) => state.Wallet);
+  const { logged_in, principal, pylon_account } = useTypedSelector(
+    (state) => state.Wallet
+  );
   const [amount, setAmount] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
@@ -64,6 +57,12 @@ const Deposit = ({
   const realFee = tokenFee * 2; // depositing has at least two fees
 
   const { actors } = useActors();
+  const w = pylon_account?.find((w) => {
+    const walletLedger = endpointToBalanceAndAccount(w).ledger;
+    return walletLedger === ledger;
+  });
+
+  const walletBalance = w ? endpointToBalanceAndAccount(w).balance : 0;
 
   const send = async () => {
     setSending(true);
@@ -81,6 +80,24 @@ const Deposit = ({
     });
   };
 
+  const confirm = async () => {
+    const promise = send();
+
+    toaster.promise(promise, {
+      success: {
+        title: `${amount} ${tokenSymbol} sent to:`,
+        description: `Vector #${vectorId} source account`,
+        duration: 3000,
+      },
+      error: {
+        title: "Transaction failed",
+        description: "Please try again.",
+        duration: 3000,
+      },
+      loading: { title: `Sending ${amount} ${tokenSymbol}` },
+    });
+  };
+
   return (
     <Flex
       align="center"
@@ -88,7 +105,7 @@ const Deposit = ({
       w="100%"
       gap={6}
     >
-      <Flex direction={"column"} w="100%" gap={3}>
+      <Flex direction={"column"} gap={3} w="100%">
         <Field
           label="From wallet"
           invalid={!isBalanceOkay(walletBalance, Number(amount), realFee)}
@@ -139,88 +156,33 @@ const Deposit = ({
           stat={`${walletBalance.toFixed(4)} ${tokenSymbol}`}
         />
         <StatRow title={"Ledger fee"} stat={`${realFee} ${tokenSymbol}`} />
-        <DialogRoot
-          lazyMount
-          placement={"center"}
-          motionPreset="slide-in-bottom"
-          open={open}
-          onOpenChange={(e) => setOpen(e.open)}
+        <ConfirmDialog
+          confirmTitle={`Deposit ${tokenSymbol}`}
+          openDisabled={
+            !logged_in ||
+            !amount ||
+            !isBalanceOkay(walletBalance, Number(amount), tokenFee)
+          }
+          buttonIcon={<BiSend />}
+          isOpen={open}
+          setOpen={setOpen}
+          onConfirm={confirm}
+          loading={sending}
         >
-          <DialogTrigger asChild>
-            <Button
-              disabled={
-                !logged_in ||
-                !amount ||
-                !isBalanceOkay(walletBalance, Number(amount), tokenFee)
-              }
-              variant="surface"
-              colorPalette={"gray"}
-              rounded="md"
-              boxShadow="xs"
-              w="100%"
-            >
-              <BiSend /> Deposit {tokenSymbol}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Deposit {tokenSymbol}</DialogTitle>
-            </DialogHeader>
-            <DialogBody>
-              <Flex w="100%" gap={3} direction={"column"}>
-                <StatBox
-                  title={"Deposit"}
-                  bg={"bg"}
-                  fontSize="md"
-                  value={`${amount} ${tokenSymbol}`}
-                />
-                <StatRow
-                  title={`Vector #${vectorId}`}
-                  stat={`${sourceName} source`}
-                />
-                <StatRow
-                  title={"Total fees"}
-                  stat={`${realFee} ${tokenSymbol}`}
-                />
-              </Flex>
-            </DialogBody>
-            <DialogFooter>
-              <Button
-                disabled={
-                  !logged_in ||
-                  !amount ||
-                  !isBalanceOkay(walletBalance, Number(amount), tokenFee)
-                }
-                variant="surface"
-                colorPalette={"gray"}
-                rounded="md"
-                boxShadow="xs"
-                w="100%"
-                loading={sending}
-                onClick={() => {
-                  const promise = send();
-
-                  toaster.promise(promise, {
-                    success: {
-                      title: `${amount} ${tokenSymbol} sent to:`,
-                      description: `Vector #${vectorId}`,
-                      duration: 3000,
-                    },
-                    error: {
-                      title: "Transaction failed",
-                      description: "Please try again.",
-                      duration: 3000,
-                    },
-                    loading: { title: `Sending ${amount} ${tokenSymbol}` },
-                  });
-                }}
-              >
-                <BiSend /> Confirm {tokenSymbol} Deposit
-              </Button>
-            </DialogFooter>
-            <DialogCloseTrigger />
-          </DialogContent>
-        </DialogRoot>
+          <Flex w="100%" gap={3} direction={"column"}>
+            <StatBox
+              title={"Deposit"}
+              bg={"bg"}
+              fontSize="md"
+              value={`${amount} ${tokenSymbol}`}
+            />
+            <StatRow
+              title={`Vector #${vectorId}`}
+              stat={`${sourceName} source`}
+            />
+            <StatRow title={"Total fees"} stat={`${realFee} ${tokenSymbol}`} />
+          </Flex>
+        </ConfirmDialog>
       </Flex>
 
       <Icon fontSize="40px" hideBelow={"md"}>
@@ -230,7 +192,7 @@ const Deposit = ({
         <BiDownArrowAlt />
       </Icon>
 
-      <Flex direction={"column"} w="100%" gap={3}>
+      <Flex direction={"column"} gap={3} w={{ base: "100%", md: "50%" }}>
         <StatBox title={`${sourceName} source`} bg={"bg.subtle"} fontSize="md">
           <Text lineClamp={1} fontSize="md" fontWeight={500}>
             {sourceAccount}

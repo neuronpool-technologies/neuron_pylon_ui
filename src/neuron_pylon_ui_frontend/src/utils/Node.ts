@@ -39,8 +39,14 @@ export type NodeTypeResult = {
   controller: string;
   active: boolean;
   fee: number;
-  billingLedger: string;
   refreshingStake?: boolean;
+  billing: {
+    transaction_percentage_fee_e8s: bigint;
+    current_balance: bigint;
+    account: string;
+    cost_per_day: bigint;
+    ledger: string;
+  };
 };
 
 export const extractNodeType = (
@@ -53,6 +59,22 @@ export const extractNodeType = (
 
   // Calculate active status - true if node is active AND not frozen
   const isActive = vector.active && !vector.billing.frozen;
+
+  // Extract billing information to be included in all return types
+  const transactionFee: bigint = match(vector.billing.transaction_fee)
+    .with(
+      { transaction_percentage_fee_e8s: P.not(P.nullish) },
+      ({ transaction_percentage_fee_e8s }) => transaction_percentage_fee_e8s
+    )
+    .otherwise(() => BigInt(0));
+
+  const billingInfo = {
+    transaction_percentage_fee_e8s: transactionFee,
+    current_balance: vector.billing.current_balance,
+    account: accountToString(vector.billing.account),
+    cost_per_day: vector.billing.cost_per_day,
+    ledger: meta.billing.ledger.toString(),
+  };
 
   // Helper function to get token info
   const getTokenInfo = () => {
@@ -97,6 +119,7 @@ export const extractNodeType = (
         fee: Number(getTokenInfo().fee),
         billingLedger: meta.billing.ledger.toString(),
         refreshingStake: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
+        billing: billingInfo,
       })
     )
     .with(
@@ -126,9 +149,9 @@ export const extractNodeType = (
           controller,
           active: isActive,
           fee: Number(fee),
-          billingLedger: meta.billing.ledger.toString(),
           refreshingStake:
             devefi_jes1_snsneuron.internals.refresh_idx.length > 0,
+          billing: billingInfo,
         };
       }
     )
@@ -144,7 +167,7 @@ export const extractNodeType = (
         controller,
         active: isActive,
         fee: Number(fee),
-        billingLedger: meta.billing.ledger.toString(),
+        billing: billingInfo,
       };
     })
     .exhaustive();

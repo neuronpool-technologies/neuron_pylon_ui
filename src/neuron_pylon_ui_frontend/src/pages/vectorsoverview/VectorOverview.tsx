@@ -24,9 +24,7 @@ const VectorOverview = () => {
   const navigate = useNavigate();
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { principal, pylon_account } = useTypedSelector(
-    (state) => state.Wallet
-  );
+  const { principal } = useTypedSelector((state) => state.Wallet);
   if (!meta) return null;
 
   const vector = vectors.find((v) => v.id.toString() === id);
@@ -41,22 +39,34 @@ const VectorOverview = () => {
     created,
     fee,
     amount,
-    billingLedger,
+    billing,
     refreshingStake,
   } = extractNodeType(vector, meta);
 
   const source = endpointToBalanceAndAccount(vector.sources[0]);
 
-  const w = pylon_account?.find((w) => {
-    const { ledger } = endpointToBalanceAndAccount(w);
-    return ledger === source.ledger;
+  const billingTokenInfo = meta?.supported_ledgers.find((ledger) => {
+    if (!("ic" in ledger?.ledger)) return false;
+    return ledger?.ledger.ic.toString() === billing.ledger;
   });
-  if (!w) return null;
 
-  const wallet = endpointToBalanceAndAccount(w);
+  if (!billingTokenInfo) return null;
 
-  const image =
+  const billingImage =
+    tokensIcons.find((images) => images.symbol === billingTokenInfo.symbol) ||
+    tokensIcons[1];
+
+  const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
+
+  const billingOption =
+    billing.cost_per_day > 0
+      ? `${e8sToIcp(Number(billing.cost_per_day))} ${
+          billingTokenInfo.symbol
+        } per day`
+      : billing.transaction_percentage_fee_e8s > 0
+      ? "5% of Maturity"
+      : "None";
 
   return (
     <Header>
@@ -72,8 +82,8 @@ const VectorOverview = () => {
       >
         <Flex align="center" gap={3}>
           <ChakraImage
-            src={image.src}
-            alt={image.symbol}
+            src={tokenImage.src}
+            alt={tokenImage.symbol}
             bg={"bg.emphasized"}
             borderRadius="full"
             h={45}
@@ -135,12 +145,14 @@ const VectorOverview = () => {
               </StatBox>
             </Flex>
             <Separator orientation="vertical" mt={3} hideBelow={"md"} />
-            <StatBox
-              title={"Created"}
-              value={created}
-              bg={"bg.subtle"}
-              fontSize="md"
-            />
+            <Flex w="fit-content">
+              <StatBox
+                title={"Created"}
+                value={created}
+                bg={"bg.subtle"}
+                fontSize="md"
+              />
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
@@ -185,11 +197,10 @@ const VectorOverview = () => {
           <Tabs.Content value="deposit">
             <Deposit
               vectorId={id ?? ""}
-              image={image}
+              image={tokenImage}
               ledger={source.ledger}
               tokenSymbol={symbol}
               tokenFee={e8sToIcp(Number(fee))}
-              walletBalance={wallet.balance}
               sourceBalance={source.balance}
               sourceAccount={source.account}
               sourceName={label}
@@ -214,7 +225,17 @@ const VectorOverview = () => {
             </Deposit>
           </Tabs.Content>
           <Tabs.Content value="billing">
-            <Billing />
+            <Billing
+              vectorId={id ?? ""}
+              image={billingImage}
+              ledger={billing.ledger}
+              tokenSymbol={billingTokenInfo.symbol}
+              tokenFee={e8sToIcp(Number(billingTokenInfo.fee))}
+              billingBalance={e8sToIcp(Number(billing.current_balance))}
+              billingAccount={billing.account}
+              active={active}
+              billingOption={billingOption}
+            />
           </Tabs.Content>
           <Tabs.Content value="modify">
             <Modify />
