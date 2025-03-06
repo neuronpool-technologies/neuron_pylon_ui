@@ -19,8 +19,6 @@ import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
 import { About, Activity, Faq, Deposit, Billing, Modify } from "./components";
-import { endpointToBalanceAndAccount } from "@/utils/AccountTools";
-import { e8sToIcp } from "@/utils/TokenTools";
 
 const VectorOverview = () => {
   const { controller, id, tab } = useParams();
@@ -34,45 +32,11 @@ const VectorOverview = () => {
   const vector = vectors.find((v) => v.id.toString() === id);
   if (!vector) return null;
 
-  const {
-    type,
-    name,
-    label,
-    symbol,
-    active,
-    created,
-    fee,
-    amount,
-    billing,
-    refreshingStake,
-    minimumStake,
-    activity,
-  } = extractNodeType(vector, meta);
-
-  const source = endpointToBalanceAndAccount(vector.sources[0]);
-
-  const billingTokenInfo = meta?.supported_ledgers.find((ledger) => {
-    if (!("ic" in ledger?.ledger)) return false;
-    return ledger?.ledger.ic.toString() === billing.ledger;
-  });
-
-  if (!billingTokenInfo) return null;
-
-  const billingImage =
-    tokensIcons.find((images) => images.symbol === billingTokenInfo.symbol) ||
-    tokensIcons[1];
+  const { type, name, label, symbol, active, created, activity } =
+    extractNodeType(vector, meta);
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
-
-  const billingOption =
-    billing.cost_per_day > 0
-      ? `${e8sToIcp(Number(billing.cost_per_day))} ${
-          billingTokenInfo.symbol
-        } per day`
-      : billing.transaction_percentage_fee_e8s > 0
-      ? "5% of Maturity"
-      : "None";
 
   return (
     <Header>
@@ -238,52 +202,10 @@ const VectorOverview = () => {
             </Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content value="deposit">
-            <Deposit
-              vectorId={id ?? ""}
-              image={tokenImage}
-              ledger={source.ledger}
-              tokenSymbol={symbol}
-              tokenFee={e8sToIcp(Number(fee))}
-              sourceBalance={source.balance}
-              sourceAccount={source.account}
-              sourceName={label}
-              active={active}
-            >
-              {label === "Stake" ? (
-                <StatBox
-                  title={
-                    active
-                      ? amount !== undefined && Number(amount) > 0
-                        ? "Neuron stake"
-                        : minimumStake ?? "Neuron stake"
-                      : "Neuron frozen"
-                  }
-                  value={`${amount} ${symbol}`}
-                  bg={"bg.subtle"}
-                  fontSize="md"
-                  animation={refreshingStake && active}
-                />
-              ) : label === "Split" ? (
-                <StatBox
-                  title={active ? label : `${label} frozen`}
-                  value={`${symbol}`}
-                  bg={"bg.subtle"}
-                  fontSize="md"
-                />
-              ) : null}
-            </Deposit>
+            <Deposit vector={vector} />
           </Tabs.Content>
           <Tabs.Content value="billing">
-            <Billing
-              vectorId={id ?? ""}
-              image={billingImage}
-              ledger={billing.ledger}
-              tokenSymbol={billingTokenInfo.symbol}
-              tokenFee={e8sToIcp(Number(billingTokenInfo.fee))}
-              billingBalance={e8sToIcp(Number(billing.current_balance))}
-              billingAccount={billing.account}
-              billingOption={billingOption}
-            />
+            <Billing vector={vector} />
           </Tabs.Content>
           <Tabs.Content value="modify">
             <Modify vector={vector} />

@@ -20,46 +20,37 @@ import {
 import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
+import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did";
+import { extractNodeType } from "@/utils/Node";
+import { tokensIcons } from "@/utils/TokensIcons";
+import { e8sToIcp } from "@/utils/TokenTools";
 
-const Deposit = ({
-  vectorId,
-  image,
-  ledger,
-  tokenSymbol,
-  tokenFee,
-  sourceBalance,
-  sourceAccount,
-  sourceName,
-  active,
-  children,
-}: {
-  vectorId: string;
-  image: {
-    src: string;
-    symbol: string;
-  };
-  ledger: string;
-  tokenSymbol: string;
-  tokenFee: number;
-  sourceBalance: number;
-  sourceAccount: string;
-  sourceName: string;
-  active: boolean;
-  children: React.ReactNode;
-}) => {
+const Deposit = ({ vector }: { vector: NodeShared }) => {
   const { logged_in, principal, pylon_account } = useTypedSelector(
     (state) => state.Wallet
   );
-  const [amount, setAmount] = useState<string>("");
+  const { meta } = useTypedSelector((state) => state.Meta);
+
+  const [sendAmount, setSendAmount] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
-  const realFee = tokenFee * 2; // depositing has at least two fees
+  if (!meta) return null;
+
+  const { label, symbol, active, fee,amount, refreshingStake, minimumStake } =
+    extractNodeType(vector, meta);
+
+  const tokenImage =
+    tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
+
+  const source = endpointToBalanceAndAccount(vector.sources[0]);
+
+  const realFee = e8sToIcp(Number(fee * 2)); // depositing has at least two fees
 
   const { actors } = useActors();
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
-    return walletLedger === ledger;
+    return walletLedger === source.ledger;
   });
 
   const walletBalance = w ? endpointToBalanceAndAccount(w).balance : 0;
@@ -70,11 +61,11 @@ const Deposit = ({
     await transfer({
       pylon: actors.neuronPylon,
       controller: principal,
-      ledger: ledger,
-      to: sourceAccount,
-      amount: amount,
+      ledger: source.ledger,
+      to: source.account,
+      amount: sendAmount,
     }).finally(() => {
-      setAmount("");
+      setSendAmount("");
       setSending(false);
       setOpen(false);
     });
@@ -85,8 +76,8 @@ const Deposit = ({
 
     toaster.promise(promise, {
       success: {
-        title: `${amount} ${tokenSymbol} sent to:`,
-        description: `Vector #${vectorId} source account`,
+        title: `${sendAmount} ${symbol} sent to:`,
+        description: `Vector #${vector.id} source account`,
         duration: 3000,
       },
       error: {
@@ -94,7 +85,7 @@ const Deposit = ({
         description: "Please try again.",
         duration: 3000,
       },
-      loading: { title: `Sending ${amount} ${tokenSymbol}` },
+      loading: { title: `Sending ${sendAmount} ${symbol}` },
     });
   };
 
@@ -108,15 +99,15 @@ const Deposit = ({
       <Flex direction={"column"} gap={3} w="100%">
         <Field
           label="From wallet"
-          invalid={!isBalanceOkay(walletBalance, Number(amount), realFee)}
+          invalid={!isBalanceOkay(walletBalance, Number(sendAmount), realFee)}
           disabled={sending}
         >
           <InputGroup
             w="100%"
             startElement={
               <ChakraImage
-                src={image.src}
-                alt={image.symbol}
+                src={tokenImage.src}
+                alt={tokenImage.symbol}
                 bg={"bg.emphasized"}
                 borderRadius="full"
                 h={"20px"}
@@ -129,7 +120,7 @@ const Deposit = ({
                 rounded="md"
                 boxShadow="xs"
                 size="2xs"
-                onClick={() => setAmount(walletBalance.toString())}
+                onClick={() => setSendAmount(walletBalance.toString())}
                 disabled={sending || !logged_in}
                 colorPalette={"gray"}
               >
@@ -139,29 +130,29 @@ const Deposit = ({
           >
             <Input
               type="number"
-              placeholder={`${tokenSymbol} amount`}
+              placeholder={`${symbol} amount`}
               size="lg"
               bg={
-                !isBalanceOkay(walletBalance, Number(amount), realFee)
+                !isBalanceOkay(walletBalance, Number(sendAmount), realFee)
                   ? "bg.error"
                   : ""
               }
-              onChange={(e) => setAmount(e.target.value)}
-              value={amount}
+              onChange={(e) => setSendAmount(e.target.value)}
+              value={sendAmount}
             />
           </InputGroup>
         </Field>
         <StatRow
           title={"Balance"}
-          stat={`${walletBalance.toFixed(4)} ${tokenSymbol}`}
+          stat={`${walletBalance.toFixed(4)} ${symbol}`}
         />
-        <StatRow title={"Ledger fee"} stat={`${realFee} ${tokenSymbol}`} />
+        <StatRow title={"Ledger fee"} stat={`${realFee} ${symbol}`} />
         <ConfirmDialog
-          confirmTitle={`Deposit ${tokenSymbol}`}
+          confirmTitle={`Deposit ${symbol}`}
           openDisabled={
             !logged_in ||
-            !amount ||
-            !isBalanceOkay(walletBalance, Number(amount), tokenFee)
+            !sendAmount ||
+            !isBalanceOkay(walletBalance, Number(sendAmount), realFee)
           }
           buttonIcon={<BiSend />}
           isOpen={open}
@@ -174,13 +165,10 @@ const Deposit = ({
               title={"Deposit"}
               bg={"bg"}
               fontSize="md"
-              value={`${amount} ${tokenSymbol}`}
+              value={`${sendAmount} ${symbol}`}
             />
-            <StatRow
-              title={`Vector #${vectorId}`}
-              stat={`${sourceName} source`}
-            />
-            <StatRow title={"Total fees"} stat={`${realFee} ${tokenSymbol}`} />
+            <StatRow title={`Vector #${vector.id}`} stat={`${label} source`} />
+            <StatRow title={"Total fees"} stat={`${realFee} ${symbol}`} />
           </Flex>
         </ConfirmDialog>
       </Flex>
@@ -193,11 +181,11 @@ const Deposit = ({
       </Icon>
 
       <Flex direction={"column"} gap={3} w={{ base: "100%", md: "50%" }}>
-        <StatBox title={`${sourceName} source`} bg={"bg.subtle"} fontSize="md">
+        <StatBox title={`${label} source`} bg={"bg.subtle"} fontSize="md">
           <Text lineClamp={1} fontSize="md" fontWeight={500}>
-            {sourceAccount}
+            {source.account}
           </Text>
-          <ClipboardRoot value={sourceAccount}>
+          <ClipboardRoot value={source.account}>
             <ClipboardIconButton
               variant="surface"
               colorPalette={"gray"}
@@ -210,15 +198,36 @@ const Deposit = ({
         <Flex gap={3} align="center">
           <StatBox
             title={active ? "Source balance" : "Source frozen"}
-            value={`${sourceBalance.toFixed(4)} ${tokenSymbol}`}
+            value={`${source.balance.toFixed(4)} ${symbol}`}
             bg={"bg.subtle"}
             fontSize="md"
-            animation={sourceBalance > 0 && active}
+            animation={source.balance > 0 && active}
           />
           <Icon size="lg">
             <BiRightArrowAlt />
           </Icon>
-          {children}
+          {label === "Stake" ? (
+            <StatBox
+              title={
+                active
+                  ? amount !== undefined && Number(amount) > 0
+                    ? "Neuron stake"
+                    : minimumStake ?? "Neuron stake"
+                  : "Neuron frozen"
+              }
+              value={`${amount} ${symbol}`}
+              bg={"bg.subtle"}
+              fontSize="md"
+              animation={refreshingStake && active}
+            />
+          ) : label === "Split" ? (
+            <StatBox
+              title={active ? label : `${label} frozen`}
+              value={`${symbol}`}
+              bg={"bg.subtle"}
+              fontSize="md"
+            />
+          ) : null}
         </Flex>
       </Flex>
     </Flex>

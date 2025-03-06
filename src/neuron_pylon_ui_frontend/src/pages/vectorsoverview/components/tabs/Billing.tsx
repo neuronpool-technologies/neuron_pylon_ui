@@ -20,43 +20,45 @@ import {
 import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
+import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did";
+import { extractNodeType } from "@/utils/Node";
+import { e8sToIcp } from "@/utils/TokenTools";
+import { tokensIcons } from "@/utils/TokensIcons";
 
-const Billing = ({
-  vectorId,
-  image,
-  ledger,
-  tokenSymbol,
-  tokenFee,
-  billingBalance,
-  billingAccount,
-  billingOption,
-}: {
-  vectorId: string;
-  image: {
-    src: string;
-    symbol: string;
-  };
-  ledger: string;
-  tokenSymbol: string;
-  tokenFee: number;
-  billingBalance: number;
-  billingAccount: string;
-  billingOption: string;
-}) => {
+const Billing = ({ vector }: { vector: NodeShared }) => {
   const { logged_in, principal, pylon_account } = useTypedSelector(
     (state) => state.Wallet
   );
+  const { meta } = useTypedSelector((state) => state.Meta);
+
   const [amount, setAmount] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
+  if (!meta) return null;
+
+  const { billing } = extractNodeType(vector, meta);
+
   const { actors } = useActors();
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
-    return walletLedger === ledger;
+    return walletLedger === billing.ledger;
   });
 
+  const billingTokenInfo = meta?.supported_ledgers.find((ledger) => {
+    if (!("ic" in ledger?.ledger)) return false;
+    return ledger?.ledger.ic.toString() === billing.ledger;
+  });
+
+  if (!billingTokenInfo) return null;
+
+  const billingImage =
+    tokensIcons.find((images) => images.symbol === billingTokenInfo.symbol) ||
+    tokensIcons[1];
+
   const walletBalance = w ? endpointToBalanceAndAccount(w).balance : 0;
+
+  const realFee = e8sToIcp(Number(billingTokenInfo.fee));
 
   const send = async () => {
     setSending(true);
@@ -64,8 +66,8 @@ const Billing = ({
     await transfer({
       pylon: actors.neuronPylon,
       controller: principal,
-      ledger: ledger,
-      to: billingAccount,
+      ledger: billing.ledger,
+      to: billing.account,
       amount: amount,
     }).finally(() => {
       setAmount("");
@@ -79,8 +81,8 @@ const Billing = ({
 
     toaster.promise(promise, {
       success: {
-        title: `${amount} ${tokenSymbol} sent to:`,
-        description: `Vector #${vectorId} billing account`,
+        title: `${amount} ${billingTokenInfo.symbol} sent to:`,
+        description: `Vector #${vector.id} billing account`,
         duration: 3000,
       },
       error: {
@@ -88,9 +90,18 @@ const Billing = ({
         description: "Please try again.",
         duration: 3000,
       },
-      loading: { title: `Sending ${amount} ${tokenSymbol}` },
+      loading: { title: `Sending ${amount} ${billingTokenInfo.symbol}` },
     });
   };
+
+  const billingOption =
+    billing.cost_per_day > 0
+      ? `${e8sToIcp(Number(billing.cost_per_day))} ${
+          billingTokenInfo.symbol
+        } per day`
+      : billing.transaction_percentage_fee_e8s > 0
+      ? "5% of Maturity"
+      : "None";
 
   return (
     <Flex
@@ -102,15 +113,15 @@ const Billing = ({
       <Flex direction={"column"} gap={3} w="100%">
         <Field
           label="From wallet"
-          invalid={!isBalanceOkay(walletBalance, Number(amount), tokenFee)}
+          invalid={!isBalanceOkay(walletBalance, Number(amount), realFee)}
           disabled={sending}
         >
           <InputGroup
             w="100%"
             startElement={
               <ChakraImage
-                src={image.src}
-                alt={image.symbol}
+                src={billingImage.src}
+                alt={billingImage.symbol}
                 bg={"bg.emphasized"}
                 borderRadius="full"
                 h={"20px"}
@@ -133,10 +144,10 @@ const Billing = ({
           >
             <Input
               type="number"
-              placeholder={`${tokenSymbol} amount`}
+              placeholder={`${billingTokenInfo.symbol} amount`}
               size="lg"
               bg={
-                !isBalanceOkay(walletBalance, Number(amount), tokenFee)
+                !isBalanceOkay(walletBalance, Number(amount), realFee)
                   ? "bg.error"
                   : ""
               }
@@ -147,15 +158,18 @@ const Billing = ({
         </Field>
         <StatRow
           title={"Balance"}
-          stat={`${walletBalance.toFixed(4)} ${tokenSymbol}`}
+          stat={`${walletBalance.toFixed(4)} ${billingTokenInfo.symbol}`}
         />
-        <StatRow title={"Ledger fee"} stat={`${tokenFee} ${tokenSymbol}`} />
+        <StatRow
+          title={"Ledger fee"}
+          stat={`${realFee} ${billingTokenInfo.symbol}`}
+        />
         <ConfirmDialog
-          confirmTitle={`Deposit ${tokenSymbol}`}
+          confirmTitle={`Deposit ${billingTokenInfo.symbol}`}
           openDisabled={
             !logged_in ||
             !amount ||
-            !isBalanceOkay(walletBalance, Number(amount), tokenFee)
+            !isBalanceOkay(walletBalance, Number(amount), realFee)
           }
           buttonIcon={<BiSend />}
           isOpen={open}
@@ -168,10 +182,13 @@ const Billing = ({
               title={"Deposit"}
               bg={"bg"}
               fontSize="md"
-              value={`${amount} ${tokenSymbol}`}
+              value={`${amount} ${billingTokenInfo.symbol}`}
             />
-            <StatRow title={`Vector #${vectorId}`} stat={`Billing account`} />
-            <StatRow title={"Total fees"} stat={`${tokenFee} ${tokenSymbol}`} />
+            <StatRow title={`Vector #${vector.id}`} stat={`Billing account`} />
+            <StatRow
+              title={"Total fees"}
+              stat={`${realFee} ${billingTokenInfo.symbol}`}
+            />
           </Flex>
         </ConfirmDialog>
       </Flex>
@@ -186,9 +203,9 @@ const Billing = ({
       <Flex direction={"column"} gap={3} w={{ base: "100%", md: "50%" }}>
         <StatBox title={"Billing account"} bg={"bg.subtle"} fontSize="md">
           <Text lineClamp={1} fontSize="md" fontWeight={500}>
-            {billingAccount}
+            {billing.account}
           </Text>
-          <ClipboardRoot value={billingAccount}>
+          <ClipboardRoot value={billing.account}>
             <ClipboardIconButton
               variant="surface"
               colorPalette={"gray"}
@@ -201,7 +218,9 @@ const Billing = ({
         <Flex gap={3} align="center">
           <StatBox
             title={"Billing balance"}
-            value={`${billingBalance.toFixed(4)} ${tokenSymbol}`}
+            value={`${e8sToIcp(Number(billing.current_balance)).toFixed(4)} ${
+              billingTokenInfo.symbol
+            }`}
             bg={"bg.subtle"}
             fontSize="md"
           />

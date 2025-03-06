@@ -12,7 +12,7 @@ const Activity = ({
   vectorLog: Array<Activity>;
   vector: NodeShared;
 }) => {
-  const logToShow = vectorLog.slice(0, 5).reverse();
+  const logToShow = [...vectorLog].reverse().slice(0, 5);
   return (
     <Flex
       bg="bg.subtle"
