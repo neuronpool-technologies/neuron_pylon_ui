@@ -29,7 +29,6 @@ const Billing = ({
   tokenFee,
   billingBalance,
   billingAccount,
-  active,
   billingOption,
 }: {
   vectorId: string;
@@ -42,7 +41,6 @@ const Billing = ({
   tokenFee: number;
   billingBalance: number;
   billingAccount: string;
-  active: boolean;
   billingOption: string;
 }) => {
   const { logged_in, principal, pylon_account } = useTypedSelector(
@@ -202,7 +200,7 @@ const Billing = ({
         </StatBox>
         <Flex gap={3} align="center">
           <StatBox
-            title={active ? "Billing balance" : "Billing frozen"}
+            title={"Billing balance"}
             value={`${billingBalance.toFixed(4)} ${tokenSymbol}`}
             bg={"bg.subtle"}
             fontSize="md"

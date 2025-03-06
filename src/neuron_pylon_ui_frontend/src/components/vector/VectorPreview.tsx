@@ -1,4 +1,10 @@
-import { Flex, Text, Heading, Image as ChakraImage } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Heading,
+  Image as ChakraImage,
+  Separator,
+} from "@chakra-ui/react";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { StatBox } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
@@ -6,7 +12,13 @@ import { NavLink } from "react-router-dom";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 
-const VectorPreview = ({ vector }: { vector: NodeShared }) => {
+const VectorPreview = ({
+  first,
+  vector,
+}: {
+  first: boolean;
+  vector: NodeShared;
+}) => {
   const { meta } = useTypedSelector((state) => state.Meta);
   if (!meta) return null;
   const { type, label, symbol, value, created, controller } = extractNodeType(
@@ -18,19 +30,18 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
 
   return (
     <NavLink to={`/vectors/${controller}/${vector.id}`}>
+      {!first ? <Separator /> : null}
       <Flex
-        boxShadow={"sm"}
-        borderRadius={"md"}
-        p={3}
         direction={"row"}
         align="center"
-        bg="bg.muted"
         transition={"all 0.2s"}
         _hover={{
           cursor: "pointer",
-          boxShadow: "md",
-          transform: "translateX(5px)",
+          bg: "bg.muted",
         }}
+        p={3}
+        bg="bg.subtle"
+        borderRadius="md"
       >
         <Flex w={{ base: "65%", md: "80%" }} gap={3} align="center">
           <ChakraImage
@@ -51,8 +62,8 @@ const VectorPreview = ({ vector }: { vector: NodeShared }) => {
             </Text>
           </Flex>
         </Flex>
-        <Flex w={{ base: "35%", md: "20%" }} align={"center"}>
-          <StatBox title={label} value={value} bg="bg.muted" fontSize="sm" />
+        <Flex w={{ base: "35%", md: "20%" }} align={"center"} bg="inherit">
+          <StatBox title={label} value={value} bg="inherit" fontSize="sm" />
         </Flex>
       </Flex>
     </NavLink>

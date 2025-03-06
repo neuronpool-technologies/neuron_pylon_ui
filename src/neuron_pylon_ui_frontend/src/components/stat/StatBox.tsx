@@ -31,8 +31,8 @@ const StatBox = ({
   `;
 
   return (
-    <Box w="100%">
-      <Flex color="fg.muted" ml="10px" mb="-10px">
+    <Box w="100%" bg="inherit">
+      <Flex color="fg.muted" ml="10px" mb="-10px" bg="inherit">
         <Text bg={bg} fontSize="xs" display="inline-flex" px={2} lineClamp={1}>
           {animation ? <Spinner size="inherit" /> : title}
         </Text>

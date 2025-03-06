@@ -19,9 +19,9 @@ const RecentVectors = () => {
     >
       <Heading p={3}>Latest Vectors</Heading>
       <Separator />
-      <Flex direction="column" w="100%" p={3} gap={3}>
-        {latestVectors.map((vector) => (
-          <VectorPreview key={vector.id} vector={vector} />
+      <Flex direction="column" w="100%">
+        {latestVectors.map((vector, index) => (
+          <VectorPreview key={index} vector={vector} first={index === 0} />
         ))}
       </Flex>
       <NavLink to={`/vectors`}>

@@ -248,9 +248,9 @@ const VectorsTable = () => {
           <CreateVector />
         </Flex>
         <Separator />
-        <Flex direction="column" w="100%" p={3} gap={3}>
-          {filteredVectors.map((vector) => (
-            <VectorPreview key={vector.id} vector={vector} />
+        <Flex direction="column" w="100%">
+          {filteredVectors.map((vector, index) => (
+            <VectorPreview key={index} vector={vector} first={index === 0} />
           ))}
         </Flex>
       </Flex>

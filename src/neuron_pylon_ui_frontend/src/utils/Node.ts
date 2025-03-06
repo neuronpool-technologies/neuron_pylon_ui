@@ -48,6 +48,7 @@ export type NodeTypeResult = {
     cost_per_day: bigint;
     ledger: string;
   };
+  activity?: Array<Activity>;
 };
 
 export const extractNodeType = (
@@ -120,6 +121,7 @@ export const extractNodeType = (
         refreshingStake: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
         minimumStake: "Minimum 20 ICP",
         billing: billingInfo,
+        activity: extractAllLogs(vector),
       })
     )
     .with(
@@ -156,6 +158,7 @@ export const extractNodeType = (
             )
           ).toFixed(4)} ${symbol}`,
           billing: billingInfo,
+          activity: extractAllLogs(vector),
         };
       }
     )

@@ -18,9 +18,15 @@ const RecentActivity = () => {
     >
       <Heading p={3}>Recent Activity</Heading>
       <Separator />
-      <Flex direction="column" w="100%" p={3} gap={3}>
+      <Flex direction="column" w="100%">
         {latest_log.map(({ log, node }, index) => (
-          <VectorLog key={index} vector={node} activity={log} />
+          <VectorLog
+            key={index}
+            vector={node}
+            activity={log}
+            first={index === 0}
+            showLink
+          />
         ))}
       </Flex>
       <NavLink to={`/vectors`}>

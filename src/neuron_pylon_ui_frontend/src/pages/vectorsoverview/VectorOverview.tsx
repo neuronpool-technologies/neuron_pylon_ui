@@ -9,6 +9,7 @@ import {
   Icon,
   Separator,
   Tabs,
+  Button,
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox } from "@/components";
@@ -42,6 +43,7 @@ const VectorOverview = () => {
     billing,
     refreshingStake,
     minimumStake,
+    activity,
   } = extractNodeType(vector, meta);
 
   const source = endpointToBalanceAndAccount(vector.sources[0]);
@@ -74,7 +76,6 @@ const VectorOverview = () => {
       <Flex
         bg="bg.subtle"
         boxShadow={"md"}
-        mt={6}
         borderRadius={"md"}
         direction={"column"}
         w="100%"
@@ -240,7 +241,6 @@ const VectorOverview = () => {
               tokenFee={e8sToIcp(Number(billingTokenInfo.fee))}
               billingBalance={e8sToIcp(Number(billing.current_balance))}
               billingAccount={billing.account}
-              active={active}
               billingOption={billingOption}
             />
           </Tabs.Content>
@@ -255,7 +255,9 @@ const VectorOverview = () => {
         w="100%"
       >
         <About />
-        <Activity />
+        {label === "Stake" ? (
+          <Activity vectorLog={activity || []} vector={vector} />
+        ) : null}
       </Flex>
       <Faq />
     </Header>
