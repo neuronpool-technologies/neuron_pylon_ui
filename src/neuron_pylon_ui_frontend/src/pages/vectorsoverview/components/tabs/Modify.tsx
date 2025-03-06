@@ -1,9 +1,13 @@
-import React from 'react'
+import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { useTypedSelector } from "@/hooks/useRedux";
+import { extractNodeType } from "@/utils/Node";
 
-const Modify = () => {
-  return (
-    <div>Modify</div>
-  )
-}
+const Modify = ({ vector }: { vector: NodeShared }) => {
+  const { meta } = useTypedSelector((state) => state.Meta);
+  if (!meta) return null;
 
-export default Modify
+  const { type, symbol } = extractNodeType(vector, meta);
+  return <>modify</>;
+};
+
+export default Modify;

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useTypedSelector } from "@/hooks/useRedux";
 import {
   Heading,
@@ -9,19 +9,22 @@ import {
   Icon,
   Separator,
   Tabs,
-  Button,
+  Breadcrumb,
+  IconButton,
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox } from "@/components";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
+import { BiArrowBack } from "react-icons/bi";
 import { About, Activity, Faq, Deposit, Billing, Modify } from "./components";
 import { endpointToBalanceAndAccount } from "@/utils/AccountTools";
 import { e8sToIcp } from "@/utils/TokenTools";
 
 const VectorOverview = () => {
   const { controller, id, tab } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
@@ -73,6 +76,44 @@ const VectorOverview = () => {
 
   return (
     <Header>
+      <Flex gap={3} mb={3} align="center">
+        <NavLink
+          to={
+            location.state?.from
+              ? `/vectors/${location.state.from}`
+              : "/vectors"
+          }
+        >
+          <IconButton
+            aria-label="Back button"
+            variant="surface"
+            rounded="md"
+            boxShadow="xs"
+            size="xs"
+          >
+            <BiArrowBack />
+          </IconButton>
+        </NavLink>
+        <Breadcrumb.Root size="lg">
+          <Breadcrumb.List>
+            <Breadcrumb.Item>
+              <NavLink
+                to={
+                  location.state?.from
+                    ? `/vectors${location.state.from}`
+                    : "/vectors"
+                }
+              >
+                Vectors
+              </NavLink>
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator />
+            <Breadcrumb.Item>
+              <Breadcrumb.CurrentLink>Vector #{id}</Breadcrumb.CurrentLink>
+            </Breadcrumb.Item>
+          </Breadcrumb.List>
+        </Breadcrumb.Root>
+      </Flex>
       <Flex
         bg="bg.subtle"
         boxShadow={"md"}
@@ -245,7 +286,7 @@ const VectorOverview = () => {
             />
           </Tabs.Content>
           <Tabs.Content value="modify">
-            <Modify />
+            <Modify vector={vector} />
           </Tabs.Content>
         </Tabs.Root>
       </Flex>

@@ -8,7 +8,7 @@ import {
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { StatBox } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 
@@ -20,6 +20,8 @@ const VectorPreview = ({
   vector: NodeShared;
 }) => {
   const { meta } = useTypedSelector((state) => state.Meta);
+  const params = useParams();
+
   if (!meta) return null;
   const { type, label, symbol, value, created, controller } = extractNodeType(
     vector,
@@ -29,7 +31,10 @@ const VectorPreview = ({
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
 
   return (
-    <NavLink to={`/vectors/${controller}/${vector.id}`}>
+    <NavLink
+      to={`/vectors/${controller}/${vector.id}`}
+      state={{ from: params.controller }}
+    >
       {!first ? <Separator /> : null}
       <Flex
         direction={"row"}
