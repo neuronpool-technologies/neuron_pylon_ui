@@ -1,5 +1,6 @@
 export { default as Nav } from "./navbar/Nav";
 export { default as Wallet } from "./wallet/Wallet";
+export { default as Footer } from "./footer/Footer";
 export { default as Header } from "./header/Header";
 export { default as StatBox } from "./stat/StatBox";
 export { default as StatIcon } from "./stat/StatIcon";
