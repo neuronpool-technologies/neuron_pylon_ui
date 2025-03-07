@@ -6,8 +6,14 @@ import {
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "./TokenTools";
-import { convertNanosecondsToElapsedTime } from "./Time";
+import {
+  calculateTimeUntilTimestamp,
+  convertDaysToMonthsAndYears,
+  convertNanosecondsToElapsedTime,
+  convertSecondsToDays,
+} from "./Time";
 import { accountToString } from "./AccountTools";
+import { uint8ArrayToHexString } from "@dfinity/utils";
 
 // Extract logs from nodes and combine them into a single array
 export const extractAllLogs = (node: NodeShared): Array<Activity> => {
@@ -49,6 +55,14 @@ export type NodeTypeResult = {
     ledger: string;
   };
   activity?: Array<Activity>;
+  destinations: Array<[string, string]>;
+  neuronId?: string;
+  neuronFollowee?: string;
+  dissolveDelay?: string;
+  neuronStatus?: string;
+  unspawnedMaturity?: string;
+  lastUpdated?: string;
+  spawningMaturity?: string;
 };
 
 export const extractNodeType = (
@@ -58,6 +72,23 @@ export const extractNodeType = (
   // Common properties
   const created = convertNanosecondsToElapsedTime(Number(vector.created));
   const controller = accountToString(vector.controllers[0]);
+
+  // Map destinations to an array of tuples [name, address]
+  const destinations = vector.destinations.reduce<Array<[string, string]>>(
+    (acc, dest) => {
+      let address = "unknown";
+      if (
+        "ic" in dest.endpoint &&
+        dest.endpoint.ic.account &&
+        dest.endpoint.ic.account[0]
+      ) {
+        address = accountToString(dest.endpoint.ic.account[0]);
+      }
+      acc.push([dest.name, address]);
+      return acc;
+    },
+    []
+  );
 
   // Calculate active status - true if node is active AND not frozen
   const isActive = vector.active && !vector.billing.frozen;
@@ -100,34 +131,85 @@ export const extractNodeType = (
   return match(vector.custom?.[0] as Shared)
     .with(
       { devefi_jes1_icpneuron: P.not(P.nullish) },
-      ({ devefi_jes1_icpneuron }) => ({
-        type: "Neuron",
-        label: "Stake",
-        symbol: "ICP",
-        name: "Internet Computer",
-        value: `${e8sToIcp(
-          Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
-        ).toFixed(2)} ICP`,
-        amount: e8sToIcp(
-          Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
-        )
-          .toFixed(4)
-          .toString(),
-        created,
-        controller,
-        active: isActive,
-        fee: Number(getTokenInfo().fee),
-        billingLedger: meta.billing.ledger.toString(),
-        refreshingStake: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
-        minimumStake: "Minimum 20 ICP",
-        billing: billingInfo,
-        activity: extractAllLogs(vector),
-      })
+      ({ devefi_jes1_icpneuron }) => {
+        const updatingStatus = match(devefi_jes1_icpneuron.internals.updating)
+          .with({ Init: P._ }, () => "Init")
+          .with({ Calling: P._ }, () => "Updating")
+          .with({ Done: P.select() }, (timestamp) =>
+            convertNanosecondsToElapsedTime(Number(timestamp))
+          )
+          .exhaustive();
+
+        return {
+          type: "Neuron",
+          label: "Stake",
+          symbol: "ICP",
+          name: "Internet Computer",
+          value: `${e8sToIcp(
+            Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
+          ).toFixed(2)} ICP`,
+          amount: e8sToIcp(
+            Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
+          )
+            .toFixed(4)
+            .toString(),
+          created,
+          controller,
+          active: isActive,
+          fee: Number(getTokenInfo().fee),
+          billingLedger: meta.billing.ledger.toString(),
+          refreshingStake:
+            devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
+          minimumStake: "Minimum 20 ICP",
+          billing: billingInfo,
+          activity: extractAllLogs(vector),
+          destinations: destinations,
+          neuronId:
+            devefi_jes1_icpneuron.cache?.neuron_id?.[0]?.toString() ?? "None",
+          neuronFollowee:
+            devefi_jes1_icpneuron.cache.followees?.[0]?.[1]?.followees[0]?.id.toString() ??
+            "None",
+          dissolveDelay: devefi_jes1_icpneuron.cache.dissolve_delay_seconds?.[0]
+            ? convertDaysToMonthsAndYears(
+                convertSecondsToDays(
+                  Number(
+                    devefi_jes1_icpneuron.cache.dissolve_delay_seconds?.[0]
+                  )
+                )
+              )
+            : "None",
+          neuronStatus: devefi_jes1_icpneuron.cache.state?.[0]
+            ? devefi_jes1_icpneuron.cache.state?.[0] === 1
+              ? "Locked"
+              : "Dissolving"
+            : "None",
+          unspawnedMaturity: e8sToIcp(
+            Number(devefi_jes1_icpneuron.cache.maturity_e8s_equivalent?.[0])
+          ).toFixed(4),
+          lastUpdated: updatingStatus,
+          spawningMaturity:
+            devefi_jes1_icpneuron.internals.spawning_neurons.reduce(
+              (accumulator, neuron) =>
+                accumulator +
+                Number(neuron.maturity_e8s_equivalent[0]) +
+                Number(neuron.cached_neuron_stake_e8s[0]),
+              0
+            ),
+        };
+      }
     )
     .with(
       { devefi_jes1_snsneuron: P.not(P.nullish) },
       ({ devefi_jes1_snsneuron }) => {
         const { symbol, name, fee } = getTokenInfo();
+        const updatingStatus = match(devefi_jes1_snsneuron.internals.updating)
+          .with({ Init: P._ }, () => "Init")
+          .with({ Calling: P._ }, () => "Updating")
+          .with({ Done: P.select() }, (timestamp) =>
+            convertNanosecondsToElapsedTime(Number(timestamp))
+          )
+          .exhaustive();
+
         return {
           type: "Neuron",
           label: "Stake",
@@ -159,6 +241,53 @@ export const extractNodeType = (
           ).toFixed(4)} ${symbol}`,
           billing: billingInfo,
           activity: extractAllLogs(vector),
+          destinations: destinations,
+          neuronId: devefi_jes1_snsneuron.neuron_cache[0]?.id[0]?.id
+            ? uint8ArrayToHexString(
+                devefi_jes1_snsneuron.neuron_cache[0]?.id[0]?.id
+              )
+            : "None",
+          neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]?.followees[1][1]
+            .followees[0].id
+            ? uint8ArrayToHexString(
+                devefi_jes1_snsneuron.neuron_cache[0]?.followees[1][1]
+                  .followees[0].id
+              )
+            : "None",
+          dissolveDelay: match(
+            devefi_jes1_snsneuron.neuron_cache[0]?.dissolve_state[0]
+          )
+            .with({ DissolveDelaySeconds: P.select() }, (seconds) =>
+              convertDaysToMonthsAndYears(convertSecondsToDays(Number(seconds)))
+            )
+            .with({ WhenDissolvedTimestampSeconds: P.select() }, (seconds) =>
+              calculateTimeUntilTimestamp(Number(seconds))
+            )
+            .otherwise(() => "None"),
+          neuronStatus: match(
+            devefi_jes1_snsneuron.neuron_cache[0]?.dissolve_state[0]
+          )
+            .with({ DissolveDelaySeconds: P._ }, () => "Locked")
+            .with({ WhenDissolvedTimestampSeconds: P._ }, () => "Dissolving")
+            .otherwise(() => "None"),
+          unspawnedMaturity: e8sToIcp(
+            Number(
+              devefi_jes1_snsneuron.neuron_cache[0]?.maturity_e8s_equivalent
+            )
+          ).toFixed(4),
+          lastUpdated: updatingStatus,
+          snsMaturitySpawning:
+            devefi_jes1_snsneuron.neuron_cache[0]
+              ?.disburse_maturity_in_progress,
+          spawningMaturity: devefi_jes1_snsneuron.neuron_cache[0]
+            ?.disburse_maturity_in_progress
+            ? Number(
+                devefi_jes1_snsneuron.neuron_cache[0].disburse_maturity_in_progress.reduce(
+                  (total, item) => total + item.amount_e8s,
+                  0n
+                )
+              )
+            : 0,
         };
       }
     )
@@ -175,6 +304,7 @@ export const extractNodeType = (
         active: isActive,
         fee: Number(fee),
         billing: billingInfo,
+        destinations: destinations,
       };
     })
     .exhaustive();

@@ -24,7 +24,7 @@ const Activity = ({
     >
       <Heading p={3}>Recent Activity</Heading>
       <Separator />
-      <Flex direction="column" w="100%">
+      <Flex direction="column" w="100%" h="100%">
         {logToShow.length > 0 ? (
           logToShow.map((log, index) => (
             <VectorLog
@@ -38,12 +38,13 @@ const Activity = ({
         ) : (
           <Flex
             align="center"
-            direction={"column"}
-            my={3}
+            justify={"center"}
             fontWeight={500}
+            my={12}
+            h="100%"
             fontSize="md"
           >
-            No activity
+            No activity...
           </Flex>
         )}
       </Flex>

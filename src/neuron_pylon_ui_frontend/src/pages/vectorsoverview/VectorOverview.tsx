@@ -18,7 +18,16 @@ import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
-import { About, Activity, Faq, Deposit, Billing, Modify } from "./components";
+import {
+  NeuronAbout,
+  SplitterAbout,
+  Activity,
+  Deposit,
+  Billing,
+  IcpNeuronModify,
+  SnsNeuronModify,
+  SplitterModify,
+} from "./components";
 
 const VectorOverview = () => {
   const { controller, id, tab } = useParams();
@@ -32,7 +41,7 @@ const VectorOverview = () => {
   const vector = vectors.find((v) => v.id.toString() === id);
   if (!vector) return null;
 
-  const { type, name, label, symbol, active, created, activity } =
+  const { type, name, value, label, symbol, active, created, activity } =
     extractNodeType(vector, meta);
 
   const tokenImage =
@@ -113,14 +122,27 @@ const VectorOverview = () => {
             </Highlight>
           </Heading>
         </Flex>
-        <Text
-          fontSize="sm"
-          fontWeight={500}
-          color="fg.muted"
-          textTransform={"uppercase"}
-        >
-          Vector #{id}
-        </Text>
+        <Flex align="center" gap={2}>
+          <Text
+            fontSize="sm"
+            fontWeight={500}
+            color="fg.muted"
+            textTransform={"uppercase"}
+          >
+            vector #{id}
+          </Text>
+          <Text fontSize="sm" fontWeight={500} color="fg.muted">
+            •
+          </Text>
+          <Text
+            fontSize="sm"
+            fontWeight={500}
+            color="fg.muted"
+            textTransform={"uppercase"}
+          >
+            {created}
+          </Text>
+        </Flex>
         <Flex gap={3} direction={{ base: "column", md: "row" }}>
           <Flex w="fit-content">
             <StatBox title={"Controller"} bg={"bg.subtle"}>
@@ -141,24 +163,24 @@ const VectorOverview = () => {
           <Separator orientation="vertical" mt={3} hideBelow={"md"} />
           <Flex direction={{ base: "row", md: "row" }} gap={3}>
             <Flex w="fit-content">
+              <StatBox
+                title={label}
+                value={value}
+                bg={"bg.subtle"}
+                fontSize="md"
+              />
+            </Flex>
+            <Separator orientation="vertical" mt={3} hideBelow={"md"} />
+            <Flex w="fit-content">
               <StatBox title={active ? "Active" : "Frozen"} bg={"bg.subtle"}>
                 <Icon
                   size="lg"
                   color={active ? "green.solid" : "red.solid"}
-                  w="60px"
+                  w="40px"
                 >
                   {active ? <TiBatteryFull /> : <TiBatteryLow />}
                 </Icon>
               </StatBox>
-            </Flex>
-            <Separator orientation="vertical" mt={3} hideBelow={"md"} />
-            <Flex w="fit-content">
-              <StatBox
-                title={"Created"}
-                value={created}
-                bg={"bg.subtle"}
-                fontSize="md"
-              />
             </Flex>
           </Flex>
         </Flex>
@@ -196,19 +218,26 @@ const VectorOverview = () => {
               value={"modify"}
               asChild
               onClick={() => navigate(`/vectors/${controller}/${id}/modify`)}
-              disabled={principal !== controller}
+              // disabled={principal !== controller}
+              disabled={true}
             >
               <Text>Modify</Text>
             </Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content value="deposit">
-            <Deposit vector={vector} />
+            <Deposit vector={vector} meta={meta} />
           </Tabs.Content>
           <Tabs.Content value="billing">
-            <Billing vector={vector} />
+            <Billing vector={vector} meta={meta} />
           </Tabs.Content>
           <Tabs.Content value="modify">
-            <Modify vector={vector} />
+            {type === "Neuron" && symbol === "ICP" ? (
+              <IcpNeuronModify vector={vector} meta={meta} />
+            ) : type === "Neuron" && symbol !== "ICP" ? (
+              <SnsNeuronModify vector={vector} meta={meta} />
+            ) : type === "Splitter" ? (
+              <SplitterModify vector={vector} meta={meta} />
+            ) : null}
           </Tabs.Content>
         </Tabs.Root>
       </Flex>
@@ -217,12 +246,26 @@ const VectorOverview = () => {
         gap={{ base: 0, md: 3 }}
         w="100%"
       >
-        <About />
+        <Flex
+          bg="bg.subtle"
+          boxShadow={"md"}
+          mt={6}
+          borderRadius={"md"}
+          direction={"column"}
+          w="100%"
+        >
+          <Heading p={3}>About</Heading>
+          <Separator />
+          {type === "Neuron" ? (
+            <NeuronAbout vector={vector} meta={meta} />
+          ) : type === "Splitter" ? (
+            <SplitterAbout vector={vector} meta={meta} />
+          ) : null}
+        </Flex>
         {label === "Stake" ? (
           <Activity vectorLog={activity || []} vector={vector} />
         ) : null}
       </Flex>
-      <Faq />
     </Header>
   );
 };

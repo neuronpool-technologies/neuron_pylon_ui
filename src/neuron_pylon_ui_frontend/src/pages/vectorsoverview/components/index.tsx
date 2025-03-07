@@ -1,6 +1,8 @@
-export { default as About } from "./about/About";
+export { default as NeuronAbout } from "./about/NeuronAbout";
+export { default as SplitterAbout } from "./about/SplitterAbout";
 export { default as Activity } from "./activity/Activity";
-export { default as Faq } from "./faq/Faq";
-export { default as Deposit } from "./tabs/Deposit";
-export { default as Billing } from "./tabs/Billing";
-export { default as Modify } from "./tabs/Modify";
+export { default as Deposit } from "./deposit/Deposit";
+export { default as Billing } from "./billing/Billing";
+export { default as SnsNeuronModify } from "./modify/SnsNeuronModify";
+export { default as IcpNeuronModify } from "./modify/IcpNeuronModify";
+export { default as SplitterModify } from "./modify/SplitterModify";
