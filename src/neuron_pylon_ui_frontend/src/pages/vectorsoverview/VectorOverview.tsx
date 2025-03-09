@@ -11,13 +11,14 @@ import {
   Tabs,
   Breadcrumb,
   IconButton,
+  Spacer,
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox } from "@/components";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
-import { BiArrowBack } from "react-icons/bi";
+import { BiArrowBack, BiTrash } from "react-icons/bi";
 import {
   NeuronAbout,
   SplitterAbout,
@@ -27,6 +28,7 @@ import {
   IcpNeuronModify,
   SnsNeuronModify,
   SplitterModify,
+  Delete,
 } from "./components";
 
 const VectorOverview = () => {
@@ -199,31 +201,41 @@ const VectorOverview = () => {
           variant="enclosed"
           colorPalette={"blue"}
         >
-          <Tabs.List>
-            <Tabs.Trigger
-              value={"deposit"}
-              asChild
-              onClick={() => navigate(`/vectors/${controller}/${id}/deposit`)}
-            >
-              <Text>Deposit</Text>
-            </Tabs.Trigger>
-            <Tabs.Trigger
-              value={"billing"}
-              asChild
-              onClick={() => navigate(`/vectors/${controller}/${id}/billing`)}
-            >
-              <Text>Billing</Text>
-            </Tabs.Trigger>
-            <Tabs.Trigger
-              value={"modify"}
-              asChild
-              onClick={() => navigate(`/vectors/${controller}/${id}/modify`)}
-              // disabled={principal !== controller}
-              disabled={true}
-            >
-              <Text>Modify</Text>
-            </Tabs.Trigger>
-          </Tabs.List>
+          <Flex align="center">
+            <Tabs.List>
+              <Tabs.Trigger
+                value={"deposit"}
+                asChild
+                onClick={() => navigate(`/vectors/${controller}/${id}/deposit`)}
+              >
+                <Text>Deposit</Text>
+              </Tabs.Trigger>
+              <Tabs.Trigger
+                value={"billing"}
+                asChild
+                onClick={() => navigate(`/vectors/${controller}/${id}/billing`)}
+              >
+                <Text>Billing</Text>
+              </Tabs.Trigger>
+              <Tabs.Trigger
+                value={"modify"}
+                asChild
+                onClick={() => navigate(`/vectors/${controller}/${id}/modify`)}
+                disabled={principal !== controller}
+              >
+                <Text>Modify</Text>
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Spacer />
+            {tab === "modify" ? (
+              <Delete
+                principal={principal}
+                controller={controller ?? ""}
+                vector={vector}
+                meta={meta}
+              />
+            ) : null}
+          </Flex>
           <Tabs.Content value="deposit">
             <Deposit vector={vector} meta={meta} />
           </Tabs.Content>

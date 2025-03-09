@@ -6,7 +6,6 @@ const Footer = () => {
   return (
     <Flex
       direction={"row"}
-      mt={6}
       gap={3}
       align="center"
       p={{ base: 3, md: 6 }}

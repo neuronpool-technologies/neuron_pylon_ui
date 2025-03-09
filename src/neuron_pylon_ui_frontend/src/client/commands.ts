@@ -2,6 +2,7 @@ import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
   BatchCommandRequest,
+  ModifyNodeRequest,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { accountToString, stringToIcrcAccount } from "@/utils/AccountTools";
 import { icpToE8s } from "@/utils/TokenTools";
@@ -91,4 +92,50 @@ export const search = async ({
   }
 
   return finalQuery;
+};
+
+export const modify = async ({
+  pylon,
+  controller,
+  modReq,
+}: {
+  pylon: ActorSubclass;
+  controller: string;
+  modReq: ModifyNodeRequest;
+}): Promise<void> => {
+  const neuronPylon = pylon as unknown as ActorSubclass<NeuronPylon>;
+  const vectorOwner = stringToIcrcAccount(controller);
+
+  const modifyArgs: BatchCommandRequest = {
+    expire_at: [],
+    request_id: [],
+    controller: vectorOwner,
+    signature: [],
+    commands: [{ modify_node: modReq }],
+  };
+
+  await neuronPylon.icrc55_command(modifyArgs);
+};
+
+export const destroy = async ({
+  pylon,
+  controller,
+  nodeId,
+}: {
+  pylon: ActorSubclass;
+  controller: string;
+  nodeId: number;
+}): Promise<void> => {
+  const neuronPylon = pylon as unknown as ActorSubclass<NeuronPylon>;
+  const vectorOwner = stringToIcrcAccount(controller);
+
+  const modifyArgs: BatchCommandRequest = {
+    expire_at: [],
+    request_id: [],
+    controller: vectorOwner,
+    signature: [],
+    commands: [{ delete_node: nodeId }],
+  };
+
+  await neuronPylon.icrc55_command(modifyArgs);
 };
