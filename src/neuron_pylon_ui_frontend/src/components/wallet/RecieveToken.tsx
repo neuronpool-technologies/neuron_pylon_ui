@@ -68,7 +68,7 @@ const RecieveToken = ({
         </DialogHeader>
         <DialogBody>
           <Flex align="center" mb={3}>
-            <Text fontWeight={500}>Principal ID</Text>
+            <Text fontWeight={500}>ICRC Account</Text>
             <Spacer />
             <ClipboardRoot value={account}>
               <ClipboardButton

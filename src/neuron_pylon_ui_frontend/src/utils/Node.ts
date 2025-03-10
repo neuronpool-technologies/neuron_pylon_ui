@@ -63,6 +63,9 @@ export type NodeTypeResult = {
   unspawnedMaturity?: string;
   lastUpdated?: string;
   spawningMaturity?: string;
+  varFollowee?: string;
+  varDissolve?: string;
+  varDelay?: string;
 };
 
 export const extractNodeType = (
@@ -140,6 +143,27 @@ export const extractNodeType = (
           )
           .exhaustive();
 
+        const varFollowee: string = match(
+          devefi_jes1_icpneuron.variables.followee
+        )
+          .with({ Default: P._ }, () => "Default")
+          .with({ FolloweeId: P.select() }, (f) => f.toString())
+          .exhaustive();
+
+        const varDissolve: string = match(
+          devefi_jes1_icpneuron.variables.dissolve_status
+        )
+          .with({ Locked: P._ }, () => "Locked")
+          .with({ Dissolving: P._ }, () => "Dissolving")
+          .exhaustive();
+
+        const varDelay: string = match(
+          devefi_jes1_icpneuron.variables.dissolve_delay
+        )
+          .with({ Default: P._ }, () => "Default")
+          .with({ DelayDays: P.select() }, (d) => d.toString())
+          .exhaustive();
+
         return {
           type: "Neuron",
           label: "Stake",
@@ -195,6 +219,9 @@ export const extractNodeType = (
                 Number(neuron.cached_neuron_stake_e8s[0]),
               0
             ),
+          varFollowee: varFollowee,
+          varDissolve: varDissolve,
+          varDelay: varDelay,
         };
       }
     )

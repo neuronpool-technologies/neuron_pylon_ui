@@ -113,7 +113,7 @@ export const modify = async ({
     signature: [],
     commands: [{ modify_node: modReq }],
   };
-
+  
   await neuronPylon.icrc55_command(modifyArgs);
 };
 

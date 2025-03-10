@@ -1,8 +1,20 @@
-import { useState } from "react";
-import { Flex, Input, Spacer } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import {
+  Flex,
+  Input,
+  Separator,
+  Spacer,
+  Heading,
+  Highlight,
+  RadioCard,
+} from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { BiSave } from "react-icons/bi";
-import { isAccountOkay, stringToIcrcAccount } from "@/utils/AccountTools";
+import {
+  accountToString,
+  isAccountOkay,
+  stringToIcrcAccount,
+} from "@/utils/AccountTools";
 import {
   NodeShared,
   PylonMetaResp,
@@ -25,17 +37,23 @@ const IcpNeuronModify = ({
   meta: PylonMetaResp;
 }) => {
   const { principal } = useTypedSelector((state) => state.Wallet);
-  const { destinations } = extractNodeType(vector, meta);
+  const { destinations, controller, varFollowee, varDissolve, varDelay } =
+    extractNodeType(vector, meta);
   const [saving, setSaving] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { actors } = useActors();
 
+  const refundAccount = accountToString(vector.refund);
   const [modifyState, setModifyState] = useState({
-    maturityDestination: destinations[0][1],
-    disburseDestination: destinations[1][1],
-    followee: "",
-    dissolveDelayDays: "",
+    maturity: destinations[0][1],
+    disburse: destinations[1][1],
+    controller: controller,
+    refund: refundAccount,
+    followee: varFollowee ?? "",
+    status: varDissolve ?? "",
+    delay: varDelay ?? "",
   });
 
   const saveChanges = async () => {
@@ -43,22 +61,26 @@ const IcpNeuronModify = ({
 
     const commonEditRequest: CommonModifyRequest = {
       active: [],
-      controllers: [],
+      controllers: [[stringToIcrcAccount(modifyState.controller)]],
       extractors: [],
       destinations: [
         [
-          [{ ic: stringToIcrcAccount(modifyState.maturityDestination) }],
-          [{ ic: stringToIcrcAccount(modifyState.disburseDestination) }],
+          [{ ic: stringToIcrcAccount(modifyState.maturity) }],
+          [{ ic: stringToIcrcAccount(modifyState.disburse) }],
         ],
       ],
       sources: [],
-      refund: [],
+      refund: [stringToIcrcAccount(modifyState.refund)],
     };
 
     const editRequest: ModifyRequest = {
       devefi_jes1_icpneuron: {
-        dissolve_delay: [{ DelayDays: BigInt(modifyState.dissolveDelayDays) }],
-        dissolve_status: [],
+        dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
+        dissolve_status: [
+          modifyState.status === "Locked"
+            ? { Locked: null }
+            : { Dissolving: null },
+        ],
         followee: [{ FolloweeId: BigInt(modifyState.followee) }],
       },
     };
@@ -68,8 +90,7 @@ const IcpNeuronModify = ({
       controller: principal,
       modReq: [vector.id, [commonEditRequest], [editRequest]],
     }).finally(() => {
-      setSaving(false);
-      setOpen(false);
+      setHasUnsavedChanges(false);
     });
   };
 
@@ -81,100 +102,283 @@ const IcpNeuronModify = ({
         title: `Vector #${vector.id} modified`,
         duration: 3000,
       },
-      error: {
-        title: "Transaction failed",
-        description: "Please try again.",
+      error: (error) => ({
+        title: "Modify failed",
+        description: error.message || "Please try again.",
         duration: 3000,
-      },
+      }),
       loading: { title: `Modifying vector #${vector.id}` },
+      finally: () => {
+        setSaving(false);
+        setOpen(false);
+      },
     });
   };
 
+  const newChanges = () => {
+    // Create an object to store the changes
+    const changes: any = {};
+
+    // Compare current state with initial values
+    if (modifyState.maturity !== destinations[0][1]) {
+      changes["maturity"] = {
+        from: destinations[0][1],
+        to: modifyState.maturity,
+      };
+    }
+
+    if (modifyState.disburse !== destinations[1][1]) {
+      changes["disburse"] = {
+        from: destinations[1][1],
+        to: modifyState.disburse,
+      };
+    }
+
+    if (modifyState.controller !== controller) {
+      changes["controller"] = {
+        from: controller,
+        to: modifyState.controller,
+      };
+    }
+
+    if (modifyState.refund !== refundAccount) {
+      changes["refund"] = {
+        from: refundAccount,
+        to: modifyState.refund,
+      };
+    }
+
+    if (modifyState.followee !== varFollowee) {
+      changes["followee"] = {
+        from: varFollowee,
+        to: modifyState.followee,
+      };
+    }
+
+    if (modifyState.status !== varDissolve) {
+      changes["status"] = {
+        from: varDissolve,
+        to: modifyState.status,
+      };
+    }
+
+    if (modifyState.delay !== varDelay) {
+      changes["delay"] = {
+        from: varDelay,
+        to: modifyState.delay,
+      };
+    }
+
+    return changes;
+  };
+
+  useEffect(() => {
+    const changes = newChanges();
+    setHasUnsavedChanges(Object.keys(changes).length > 0);
+  }, [modifyState]);
+
   return (
-    <Flex align="center" direction={"column"} w="100%" gap={6}>
-      <Flex direction={{ base: "column", md: "row" }} gap={3} w="100%">
-        <Field
-          label={"Maturity destination"}
-          invalid={!isAccountOkay(modifyState.maturityDestination)}
-          disabled={saving}
-        >
-          <Input
-            placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
-            size="lg"
-            bg={
-              !isAccountOkay(modifyState.maturityDestination) ? "bg.error" : ""
-            }
-            onChange={(e) =>
+    <Flex direction={"column"} gap={6}>
+      <Flex
+        align="center"
+        direction={{ base: "column", md: "row" }}
+        w="100%"
+        gap={6}
+      >
+        <Flex direction={"column"} gap={3} w="100%">
+          <Heading letterSpacing="tight" size={"lg"} lineClamp={1}>
+            <Highlight
+              query={"Destinations"}
+              styles={{
+                px: "1",
+                py: "1",
+                color: "blue.fg",
+              }}
+            >
+              Edit Destinations
+            </Highlight>
+          </Heading>
+          <Separator />
+          <Field
+            label={"Maturity destination"}
+            invalid={!isAccountOkay(modifyState.maturity)}
+            disabled={saving}
+          >
+            <Input
+              placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
+              size="lg"
+              bg={!isAccountOkay(modifyState.maturity) ? "bg.error" : ""}
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  maturity: e.target.value,
+                }))
+              }
+              value={modifyState.maturity}
+            />
+          </Field>
+          <Field
+            label={"Disburse destination"}
+            invalid={!isAccountOkay(modifyState.disburse)}
+            disabled={saving}
+          >
+            <Input
+              placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
+              size="lg"
+              bg={!isAccountOkay(modifyState.disburse) ? "bg.error" : ""}
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  disburse: e.target.value,
+                }))
+              }
+              value={modifyState.disburse}
+            />
+          </Field>
+          <Heading letterSpacing="tight" size={"lg"} lineClamp={1} mt={3}>
+            <Highlight
+              query={"Controller"}
+              styles={{
+                px: "1",
+                py: "1",
+                color: "blue.fg",
+              }}
+            >
+              Edit Controller
+            </Highlight>
+          </Heading>
+          <Separator />
+          <Field
+            label={"Controller"}
+            invalid={!isAccountOkay(modifyState.controller)}
+            disabled={saving}
+          >
+            <Input
+              placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
+              size="lg"
+              bg={!isAccountOkay(modifyState.controller) ? "bg.error" : ""}
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  controller: e.target.value,
+                }))
+              }
+              value={modifyState.controller}
+            />
+          </Field>
+          <Field
+            label={"Refund account"}
+            invalid={!isAccountOkay(modifyState.refund)}
+            disabled={saving}
+          >
+            <Input
+              placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
+              size="lg"
+              bg={!isAccountOkay(modifyState.refund) ? "bg.error" : ""}
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  refund: e.target.value,
+                }))
+              }
+              value={modifyState.refund}
+            />
+          </Field>
+        </Flex>
+        <Flex direction={"column"} gap={3} w="100%">
+          <Heading letterSpacing="tight" size={"lg"} lineClamp={1}>
+            <Highlight
+              query={"Neuron"}
+              styles={{
+                px: "1",
+                py: "1",
+                color: "blue.fg",
+              }}
+            >
+              Edit Neuron
+            </Highlight>
+          </Heading>
+          <Separator />
+          <Field label={"Followee"} disabled={saving}>
+            <Input
+              placeholder="Neuron ID (e.g., 6914974521667616512, ...)"
+              size="lg"
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  followee: e.target.value,
+                }))
+              }
+              value={modifyState.followee}
+            />
+          </Field>
+          <Field label={"Dissolve Delay (days)"} disabled={saving}>
+            <Input
+              placeholder="Days (e.g., 184, 2922, ...)"
+              size="lg"
+              onChange={(e) =>
+                setModifyState((prevState) => ({
+                  ...prevState,
+                  delay: e.target.value,
+                }))
+              }
+              value={modifyState.delay}
+            />
+          </Field>
+          <RadioCard.Root
+            defaultValue={varDissolve}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setModifyState((prevState) => ({
                 ...prevState,
-                maturityDestination: e.target.value,
-              }))
-            }
-            value={modifyState.maturityDestination}
-          />
-        </Field>
-        <Field label={"Disburse destination"}>
-          <Input
-            placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
-            size="lg"
-            bg={
-              !isAccountOkay(modifyState.disburseDestination) ? "bg.error" : ""
-            }
-            onChange={(e) =>
-              setModifyState((prevState) => ({
-                ...prevState,
-                disburseDestination: e.target.value,
-              }))
-            }
-            value={modifyState.disburseDestination}
-          />
-        </Field>
+                status: event.target.value,
+              }));
+            }}
+          >
+            <RadioCard.Label>Neuron status</RadioCard.Label>
+            <Flex align="center" gap={3}>
+              <RadioCard.Item value="Locked">
+                <RadioCard.ItemHiddenInput />
+                <RadioCard.ItemControl>
+                  <RadioCard.ItemContent>
+                    <RadioCard.ItemText>Locked</RadioCard.ItemText>
+                    <RadioCard.ItemDescription>
+                      Staked and earning maturity
+                    </RadioCard.ItemDescription>
+                  </RadioCard.ItemContent>
+                </RadioCard.ItemControl>
+              </RadioCard.Item>
+
+              <RadioCard.Item value="Dissolving">
+                <RadioCard.ItemHiddenInput />
+                <RadioCard.ItemControl>
+                  <RadioCard.ItemContent>
+                    <RadioCard.ItemText>Dissolving</RadioCard.ItemText>
+                    <RadioCard.ItemDescription>
+                      Unstaking, losing maturity
+                    </RadioCard.ItemDescription>
+                  </RadioCard.ItemContent>
+                </RadioCard.ItemControl>
+              </RadioCard.Item>
+            </Flex>
+          </RadioCard.Root>
+        </Flex>
       </Flex>
-      <Flex direction={{ base: "column", md: "row" }} gap={3} w="100%">
-        <Field
-          label={"Followee"}
-          invalid={!isAccountOkay(modifyState.maturityDestination)}
-          disabled={saving}
-        >
-          <Input
-            placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
-            size="lg"
-            bg={
-              !isAccountOkay(modifyState.maturityDestination) ? "bg.error" : ""
-            }
-            onChange={(e) =>
-              setModifyState((prevState) => ({
-                ...prevState,
-                maturityDestination: e.target.value,
-              }))
-            }
-            value={modifyState.maturityDestination}
-          />
-        </Field>
-        {/* TODO add a max button here to help users out */}
-        <Field label={"Dissolve delay (days)"}>
-          <Input
-            placeholder="Principal, ICRC (e.g., ntohy-uex..., ...)"
-            size="lg"
-            bg={
-              !isAccountOkay(modifyState.disburseDestination) ? "bg.error" : ""
-            }
-            onChange={(e) =>
-              setModifyState((prevState) => ({
-                ...prevState,
-                disburseDestination: e.target.value,
-              }))
-            }
-            value={modifyState.disburseDestination}
-          />
-        </Field>
-      </Flex>
-      <Flex align="center" w="100%">
+      <Flex
+        align="center"
+        direction={{ base: "column", md: "row" }}
+        w="100%"
+        gap={3}
+      >
         <Spacer />
+        {hasUnsavedChanges ? (
+          <Flex fontWeight={500} color="fg.muted" fontSize="xs">
+            You have unsaved changes!
+          </Flex>
+        ) : null}
         <Flex w={{ base: "100%", md: "auto" }}>
           <ConfirmDialog
             confirmTitle={"Save changes"}
-            openDisabled={false}
+            openDisabled={!hasUnsavedChanges}
             buttonIcon={<BiSave />}
             isOpen={open}
             setOpen={setOpen}
@@ -182,18 +386,22 @@ const IcpNeuronModify = ({
             loading={saving}
           >
             <Flex w="100%" gap={3} direction={"column"}>
-              <StatBox
-                title={`${destinations[0][0]} destination`}
-                bg={"bg"}
-                fontSize="md"
-                value={`${modifyState.maturityDestination}`}
-              />
-              <StatBox
-                title={`${destinations[1][0]} destination`}
-                bg={"bg"}
-                fontSize="md"
-                value={`${modifyState.disburseDestination}`}
-              />
+              {hasUnsavedChanges && (
+                <>
+                  <Heading size="sm" color="blue.fg">
+                    Changes to be applied:
+                  </Heading>
+                  {Object.entries(newChanges()).map(([key, value]) => (
+                    <StatBox
+                      key={key}
+                      title={key.charAt(0).toUpperCase() + key.slice(1)}
+                      bg={"bg"}
+                      fontSize="md"
+                      value={`${(value as any).to}`}
+                    />
+                  ))}
+                </>
+              )}
               <StatRow title={`Vector #${vector.id}`} stat={"Modify"} />
               <StatRow
                 title={"Billing fees"}

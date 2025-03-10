@@ -18,7 +18,7 @@ import { useState } from "react";
 import { BiTrash } from "react-icons/bi";
 import { destroy } from "@/client/commands";
 import { useActors } from "@/hooks/useActors";
-import { StatBox } from "@/components";
+import { StatBox, StatRow } from "@/components";
 import { accountToString } from "@/utils/AccountTools";
 import { extractNodeType } from "@/utils/Node";
 import { e8sToIcp } from "@/utils/TokenTools";
@@ -114,17 +114,13 @@ const Delete = ({
               fontSize="md"
               value={`Vector #${vector.id}`}
             />
-            <StatBox
-              title={"Refund account"}
-              bg={"bg"}
-              fontSize="md"
-              value={refundAccount}
+            <StatRow
+              title={"Refund to"}
+              stat={`${refundAccount.slice(0, 7)}...${refundAccount.slice(-6)}`}
             />
-            <StatBox
+            <StatRow
               title={"Refund amount"}
-              bg={"bg"}
-              fontSize="md"
-              value={`${e8sToIcp(Number(billing.current_balance)).toFixed(4)} ${
+              stat={`${e8sToIcp(Number(billing.current_balance)).toFixed(4)} ${
                 billingTokenInfo.symbol
               }`}
             />
