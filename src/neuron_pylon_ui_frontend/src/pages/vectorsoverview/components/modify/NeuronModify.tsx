@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Flex,
   Input,
@@ -28,8 +28,9 @@ import { CommonModifyRequest } from "@/declarations/neuron_pylon/neuron_pylon.di
 import { ConfirmDialog, StatBox, StatRow } from "@/components";
 import { e8sToIcp } from "@/utils/TokenTools";
 import { toaster } from "@/components/ui/toaster";
+import { hexStringToUint8Array } from "@dfinity/utils";
 
-const IcpNeuronModify = ({
+const NeuronModify = ({
   vector,
   meta,
 }: {
@@ -37,8 +38,14 @@ const IcpNeuronModify = ({
   meta: PylonMetaResp;
 }) => {
   const { principal } = useTypedSelector((state) => state.Wallet);
-  const { destinations, controller, varFollowee, varDissolve, varDelay } =
-    extractNodeType(vector, meta);
+  const {
+    symbol,
+    destinations,
+    controller,
+    varFollowee,
+    varDissolve,
+    varDelay,
+  } = extractNodeType(vector, meta);
   const [saving, setSaving] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -73,17 +80,32 @@ const IcpNeuronModify = ({
       refund: [stringToIcrcAccount(modifyState.refund)],
     };
 
-    const editRequest: ModifyRequest = {
-      devefi_jes1_icpneuron: {
-        dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
-        dissolve_status: [
-          modifyState.status === "Locked"
-            ? { Locked: null }
-            : { Dissolving: null },
-        ],
-        followee: [{ FolloweeId: BigInt(modifyState.followee) }],
-      },
-    };
+    const editRequest: ModifyRequest =
+      symbol === "ICP"
+        ? {
+            devefi_jes1_icpneuron: {
+              dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
+              dissolve_status: [
+                modifyState.status === "Locked"
+                  ? { Locked: null }
+                  : { Dissolving: null },
+              ],
+              followee: [{ FolloweeId: BigInt(modifyState.followee) }],
+            },
+          }
+        : {
+            devefi_jes1_snsneuron: {
+              dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
+              dissolve_status: [
+                modifyState.status === "Locked"
+                  ? { Locked: null }
+                  : { Dissolving: null },
+              ],
+              followee: [
+                { FolloweeId: hexStringToUint8Array(modifyState.followee) },
+              ],
+            },
+          };
 
     await modify({
       pylon: actors.neuronPylon,
@@ -115,72 +137,56 @@ const IcpNeuronModify = ({
     });
   };
 
-  const newChanges = () => {
-    // Create an object to store the changes
-    const changes: any = {};
+  const diffChanges = useMemo(() => {
+    const changes: { [key: string]: { from: any; to: any } } = {};
 
-    // Compare current state with initial values
     if (modifyState.maturity !== destinations[0][1]) {
       changes["maturity"] = {
         from: destinations[0][1],
         to: modifyState.maturity,
       };
     }
-
     if (modifyState.disburse !== destinations[1][1]) {
       changes["disburse"] = {
         from: destinations[1][1],
         to: modifyState.disburse,
       };
     }
-
     if (modifyState.controller !== controller) {
-      changes["controller"] = {
-        from: controller,
-        to: modifyState.controller,
-      };
+      changes["controller"] = { from: controller, to: modifyState.controller };
     }
-
     if (modifyState.refund !== refundAccount) {
-      changes["refund"] = {
-        from: refundAccount,
-        to: modifyState.refund,
-      };
+      changes["refund"] = { from: refundAccount, to: modifyState.refund };
     }
-
     if (modifyState.followee !== varFollowee) {
-      changes["followee"] = {
-        from: varFollowee,
-        to: modifyState.followee,
-      };
+      changes["followee"] = { from: varFollowee, to: modifyState.followee };
     }
-
     if (modifyState.status !== varDissolve) {
-      changes["status"] = {
-        from: varDissolve,
-        to: modifyState.status,
-      };
+      changes["status"] = { from: varDissolve, to: modifyState.status };
     }
-
     if (modifyState.delay !== varDelay) {
-      changes["delay"] = {
-        from: varDelay,
-        to: modifyState.delay,
-      };
+      changes["delay"] = { from: varDelay, to: modifyState.delay };
     }
 
     return changes;
-  };
+  }, [
+    modifyState,
+    destinations,
+    controller,
+    refundAccount,
+    varFollowee,
+    varDissolve,
+    varDelay,
+  ]);
 
   useEffect(() => {
-    const changes = newChanges();
-    setHasUnsavedChanges(Object.keys(changes).length > 0);
-  }, [modifyState]);
+    setHasUnsavedChanges(Object.keys(diffChanges).length > 0);
+  }, [diffChanges]);
 
   return (
     <Flex direction={"column"} gap={6}>
       <Flex
-        align="center"
+        align="start"
         direction={{ base: "column", md: "row" }}
         w="100%"
         gap={6}
@@ -391,7 +397,7 @@ const IcpNeuronModify = ({
                   <Heading size="sm" color="blue.fg">
                     Changes to be applied:
                   </Heading>
-                  {Object.entries(newChanges()).map(([key, value]) => (
+                  {Object.entries(diffChanges).map(([key, value]) => (
                     <StatBox
                       key={key}
                       title={key.charAt(0).toUpperCase() + key.slice(1)}
@@ -417,4 +423,4 @@ const IcpNeuronModify = ({
   );
 };
 
-export default IcpNeuronModify;
+export default NeuronModify;

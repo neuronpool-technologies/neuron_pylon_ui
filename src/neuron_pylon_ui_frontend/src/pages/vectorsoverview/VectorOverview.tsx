@@ -25,8 +25,7 @@ import {
   Activity,
   Deposit,
   Billing,
-  IcpNeuronModify,
-  SnsNeuronModify,
+  NeuronModify,
   SplitterModify,
   Delete,
 } from "./components";
@@ -243,10 +242,8 @@ const VectorOverview = () => {
             <Billing vector={vector} meta={meta} />
           </Tabs.Content>
           <Tabs.Content value="modify">
-            {type === "Neuron" && symbol === "ICP" ? (
-              <IcpNeuronModify vector={vector} meta={meta} />
-            ) : type === "Neuron" && symbol !== "ICP" ? (
-              <SnsNeuronModify vector={vector} meta={meta} />
+            {type === "Neuron" ? (
+              <NeuronModify vector={vector} meta={meta} />
             ) : type === "Splitter" ? (
               <SplitterModify vector={vector} meta={meta} />
             ) : null}

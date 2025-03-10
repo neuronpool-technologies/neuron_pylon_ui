@@ -237,6 +237,27 @@ export const extractNodeType = (
           )
           .exhaustive();
 
+        const varFollowee: string = match(
+          devefi_jes1_snsneuron.variables.followee
+        )
+          .with({ Unspecified: P._ }, () => "Unspecified")
+          .with({ FolloweeId: P.select() }, (f) => uint8ArrayToHexString(f))
+          .exhaustive();
+
+        const varDissolve: string = match(
+          devefi_jes1_snsneuron.variables.dissolve_status
+        )
+          .with({ Locked: P._ }, () => "Locked")
+          .with({ Dissolving: P._ }, () => "Dissolving")
+          .exhaustive();
+
+        const varDelay: string = match(
+          devefi_jes1_snsneuron.variables.dissolve_delay
+        )
+          .with({ Default: P._ }, () => "Default")
+          .with({ DelayDays: P.select() }, (d) => d.toString())
+          .exhaustive();
+
         return {
           type: "Neuron",
           label: "Stake",
@@ -315,6 +336,9 @@ export const extractNodeType = (
                 )
               )
             : 0,
+          varFollowee: varFollowee,
+          varDissolve: varDissolve,
+          varDelay: varDelay,
         };
       }
     )

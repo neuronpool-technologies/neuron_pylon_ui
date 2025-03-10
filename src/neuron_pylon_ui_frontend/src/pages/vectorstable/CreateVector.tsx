@@ -1,8 +1,6 @@
 import { Button, Text } from "@chakra-ui/react";
 import { BiPlus } from "react-icons/bi";
 
-// TODO: Implement CreateVector component
-
 const CreateVector = () => {
   return (
     <Button variant={"subtle"} colorPalette="blue" rounded="0" size="sm" disabled>
