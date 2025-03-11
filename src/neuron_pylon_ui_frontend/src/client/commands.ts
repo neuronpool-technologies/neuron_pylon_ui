@@ -3,9 +3,11 @@ import {
   _SERVICE as NeuronPylon,
   BatchCommandRequest,
   ModifyNodeRequest,
+  CreateNodeRequest,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { accountToString, stringToIcrcAccount } from "@/utils/AccountTools";
 import { icpToE8s } from "@/utils/TokenTools";
+import { match, P } from "ts-pattern";
 
 export const transfer = async ({
   pylon,
@@ -113,7 +115,7 @@ export const modify = async ({
     signature: [],
     commands: [{ modify_node: modReq }],
   };
-  
+
   await neuronPylon.icrc55_command(modifyArgs);
 };
 
@@ -138,4 +140,46 @@ export const destroy = async ({
   };
 
   await neuronPylon.icrc55_command(modifyArgs);
+};
+
+export const create = async ({
+  pylon,
+  controller,
+  createReq,
+}: {
+  pylon: ActorSubclass;
+  controller: string;
+  createReq: CreateNodeRequest;
+}): Promise<number> => {
+  const neuronPylon = pylon as unknown as ActorSubclass<NeuronPylon>;
+  const vectorOwner = stringToIcrcAccount(controller);
+
+  const createArgs: BatchCommandRequest = {
+    expire_at: [],
+    request_id: [],
+    controller: vectorOwner,
+    signature: [],
+    commands: [{ create_node: createReq }],
+  };
+
+  const res = await neuronPylon.icrc55_command(createArgs);
+
+  return match(res)
+    .with({ ok: P.select() }, (ok) => {
+      // Check if we have command responses
+      if (ok.commands.length > 0) {
+        // Extract the first create_node response
+        const createNodeRes = ok.commands[0];
+        if ("create_node" in createNodeRes) {
+          // Access the node ID from the GetNodeResponse
+          if ("ok" in createNodeRes.create_node) {
+            return Number(createNodeRes.create_node.ok.id);
+          }
+        }
+      }
+      throw new Error("Vector created successfully but no ID was returned");
+    })
+    .otherwise(() => {
+      throw new Error("Failed to create vector");
+    });
 };

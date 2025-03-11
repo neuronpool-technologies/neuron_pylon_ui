@@ -26,7 +26,9 @@ type SortDirection = "asc" | "desc";
 const VectorsTable = () => {
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { logged_in, principal } = useTypedSelector((state) => state.Wallet);
+  const { logged_in, principal, pylon_account } = useTypedSelector(
+    (state) => state.Wallet
+  );
   const { controller } = useParams();
   const navigate = useNavigate();
 
@@ -245,7 +247,12 @@ const VectorsTable = () => {
             Staked {getSortIcon("staked")}
           </Button>
           <Spacer />
-          <CreateVector />
+          <CreateVector
+            loggedIn={logged_in}
+            pylonAccount={pylon_account}
+            principal={principal}
+            meta={meta}
+          />
         </Flex>
         <Separator />
         <Flex direction="column" w="100%">
