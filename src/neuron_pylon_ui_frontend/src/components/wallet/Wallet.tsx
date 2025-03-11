@@ -49,6 +49,7 @@ const Wallet = () => {
       refreshWallet({
         principal: principal,
         pylon: actors.neuronPylon,
+        shouldRegister: true, // Register on initial setup
       })
     );
   };
@@ -65,7 +66,14 @@ const Wallet = () => {
       setupWallet();
 
       const intervalId = setInterval(() => {
-        setupWallet(); // poll the wallet every 5 seconds
+        // Don't register on periodic refreshes
+        dispatch(
+          refreshWallet({
+            principal: identity?.getPrincipal(),
+            pylon: actors.neuronPylon,
+            shouldRegister: false,
+          })
+        );
       }, 5000);
 
       return () => clearInterval(intervalId);

@@ -16,9 +16,11 @@ type FetchWalletResp = {
 export const fetchWallet = async ({
   pylon,
   principal,
+  shouldRegister,
 }: {
   pylon: ActorSubclass<NeuronPylon>;
   principal: Principal;
+  shouldRegister: boolean;
 }): Promise<FetchWalletResp> => {
   try {
     const account = stringToIcrcAccount(principal.toString());
@@ -26,8 +28,10 @@ export const fetchWallet = async ({
     // Run both requests in parallel
     const [icrcRes] = await Promise.all([pylon.icrc55_accounts(account)]);
 
-    // register user for ICP tokens and ignore the result
-    void pylon.icrc55_account_register(account).catch(() => {});
+    // Only register when explicitly requested (first call)
+    if (shouldRegister) {
+      void pylon.icrc55_account_register(account).catch(() => {});
+    }
 
     return {
       pylon_account: icrcRes,

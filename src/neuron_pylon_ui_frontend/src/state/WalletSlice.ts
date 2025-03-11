@@ -54,10 +54,17 @@ export const refreshWallet = createAsyncThunk(
   async ({
     principal,
     pylon,
+    shouldRegister,
   }: {
     principal: Principal;
     pylon: ActorSubclass;
-  }) => await fetchWallet({ principal : principal, pylon: pylon as unknown as ActorSubclass<NeuronPylon> })
+    shouldRegister: boolean;
+  }) =>
+    await fetchWallet({
+      principal: principal,
+      pylon: pylon as unknown as ActorSubclass<NeuronPylon>,
+      shouldRegister: shouldRegister,
+    })
 );
 
 export default WalletSlice.reducer;

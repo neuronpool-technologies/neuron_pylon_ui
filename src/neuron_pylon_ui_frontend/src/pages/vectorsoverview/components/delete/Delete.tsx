@@ -70,15 +70,15 @@ const Delete = ({
 
     toaster.promise(promise, {
       success: {
-        title: `Vector #${vector.id} modified`,
+        title: `Vector #${vector.id} deleted`,
         duration: 3000,
       },
       error: {
-        title: "Transaction failed",
+        title: "Delete failed",
         description: "Please try again.",
         duration: 3000,
       },
-      loading: { title: `Modifying vector #${vector.id}` },
+      loading: { title: `Deleting vector #${vector.id}` },
     });
   };
   return (
