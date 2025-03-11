@@ -18,7 +18,7 @@ import { Header, StatBox } from "@/components";
 import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
-import { BiArrowBack, BiTrash } from "react-icons/bi";
+import { BiArrowBack } from "react-icons/bi";
 import {
   NeuronAbout,
   SplitterAbout,
@@ -28,6 +28,8 @@ import {
   NeuronModify,
   SplitterModify,
   Delete,
+  VectorLoading,
+  VectorNotFound,
 } from "./components";
 
 const VectorOverview = () => {
@@ -37,10 +39,11 @@ const VectorOverview = () => {
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { principal } = useTypedSelector((state) => state.Wallet);
-  if (!meta) return null;
+
+  if (!meta || !vectors.length) return <VectorLoading />;
 
   const vector = vectors.find((v) => v.id.toString() === id);
-  if (!vector) return null;
+  if (!vector) return <VectorNotFound id={id} />;
 
   const { type, name, value, label, symbol, active, created, activity } =
     extractNodeType(vector, meta);
