@@ -29,7 +29,6 @@ import {
   SplitterModify,
   Delete,
   VectorLoading,
-  VectorNotFound,
 } from "./components";
 
 const VectorOverview = () => {
@@ -43,7 +42,7 @@ const VectorOverview = () => {
   if (!meta || !vectors.length) return <VectorLoading />;
 
   const vector = vectors.find((v) => v.id.toString() === id);
-  if (!vector) return <VectorNotFound id={id} />;
+  if (!vector) return <VectorLoading />;
 
   const { type, name, value, label, symbol, active, created, activity } =
     extractNodeType(vector, meta);

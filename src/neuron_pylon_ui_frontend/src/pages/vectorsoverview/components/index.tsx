@@ -7,4 +7,3 @@ export { default as Delete } from "./delete/Delete";
 export { default as NeuronModify } from "./modify/NeuronModify";
 export { default as SplitterModify } from "./modify/SplitterModify";
 export { default as VectorLoading } from "./loading/VectorLoading";
-export { default as VectorNotFound } from "./loading/VectorNotFound";
