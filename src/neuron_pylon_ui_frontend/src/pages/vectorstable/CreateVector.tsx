@@ -166,7 +166,7 @@ const CreateVector = ({
       setVectorToCreate("");
     });
 
-    navigate(`/vectors/${principal}/${id}`);
+    navigate(`/vectors/${principal}/${id}/modify`);
   };
 
   const confirm = async () => {
