@@ -76,7 +76,7 @@ const VectorOverview = () => {
               <NavLink
                 to={
                   location.state?.from
-                    ? `/vectors${location.state.from}`
+                    ? `/vectors/${location.state.from}`
                     : "/vectors"
                 }
               >
@@ -207,21 +207,33 @@ const VectorOverview = () => {
               <Tabs.Trigger
                 value={"deposit"}
                 asChild
-                onClick={() => navigate(`/vectors/${controller}/${id}/deposit`)}
+                onClick={() =>
+                  navigate(`/vectors/${controller}/${id}/deposit`, {
+                    state: { from: location.state?.from },
+                  })
+                }
               >
                 <Text>Deposit</Text>
               </Tabs.Trigger>
               <Tabs.Trigger
                 value={"billing"}
                 asChild
-                onClick={() => navigate(`/vectors/${controller}/${id}/billing`)}
+                onClick={() =>
+                  navigate(`/vectors/${controller}/${id}/billing`, {
+                    state: { from: location.state?.from },
+                  })
+                }
               >
                 <Text>Billing</Text>
               </Tabs.Trigger>
               <Tabs.Trigger
                 value={"modify"}
                 asChild
-                onClick={() => navigate(`/vectors/${controller}/${id}/modify`)}
+                onClick={() =>
+                  navigate(`/vectors/${controller}/${id}/modify`, {
+                    state: { from: location.state?.from },
+                  })
+                }
                 disabled={principal !== controller}
               >
                 <Text>Modify</Text>
