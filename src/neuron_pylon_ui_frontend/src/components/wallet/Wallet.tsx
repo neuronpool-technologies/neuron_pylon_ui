@@ -26,6 +26,7 @@ import { useTypedDispatch, useTypedSelector } from "@/hooks/useRedux";
 import { refreshWallet, setCleanup } from "@/state/WalletSlice";
 import IcLogo from "../../../assets/ic-logo.png";
 import Token from "./Token";
+import { Actor } from "@dfinity/agent";
 
 const Wallet = () => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -40,6 +41,13 @@ const Wallet = () => {
       apiKey: process.env.REACT_APP_USERGEEK_KEY ?? "",
       host: "https://lpfay-3aaaa-aaaal-qbupa-cai.raw.icp0.io",
     });
+
+    if (actors.neuronPylon && identity) {
+      const agent = Actor.agentOf(actors.neuronPylon);
+      if (agent && agent.replaceIdentity) {
+        agent.replaceIdentity(identity);
+      }
+    }
 
     const principal = identity?.getPrincipal();
     Usergeek.setPrincipal(principal);
@@ -58,6 +66,10 @@ const Wallet = () => {
     dispatch(setCleanup());
     Usergeek.setPrincipal(undefined);
     logout();
+    const agent = Actor.agentOf(actors.neuronPylon);
+    if (agent && agent.invalidateIdentity) {
+      agent.invalidateIdentity();
+    }
     window.location.reload();
   };
 
