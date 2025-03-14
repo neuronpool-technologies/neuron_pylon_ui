@@ -154,6 +154,7 @@ const MobileNav = () => {
       placement={"start"}
       open={open}
       onOpenChange={(e) => setOpen(e.open)}
+      trapFocus={false}
     >
       <DrawerBackdrop />
       <DrawerTrigger asChild>

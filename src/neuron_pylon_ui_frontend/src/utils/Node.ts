@@ -184,7 +184,7 @@ export const extractNodeType = (
           billingLedger: meta.billing.ledger.toString(),
           refreshingStake:
             devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
-          minimumStake: "Minimum 20 ICP",
+          minimumStake: "Minimum >20 ICP",
           billing: billingInfo,
           activity: extractAllLogs(vector),
           destinations: destinations,
