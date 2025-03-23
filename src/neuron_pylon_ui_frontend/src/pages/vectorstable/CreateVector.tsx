@@ -234,7 +234,11 @@ const CreateVector = ({
               </RadioCard.Label>
               <Flex direction={"column"} gap={3}>
                 {meta.modules.map((module, index) => (
-                  <RadioCard.Item value={module.name} key={index}>
+                  <RadioCard.Item
+                    value={module.name}
+                    key={index}
+                    _hover={{ cursor: "pointer", bg: "bg.muted" }}
+                  >
                     <RadioCard.ItemHiddenInput />
                     <RadioCard.ItemControl>
                       <Flex align="center" gap={3}>
@@ -305,7 +309,11 @@ const CreateVector = ({
                       )
                         return null;
                       return (
-                        <RadioCard.Item value={item.symbol} key={index}>
+                        <RadioCard.Item
+                          value={item.symbol}
+                          key={index}
+                          _hover={{ cursor: "pointer", bg: "bg.muted" }}
+                        >
                           <RadioCard.ItemHiddenInput />
                           <RadioCard.ItemControl>
                             <ChakraImage
