@@ -295,11 +295,11 @@ export const extractNodeType = (
                 devefi_jes1_snsneuron.neuron_cache[0]?.id[0]?.id
               )
             : "None",
-          neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]?.followees[1][1]
-            .followees[0].id
+          neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]?.followees?.[1]?.[1]
+            ?.followees?.[0]?.id
             ? uint8ArrayToHexString(
-                devefi_jes1_snsneuron.neuron_cache[0]?.followees[1][1]
-                  .followees[0].id
+                devefi_jes1_snsneuron.neuron_cache[0]?.followees?.[1]?.[1]
+                  ?.followees?.[0]?.id
               )
             : "None",
           dissolveDelay: match(
