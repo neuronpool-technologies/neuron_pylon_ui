@@ -39,7 +39,7 @@ const Stats = () => {
         />
         <Separator />
         <StatBox
-          title="Controllers"
+          title="Unique owners"
           value={`${stats?.total_controllers}`}
           icon={<BiUser />}
           ready={stats ? true : false}

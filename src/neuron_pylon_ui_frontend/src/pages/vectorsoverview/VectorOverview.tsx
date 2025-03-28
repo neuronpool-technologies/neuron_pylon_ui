@@ -148,7 +148,7 @@ const VectorOverview = () => {
         </Flex>
         <Flex gap={3} direction={{ base: "column", md: "row" }}>
           <Flex w="fit-content">
-            <StatBox title={"Controller"} bg={"bg.subtle"}>
+            <StatBox title={"Owner"} bg={"bg.subtle"}>
               <Text lineClamp={1} fontSize="md" fontWeight={500}>
                 {controller}
               </Text>

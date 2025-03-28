@@ -41,7 +41,7 @@ const Search = () => {
         startElement={searching ? <Spinner size="xs" /> : <BiSearch />}
       >
         <Input
-          placeholder="Search (e.g., Vector, Controller, ...)"
+          placeholder="Search (e.g., Vector, Owner, ...)"
           onKeyDown={(e) => (e.key === "Enter" ? searchVectors() : null)}
           onChange={(event) => {
             setSearchQuery(event.target.value);

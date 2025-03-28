@@ -243,19 +243,19 @@ const NeuronModify = ({
           </Field>
           <Heading letterSpacing="tight" size={"lg"} lineClamp={1} mt={3}>
             <Highlight
-              query={"Controller"}
+              query={"Owner"}
               styles={{
                 px: "1",
                 py: "1",
                 color: "blue.fg",
               }}
             >
-              Edit Controller
+              Edit Owner
             </Highlight>
           </Heading>
           <Separator />
           <Field
-            label={"Controller"}
+            label={"Owner"}
             invalid={!isAccountOkay(modifyState.controller)}
             disabled={saving}
           >

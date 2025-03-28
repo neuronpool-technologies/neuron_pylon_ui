@@ -315,19 +315,19 @@ const SplitterModify = ({
         <Flex direction={"column"} gap={3} w="100%">
           <Heading letterSpacing="tight" size={"lg"} lineClamp={1}>
             <Highlight
-              query={"Controller"}
+              query={"Owner"}
               styles={{
                 px: "1",
                 py: "1",
                 color: "blue.fg",
               }}
             >
-              Edit Controller
+              Edit Owner
             </Highlight>
           </Heading>
           <Separator />
           <Field
-            label={"Controller"}
+            label={"Owner"}
             invalid={
               !isAccountOkay(modifyState.controller) &&
               modifyState.controller.length > 0
