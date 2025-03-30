@@ -179,7 +179,8 @@ const CreateVector = ({
       },
       error: (error) => ({
         title: "Creation failed",
-        description: error.message || "Please try again.",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
         duration: 3000,
       }),
       loading: { title: `Creating ${vectorToCreate} vector` },

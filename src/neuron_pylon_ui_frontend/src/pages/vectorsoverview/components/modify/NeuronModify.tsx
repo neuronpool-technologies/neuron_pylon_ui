@@ -126,7 +126,8 @@ const NeuronModify = ({
       },
       error: (error) => ({
         title: "Modify failed",
-        description: error.message || "Please try again.",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
         duration: 3000,
       }),
       loading: { title: `Modifying vector #${vector.id}` },

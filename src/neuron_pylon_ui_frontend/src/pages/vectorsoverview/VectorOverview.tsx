@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useTypedSelector } from "@/hooks/useRedux";
 import {
@@ -49,6 +50,10 @@ const VectorOverview = () => {
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Header>

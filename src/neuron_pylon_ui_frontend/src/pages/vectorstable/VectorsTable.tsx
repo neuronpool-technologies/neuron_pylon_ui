@@ -233,6 +233,7 @@ const VectorsTable = () => {
           <Button
             variant="ghost"
             size="sm"
+            disabled={!meta}
             onClick={() => handleSortChange("created")}
           >
             Created {getSortIcon("created")}
@@ -244,7 +245,7 @@ const VectorsTable = () => {
             disabled={!meta}
             title={!meta ? "Loading metadata..." : ""}
           >
-            Staked {getSortIcon("staked")}
+            Stake {getSortIcon("staked")}
           </Button>
           <Spacer />
           <CreateVector

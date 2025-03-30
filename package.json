@@ -17,7 +17,7 @@
     "generate": "dfx generate neuron_pylon_ui_backend"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.8.0",
+    "@chakra-ui/react": "^3.15.0",
     "@dfinity/agent": "^2.3.0",
     "@dfinity/auth-client": "^2.3.0",
     "@dfinity/candid": "^2.3.0",
