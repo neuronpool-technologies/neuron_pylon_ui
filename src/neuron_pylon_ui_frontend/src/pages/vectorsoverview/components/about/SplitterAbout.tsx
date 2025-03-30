@@ -40,7 +40,7 @@ const SplitterAbout = ({
         {destinations.map((d, index) => (
           <StatBox key={index} title={`${d[0]}% sending to`} bg={"bg.subtle"}>
             <Flex w="100%" align="center">
-              <Text lineClamp={1} fontSize="md" fontWeight={500}>
+              <Text truncate fontSize="md" fontWeight={500}>
                 {d[1]}
               </Text>
               <Spacer />

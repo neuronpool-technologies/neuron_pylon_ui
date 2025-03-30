@@ -40,6 +40,10 @@ const VectorOverview = () => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { principal } = useTypedSelector((state) => state.Wallet);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (!meta || !vectors.length) return <VectorLoading />;
 
   const vector = vectors.find((v) => v.id.toString() === id);
@@ -50,10 +54,6 @@ const VectorOverview = () => {
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <Header>

@@ -187,7 +187,7 @@ const Deposit = ({
 
       <Flex direction={"column"} gap={3} w={{ base: "100%", md: "50%" }}>
         <StatBox title={`${label} source`} bg={"bg.subtle"} fontSize="md">
-          <Text lineClamp={1} fontSize="md" fontWeight={500}>
+          <Text truncate fontSize="md" fontWeight={500}>
             {source.account}
           </Text>
           <ClipboardRoot value={source.account}>

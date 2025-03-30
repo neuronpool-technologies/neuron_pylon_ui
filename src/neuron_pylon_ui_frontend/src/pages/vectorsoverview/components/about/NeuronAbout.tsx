@@ -51,7 +51,7 @@ const NeuronAbout = ({
       </StatBox>
       <Flex gap={3} align="center" direction={{ base: "column", md: "row" }}>
         <Flex
-          w="100%"
+          w={{ base: "100%", md: "50%" }}
           color={
             !active
               ? "red.solid"
@@ -77,12 +77,11 @@ const NeuronAbout = ({
         <Icon size="lg" hideFrom={"md"} transform="rotate(90deg)">
           <BiRightArrowAlt />
         </Icon>
-        <StatBox title={`${destinations[0][0]} destination`} bg={"bg.subtle"}>
-          <Flex w="100%" align="center">
-            <Text lineClamp={1} fontSize="md" fontWeight={500}>
+        <Flex w={{ base: "100%", md: "50%" }}>
+          <StatBox title={`${destinations[0][0]} destination`} bg={"bg.subtle"}>
+            <Text truncate fontSize="md" fontWeight={500}>
               {destinations[0][1].slice(0, 50)}
             </Text>
-            <Spacer />
             <ClipboardRoot value={destinations[0][1]}>
               <ClipboardIconButton
                 variant="surface"
@@ -92,8 +91,8 @@ const NeuronAbout = ({
                 ms={3}
               />
             </ClipboardRoot>
-          </Flex>
-        </StatBox>
+          </StatBox>
+        </Flex>
       </Flex>
       <Spacer />
       <Separator />

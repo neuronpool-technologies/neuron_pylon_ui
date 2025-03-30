@@ -207,7 +207,7 @@ const Billing = ({
 
       <Flex direction={"column"} gap={3} w={{ base: "100%", md: "50%" }}>
         <StatBox title={"Billing account"} bg={"bg.subtle"} fontSize="md">
-          <Text lineClamp={1} fontSize="md" fontWeight={500}>
+          <Text truncate fontSize="md" fontWeight={500}>
             {billing.account}
           </Text>
           <ClipboardRoot value={billing.account}>

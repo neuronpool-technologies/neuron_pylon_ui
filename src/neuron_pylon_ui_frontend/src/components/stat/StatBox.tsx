@@ -44,6 +44,7 @@ const StatBox = ({
         borderColor="border.emphasized"
         py={2}
         px={4}
+        gap={1}
         alignItems="center"
         borderRadius="md"
         transition={"all 0.2s"}
