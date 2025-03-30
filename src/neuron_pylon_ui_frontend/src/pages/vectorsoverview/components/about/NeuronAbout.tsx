@@ -79,18 +79,21 @@ const NeuronAbout = ({
         </Icon>
         <Flex w={{ base: "100%", md: "50%" }}>
           <StatBox title={`${destinations[0][0]} destination`} bg={"bg.subtle"}>
-            <Text truncate fontSize="md" fontWeight={500}>
-              {destinations[0][1].slice(0, 50)}
-            </Text>
-            <ClipboardRoot value={destinations[0][1]}>
-              <ClipboardIconButton
-                variant="surface"
-                rounded="md"
-                boxShadow="xs"
-                size="2xs"
-                ms={3}
-              />
-            </ClipboardRoot>
+            <Flex align="center" w="100%">
+              <Text truncate fontSize="md" fontWeight={500}>
+                {destinations[0][1].slice(0, 50)}
+              </Text>
+              <Spacer />
+              <ClipboardRoot value={destinations[0][1]}>
+                <ClipboardIconButton
+                  variant="surface"
+                  rounded="md"
+                  boxShadow="xs"
+                  size="2xs"
+                  ms={3}
+                />
+              </ClipboardRoot>
+            </Flex>
           </StatBox>
         </Flex>
       </Flex>
