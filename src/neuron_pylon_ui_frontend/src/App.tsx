@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { Flex, Box } from "@chakra-ui/react";
 import { Nav } from "@/components";
-import { Home, VectorsTable, VectorOverview } from "@/pages";
+import { Home, VectorsTable, VectorOverview, Error } from "@/pages";
 import { Toaster } from "@/components/ui/toaster";
 import { refreshMeta } from "@/state/MetaSlice";
 import { useTypedDispatch } from "./hooks/useRedux";
@@ -23,8 +23,11 @@ const App = () => {
           <Route path="/vectors" element={<VectorsTable />} />
           <Route path="/vectors/:controller" element={<VectorsTable />} />
           <Route path="/vectors/:controller/:id" element={<VectorOverview />} />
-          <Route path="/vectors/:controller/:id/:tab" element={<VectorOverview />} />
-          <Route path="*" element={<p>page not found</p>} />
+          <Route
+            path="/vectors/:controller/:id/:tab"
+            element={<VectorOverview />}
+          />
+          <Route path="*" element={<Error />} />
         </Route>
       </Routes>
     </Router>

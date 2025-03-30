@@ -4,7 +4,9 @@ import {
   Heading,
   Image as ChakraImage,
   Separator,
+  Icon,
 } from "@chakra-ui/react";
+import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { NodeShared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { StatBox } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
@@ -23,10 +25,8 @@ const VectorPreview = ({
   const params = useParams();
 
   if (!meta) return null;
-  const { type, label, symbol, value, created, controller } = extractNodeType(
-    vector,
-    meta
-  );
+  const { type, label, symbol, value, created, controller, active } =
+    extractNodeType(vector, meta);
   const image =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
 
@@ -59,8 +59,20 @@ const VectorPreview = ({
             w={45}
           />
           <Flex direction="column" gap={0}>
-            <Heading fontSize="sm" lineClamp={1} color="blue.fg">
-              {type} #{vector.id}
+            <Heading
+              fontSize="sm"
+              lineClamp={1}
+              color="blue.fg"
+              display="inline-flex"
+              alignItems="center"
+            >
+              {type} #{vector.id}{" "}
+              <Icon
+                color={active ? "green.solid" : "red.solid"}
+                transform="rotate(-90deg)"
+              >
+                {active ? <TiBatteryFull /> : <TiBatteryLow />}
+              </Icon>
             </Heading>
             <Text fontSize="sm" color="fg.muted" lineClamp={1}>
               {created}
