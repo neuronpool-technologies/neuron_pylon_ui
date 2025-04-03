@@ -225,7 +225,19 @@ const VectorsTable = () => {
             opacity={!logged_in ? 0.6 : 1}
             key={logged_in ? "auth" : "no-auth"} // Force re-render on auth change
           >
-            My Vectors {logged_in ? `(${userVectorsCount})` : ""}
+            <Flex align="center" gap={1.5}>
+              My Vectors{" "}
+              <Flex
+                bg="blue.subtle"
+                color="fg.info"
+                px={1.5}
+                borderRadius={"md"}
+                align="center"
+                justify="center"
+              >
+                {logged_in ? `${userVectorsCount}` : "0"}
+              </Flex>
+            </Flex>
           </Button>
         </Flex>
         <Separator />
