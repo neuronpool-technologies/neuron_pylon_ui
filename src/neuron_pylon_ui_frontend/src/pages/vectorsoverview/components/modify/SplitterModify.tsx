@@ -414,7 +414,7 @@ const SplitterModify = ({
                   {diffChanges.controller && (
                     <StatBox
                       title="Controller"
-                      bg={"bg"}
+                      bg={"bg.panel"}
                       fontSize="md"
                       value={diffChanges.controller.to}
                     />
@@ -422,7 +422,7 @@ const SplitterModify = ({
                   {diffChanges.refundAccount && (
                     <StatBox
                       title="Refund Account"
-                      bg={"bg"}
+                      bg={"bg.panel"}
                       fontSize="md"
                       value={diffChanges.refundAccount.to}
                     />
@@ -430,7 +430,7 @@ const SplitterModify = ({
                   {diffChanges.destinations && (
                     <StatBox
                       title="Destinations"
-                      bg={"bg"}
+                      bg={"bg.panel"}
                       fontSize="md"
                       value={`Modified (${diffChanges.destinations.modifiedCount} of ${modifyState.destinations.length} destinations)`}
                     />

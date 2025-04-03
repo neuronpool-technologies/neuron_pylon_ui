@@ -168,7 +168,7 @@ const Deposit = ({
           <Flex w="100%" gap={3} direction={"column"}>
             <StatBox
               title={"Deposit"}
-              bg={"bg"}
+              bg={"bg.panel"}
               fontSize="md"
               value={`${sendAmount} ${symbol}`}
             />

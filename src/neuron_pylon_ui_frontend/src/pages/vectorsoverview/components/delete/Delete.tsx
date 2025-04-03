@@ -110,7 +110,7 @@ const Delete = ({
           <Flex w="100%" gap={3} direction={"column"}>
             <StatBox
               title={"Delete"}
-              bg={"bg"}
+              bg={"bg.panel"}
               fontSize="md"
               value={`Vector #${vector.id}`}
             />

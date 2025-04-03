@@ -402,7 +402,7 @@ const NeuronModify = ({
                     <StatBox
                       key={key}
                       title={key.charAt(0).toUpperCase() + key.slice(1)}
-                      bg={"bg"}
+                      bg={"bg.panel"}
                       fontSize="md"
                       value={`${(value as any).to}`}
                     />

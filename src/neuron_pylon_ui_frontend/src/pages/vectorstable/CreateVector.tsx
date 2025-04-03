@@ -288,7 +288,7 @@ const CreateVector = ({
             <Flex w="100%" gap={3} direction={"column"}>
               <StatBox
                 title={"Vector Type"}
-                bg={"bg"}
+                bg={"bg.panel"}
                 fontSize="md"
                 value={vectorToCreate}
               />
