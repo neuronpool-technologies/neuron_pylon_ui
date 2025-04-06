@@ -80,30 +80,51 @@ const NeuronModify = ({
       refund: [stringToIcrcAccount(modifyState.refund)],
     };
 
+    const getDissolveDelay = () => {
+      if (modifyState.delay === "Default") {
+        return { Default: null };
+      }
+      return { DelayDays: BigInt(modifyState.delay) };
+    };
+
+    const getIcpFollowee = () => {
+      if (modifyState.followee === "Default") {
+        return { Default: null };
+      } else {
+        return { FolloweeId: BigInt(modifyState.followee) };
+      }
+    };
+
+    const getSnsFollowee = () => {
+      if (modifyState.followee === "Unspecified") {
+        return { Unspecified: null };
+      } else {
+        return { FolloweeId: hexStringToUint8Array(modifyState.followee) };
+      }
+    };
+
     const editRequest: ModifyRequest =
       symbol === "ICP"
         ? {
             devefi_jes1_icpneuron: {
-              dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
+              dissolve_delay: [getDissolveDelay()],
               dissolve_status: [
                 modifyState.status === "Locked"
                   ? { Locked: null }
                   : { Dissolving: null },
               ],
-              followee: [{ FolloweeId: BigInt(modifyState.followee) }],
+              followee: [getIcpFollowee()],
             },
           }
         : {
             devefi_jes1_snsneuron: {
-              dissolve_delay: [{ DelayDays: BigInt(modifyState.delay) }],
+              dissolve_delay: [getDissolveDelay()],
               dissolve_status: [
                 modifyState.status === "Locked"
                   ? { Locked: null }
                   : { Dissolving: null },
               ],
-              followee: [
-                { FolloweeId: hexStringToUint8Array(modifyState.followee) },
-              ],
+              followee: [getSnsFollowee()],
             },
           };
 
@@ -308,7 +329,11 @@ const NeuronModify = ({
           <Separator />
           <Field label={"Followee"} disabled={saving}>
             <Input
-              placeholder="Neuron ID (e.g., 6914974521667616512, ...)"
+              placeholder={
+                symbol === "ICP"
+                  ? "Neuron ID (e.g., 6914974521667616512, ...)"
+                  : "Neuron ID (e.g., a8a84b57c3faef493ed..., ...)"
+              }
               size="lg"
               onChange={(e) =>
                 setModifyState((prevState) => ({

@@ -295,29 +295,37 @@ export const extractNodeType = (
                 devefi_jes1_snsneuron.neuron_cache[0]?.id[0]?.id
               )
             : "None",
-          neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]?.followees?.[1]?.[1]
-            ?.followees?.[0]?.id
+          neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]
+            ?.followees?.[1]?.[1]?.followees?.[0]?.id
             ? uint8ArrayToHexString(
                 devefi_jes1_snsneuron.neuron_cache[0]?.followees?.[1]?.[1]
                   ?.followees?.[0]?.id
               )
             : "None",
-          dissolveDelay: match(
-            devefi_jes1_snsneuron.neuron_cache[0]?.dissolve_state[0]
-          )
-            .with({ DissolveDelaySeconds: P.select() }, (seconds) =>
-              convertDaysToMonthsAndYears(convertSecondsToDays(Number(seconds)))
-            )
-            .with({ WhenDissolvedTimestampSeconds: P.select() }, (seconds) =>
-              calculateTimeUntilTimestamp(Number(seconds))
-            )
-            .otherwise(() => "None"),
-          neuronStatus: match(
-            devefi_jes1_snsneuron.neuron_cache[0]?.dissolve_state[0]
-          )
-            .with({ DissolveDelaySeconds: P._ }, () => "Locked")
-            .with({ WhenDissolvedTimestampSeconds: P._ }, () => "Dissolving")
-            .otherwise(() => "None"),
+          dissolveDelay: devefi_jes1_snsneuron.neuron_cache[0]
+            ?.dissolve_state?.[0]
+            ? match(devefi_jes1_snsneuron.neuron_cache[0].dissolve_state[0])
+                .with({ DissolveDelaySeconds: P.select() }, (seconds) =>
+                  convertDaysToMonthsAndYears(
+                    convertSecondsToDays(Number(seconds))
+                  )
+                )
+                .with(
+                  { WhenDissolvedTimestampSeconds: P.select() },
+                  (seconds) => calculateTimeUntilTimestamp(Number(seconds))
+                )
+                .otherwise(() => "None")
+            : "None",
+          neuronStatus: devefi_jes1_snsneuron.neuron_cache[0]
+            ?.dissolve_state?.[0]
+            ? match(devefi_jes1_snsneuron.neuron_cache[0].dissolve_state[0])
+                .with({ DissolveDelaySeconds: P._ }, () => "Locked")
+                .with(
+                  { WhenDissolvedTimestampSeconds: P._ },
+                  () => "Dissolving"
+                )
+                .otherwise(() => "None")
+            : "None",
           unspawnedMaturity: e8sToIcp(
             Number(
               devefi_jes1_snsneuron.neuron_cache[0]?.maturity_e8s_equivalent

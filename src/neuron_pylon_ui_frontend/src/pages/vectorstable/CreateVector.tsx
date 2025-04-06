@@ -36,6 +36,7 @@ import { toaster } from "@/components/ui/toaster";
 import { useNavigate } from "react-router-dom";
 import { create } from "@/client/commands";
 import { useActors } from "@/hooks/useActors";
+import { hexStringToUint8Array } from "@dfinity/utils";
 
 const CreateVector = ({
   loggedIn,
@@ -144,7 +145,15 @@ const CreateVector = ({
               variables: {
                 dissolve_delay: { Default: null },
                 dissolve_status: { Locked: null },
-                followee: { Unspecified: null },
+                followee:
+                  ledgerFound.symbol === "NTN" &&
+                  process.env.REACT_APP_DEFAULT_NTN_FOLLOWEE
+                    ? {
+                        FolloweeId: hexStringToUint8Array(
+                          process.env.REACT_APP_DEFAULT_NTN_FOLLOWEE
+                        ),
+                      }
+                    : { Unspecified: null },
               },
             },
           }
