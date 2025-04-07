@@ -26,7 +26,7 @@ type SortDirection = "asc" | "desc";
 const VectorsTable = () => {
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { logged_in, principal, pylon_account } = useTypedSelector(
+  const { logged_in, principal, pylon_account, actors } = useTypedSelector(
     (state) => state.Wallet
   );
   const { controller } = useParams();
@@ -265,6 +265,7 @@ const VectorsTable = () => {
             pylonAccount={pylon_account}
             principal={principal}
             meta={meta}
+            actors={actors}
           />
         </Flex>
         <Separator />

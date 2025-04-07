@@ -17,23 +17,25 @@ import {
 import { useState } from "react";
 import { BiTrash } from "react-icons/bi";
 import { destroy } from "@/client/commands";
-import { useActors } from "@/hooks/useActors";
 import { StatBox, StatRow } from "@/components";
 import { accountToString } from "@/utils/AccountTools";
 import { extractNodeType } from "@/utils/Node";
 import { e8sToIcp } from "@/utils/TokenTools";
 import { useNavigate } from "react-router-dom";
+import { ActorSubclass } from "@dfinity/agent";
 
 const Delete = ({
   principal,
   controller,
   vector,
   meta,
+  actors,
 }: {
   principal: string;
   controller: string;
   vector: NodeShared;
   meta: PylonMetaResp;
+  actors: Record<string, ActorSubclass>;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
@@ -48,8 +50,6 @@ const Delete = ({
   });
 
   if (!billingTokenInfo) return null;
-
-  const { actors } = useActors();
 
   const deleteNode = async () => {
     setDeleting(true);

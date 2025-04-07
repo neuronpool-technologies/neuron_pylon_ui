@@ -23,7 +23,6 @@ import {
   InputAddress,
 } from "@/declarations/neuron_pylon/neuron_pylon.did";
 import { extractNodeType } from "@/utils/Node";
-import { useActors } from "@/hooks/useActors";
 import { modify } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { CommonModifyRequest } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
@@ -31,13 +30,16 @@ import { ConfirmDialog, StatBox, StatRow } from "@/components";
 import { e8sToIcp } from "@/utils/TokenTools";
 import { toaster } from "@/components/ui/toaster";
 import { InputGroup } from "@/components/ui/input-group";
+import { ActorSubclass } from "@dfinity/agent";
 
 const SplitterModify = ({
   vector,
   meta,
+  actors,
 }: {
   vector: NodeShared;
   meta: PylonMetaResp;
+  actors: Record<string, ActorSubclass>;
 }) => {
   const { principal } = useTypedSelector((state) => state.Wallet);
   const { destinations, controller: originalController } = extractNodeType(
@@ -48,7 +50,6 @@ const SplitterModify = ({
   const [saving, setSaving] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const { actors } = useActors();
 
   const originalRefundAccount = accountToString(vector.refund);
 

@@ -16,7 +16,6 @@ import {
 import { BiSend } from "react-icons/bi";
 import { isAccountOkay, isBalanceOkay } from "@/utils/AccountTools";
 import { toaster } from "@/components/ui/toaster";
-import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { StatRow } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
@@ -37,13 +36,11 @@ const SendToken = ({
   tokenFee: number;
   balance: number;
 }) => {
-  const { principal } = useTypedSelector((state) => state.Wallet);
+  const { principal, actors } = useTypedSelector((state) => state.Wallet);
   const [account, setAccount] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
-
-  const { actors } = useActors();
 
   const send = async () => {
     setSending(true);

@@ -17,7 +17,6 @@ import {
   endpointToBalanceAndAccount,
   isBalanceOkay,
 } from "@/utils/AccountTools";
-import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
 import {
@@ -35,7 +34,7 @@ const Deposit = ({
   vector: NodeShared;
   meta: PylonMetaResp;
 }) => {
-  const { logged_in, principal, pylon_account } = useTypedSelector(
+  const { logged_in, principal, pylon_account, actors } = useTypedSelector(
     (state) => state.Wallet
   );
   const [sendAmount, setSendAmount] = useState<string>("");
@@ -52,7 +51,6 @@ const Deposit = ({
 
   const realFee = e8sToIcp(Number(fee * 2)); // depositing has at least two fees
 
-  const { actors } = useActors();
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
     return walletLedger === source.ledger;

@@ -11,6 +11,7 @@ type FetchWalletResp = {
   pylon_account: AccountsResponse;
   logged_in: boolean;
   principal: string;
+  actors: Record<string, ActorSubclass>;
 };
 
 export const fetchWallet = async ({
@@ -18,11 +19,13 @@ export const fetchWallet = async ({
   principal,
   shouldRegister,
   logout,
+  actors,
 }: {
   pylon: ActorSubclass<NeuronPylon>;
   principal: Principal;
   shouldRegister: boolean;
   logout: () => Promise<void>;
+  actors: Record<string, ActorSubclass>;
 }): Promise<FetchWalletResp> => {
   try {
     const account = stringToIcrcAccount(principal.toString());
@@ -39,6 +42,7 @@ export const fetchWallet = async ({
       pylon_account: icrcRes,
       logged_in: true,
       principal: principal.toString(),
+      actors: actors,
     };
   } catch (error) {
     console.error(error);
@@ -63,6 +67,7 @@ export const fetchWallet = async ({
       pylon_account: [],
       logged_in: false,
       principal: "",
+      actors: actors,
     };
   }
 };

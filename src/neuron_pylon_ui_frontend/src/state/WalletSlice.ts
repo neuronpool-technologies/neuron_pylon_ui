@@ -13,12 +13,14 @@ type WalletState = {
   principal: string;
   status: string;
   error: string | null;
+  actors: Record<string, ActorSubclass>;
 };
 
 const initialState: WalletState = {
   pylon_account: [],
   logged_in: false,
   principal: "",
+  actors: {},
   status: "idle",
   error: null,
 };
@@ -39,6 +41,7 @@ const WalletSlice = createSlice({
         state.pylon_account = action.payload.pylon_account;
         state.logged_in = action.payload.logged_in;
         state.principal = action.payload.principal;
+        state.actors = action.payload.actors;
       })
       .addCase(refreshWallet.rejected, (state, action) => {
         state.status = "failed";
@@ -56,17 +59,20 @@ export const refreshWallet = createAsyncThunk(
     pylon,
     shouldRegister,
     logout,
+    actors,
   }: {
     principal: Principal;
     pylon: ActorSubclass;
     shouldRegister: boolean;
     logout: () => Promise<void>;
+    actors: Record<string, ActorSubclass>;
   }) =>
     await fetchWallet({
       principal: principal,
       pylon: pylon as unknown as ActorSubclass<NeuronPylon>,
       shouldRegister: shouldRegister,
       logout: logout,
+      actors: actors,
     })
 );
 

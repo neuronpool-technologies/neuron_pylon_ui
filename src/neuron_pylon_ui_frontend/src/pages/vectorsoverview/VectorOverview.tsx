@@ -38,7 +38,7 @@ const VectorOverview = () => {
   const navigate = useNavigate();
   const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { principal } = useTypedSelector((state) => state.Wallet);
+  const { principal, actors } = useTypedSelector((state) => state.Wallet);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -251,6 +251,7 @@ const VectorOverview = () => {
                 controller={controller ?? ""}
                 vector={vector}
                 meta={meta}
+                actors={actors}
               />
             ) : null}
           </Flex>
@@ -262,9 +263,9 @@ const VectorOverview = () => {
           </Tabs.Content>
           <Tabs.Content value="modify">
             {type === "Neuron" ? (
-              <NeuronModify vector={vector} meta={meta} />
+              <NeuronModify vector={vector} meta={meta} actors={actors} />
             ) : type === "Splitter" ? (
-              <SplitterModify vector={vector} meta={meta} />
+              <SplitterModify vector={vector} meta={meta} actors={actors} />
             ) : null}
           </Tabs.Content>
         </Tabs.Root>

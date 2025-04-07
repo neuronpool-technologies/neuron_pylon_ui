@@ -21,7 +21,6 @@ import {
   ModifyRequest,
 } from "@/declarations/neuron_pylon/neuron_pylon.did";
 import { extractNodeType } from "@/utils/Node";
-import { useActors } from "@/hooks/useActors";
 import { modify } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { CommonModifyRequest } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
@@ -29,13 +28,16 @@ import { ConfirmDialog, StatBox, StatRow } from "@/components";
 import { e8sToIcp } from "@/utils/TokenTools";
 import { toaster } from "@/components/ui/toaster";
 import { hexStringToUint8Array } from "@dfinity/utils";
+import { ActorSubclass } from "@dfinity/agent";
 
 const NeuronModify = ({
   vector,
   meta,
+  actors,
 }: {
   vector: NodeShared;
   meta: PylonMetaResp;
+  actors: Record<string, ActorSubclass>;
 }) => {
   const { principal } = useTypedSelector((state) => state.Wallet);
   const {
@@ -49,8 +51,6 @@ const NeuronModify = ({
   const [saving, setSaving] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  const { actors } = useActors();
 
   const refundAccount = accountToString(vector.refund);
   const [modifyState, setModifyState] = useState({

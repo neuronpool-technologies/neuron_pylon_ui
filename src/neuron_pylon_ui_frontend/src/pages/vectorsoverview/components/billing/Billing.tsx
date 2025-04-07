@@ -17,7 +17,6 @@ import {
   endpointToBalanceAndAccount,
   isBalanceOkay,
 } from "@/utils/AccountTools";
-import { useActors } from "@/hooks/useActors";
 import { transfer } from "@/client/commands";
 import { useTypedSelector } from "@/hooks/useRedux";
 import {
@@ -35,7 +34,7 @@ const Billing = ({
   vector: NodeShared;
   meta: PylonMetaResp;
 }) => {
-  const { logged_in, principal, pylon_account } = useTypedSelector(
+  const { logged_in, principal, pylon_account, actors } = useTypedSelector(
     (state) => state.Wallet
   );
   const [amount, setAmount] = useState<string>("");
@@ -44,7 +43,6 @@ const Billing = ({
 
   const { billing } = extractNodeType(vector, meta);
 
-  const { actors } = useActors();
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
     return walletLedger === billing.ledger;

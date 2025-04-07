@@ -42,10 +42,15 @@ const Wallet = () => {
       host: "https://lpfay-3aaaa-aaaal-qbupa-cai.raw.icp0.io",
     });
 
+    // Create a copy of the actors object to update
+    const updatedActors = { ...actors };
+
     if (actors.neuronPylon && identity) {
       const agent = Actor.agentOf(actors.neuronPylon);
       if (agent && agent.replaceIdentity) {
         agent.replaceIdentity(identity);
+        // Update the neuronPylon actor in our copy
+        updatedActors.neuronPylon = actors.neuronPylon;
       }
     }
 
@@ -59,6 +64,7 @@ const Wallet = () => {
         pylon: actors.neuronPylon,
         shouldRegister: true, // Register on initial setup
         logout: logout,
+        actors: updatedActors, // Pass the updated actors to the store
       })
     );
   };
@@ -86,6 +92,7 @@ const Wallet = () => {
             pylon: actors.neuronPylon,
             shouldRegister: false,
             logout: logout,
+            actors: actors, // Also include actors in periodic refreshes
           })
         );
       }, 5000);
@@ -101,10 +108,7 @@ const Wallet = () => {
       rounded="md"
       boxShadow="xs"
       loading={status === "loading"}
-      onClick={async () => {
-        await login();
-        window.location.reload();
-      }}
+      onClick={async () => await login()}
     >
       <ChakraImage
         src={IcLogo}

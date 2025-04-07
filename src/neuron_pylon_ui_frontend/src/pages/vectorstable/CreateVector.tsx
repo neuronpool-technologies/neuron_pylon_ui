@@ -35,26 +35,27 @@ import {
 import { toaster } from "@/components/ui/toaster";
 import { useNavigate } from "react-router-dom";
 import { create } from "@/client/commands";
-import { useActors } from "@/hooks/useActors";
 import { hexStringToUint8Array } from "@dfinity/utils";
+import { ActorSubclass } from "@dfinity/agent";
 
 const CreateVector = ({
   loggedIn,
   principal,
   pylonAccount,
   meta,
+  actors,
 }: {
   loggedIn: boolean;
   principal: string;
   pylonAccount: AccountEndpoint[];
   meta: PylonMetaResp | null;
+  actors: Record<string, ActorSubclass>;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [creating, setCreating] = useState<boolean>(false);
   const [vectorToCreate, setVectorToCreate] = useState<string>("");
   const [ledgerToUse, setLedgerToUse] = useState<string>("");
   const navigate = useNavigate();
-  const { actors } = useActors();
 
   if (!meta)
     return (
