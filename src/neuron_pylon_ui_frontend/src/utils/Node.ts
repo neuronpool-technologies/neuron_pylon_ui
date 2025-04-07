@@ -306,9 +306,11 @@ export const extractNodeType = (
             ?.dissolve_state?.[0]
             ? match(devefi_jes1_snsneuron.neuron_cache[0].dissolve_state[0])
                 .with({ DissolveDelaySeconds: P.select() }, (seconds) =>
-                  convertDaysToMonthsAndYears(
-                    convertSecondsToDays(Number(seconds))
-                  )
+                  Number(seconds) > 0n
+                    ? convertDaysToMonthsAndYears(
+                        convertSecondsToDays(Number(seconds))
+                      )
+                    : "None"
                 )
                 .with(
                   { WhenDissolvedTimestampSeconds: P.select() },
