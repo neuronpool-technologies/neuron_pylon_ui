@@ -66,7 +66,7 @@ const Wallet = () => {
   const cleanupWallet = async () => {
     dispatch(setCleanup());
     Usergeek.setPrincipal(undefined);
-    logout();
+    await logout();
     const agent = Actor.agentOf(actors.neuronPylon);
     if (agent && agent.invalidateIdentity) {
       agent.invalidateIdentity();
@@ -101,7 +101,10 @@ const Wallet = () => {
       rounded="md"
       boxShadow="xs"
       loading={status === "loading"}
-      onClick={login}
+      onClick={async () => {
+        await login();
+        window.location.reload();
+      }}
     >
       <ChakraImage
         src={IcLogo}

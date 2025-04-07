@@ -48,7 +48,7 @@ export const fetchWallet = async ({
     if (errorMessage.includes("Invalid basic signature")) {
       // on the chance this error appears, we should log out
       // the user and reload the page
-      logout();
+      await logout();
       window.location.reload();
     } else {
       // Handle other types of errors as before
