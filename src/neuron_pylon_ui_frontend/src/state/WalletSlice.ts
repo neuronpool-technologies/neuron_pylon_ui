@@ -55,15 +55,18 @@ export const refreshWallet = createAsyncThunk(
     principal,
     pylon,
     shouldRegister,
+    logout,
   }: {
     principal: Principal;
     pylon: ActorSubclass;
     shouldRegister: boolean;
+    logout: () => Promise<void>;
   }) =>
     await fetchWallet({
       principal: principal,
       pylon: pylon as unknown as ActorSubclass<NeuronPylon>,
       shouldRegister: shouldRegister,
+      logout: logout,
     })
 );
 

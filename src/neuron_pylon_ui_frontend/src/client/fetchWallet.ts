@@ -17,10 +17,12 @@ export const fetchWallet = async ({
   pylon,
   principal,
   shouldRegister,
+  logout,
 }: {
   pylon: ActorSubclass<NeuronPylon>;
   principal: Principal;
   shouldRegister: boolean;
+  logout: () => Promise<void>;
 }): Promise<FetchWalletResp> => {
   try {
     const account = stringToIcrcAccount(principal.toString());
@@ -41,11 +43,21 @@ export const fetchWallet = async ({
   } catch (error) {
     console.error(error);
 
-    toaster.create({
-      title: "Error fetching wallet information",
-      description: `${String(error).substring(0, 200)}...`,
-      type: "warning",
-    });
+    const errorMessage = String(error);
+
+    if (errorMessage.includes("Invalid basic signature")) {
+      // on the chance this error appears, we should log out
+      // the user and reload the page
+      logout();
+      window.location.reload();
+    } else {
+      // Handle other types of errors as before
+      toaster.create({
+        title: "Error fetching wallet information",
+        description: `${errorMessage.substring(0, 200)}...`,
+        type: "warning",
+      });
+    }
 
     return {
       pylon_account: [],

@@ -58,6 +58,7 @@ const Wallet = () => {
         principal: principal,
         pylon: actors.neuronPylon,
         shouldRegister: true, // Register on initial setup
+        logout: logout,
       })
     );
   };
@@ -84,6 +85,7 @@ const Wallet = () => {
             principal: identity?.getPrincipal(),
             pylon: actors.neuronPylon,
             shouldRegister: false,
+            logout: logout,
           })
         );
       }, 5000);
