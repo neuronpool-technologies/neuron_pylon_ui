@@ -355,6 +355,16 @@ const CreateVector = ({
                 title={"Create fee"}
                 stat={`${createFee} ${billingTokenInfo.symbol}`}
               />
+              <StatRow
+                title={"Vector billing"}
+                stat={
+                  vectorToCreate === "SNS Neuron"
+                    ? "0.05 NTN per day"
+                    : vectorToCreate === "ICP Neuron"
+                    ? "5% of Maturity"
+                    : "None"
+                }
+              />
             </Flex>
           )}
         </DialogBody>

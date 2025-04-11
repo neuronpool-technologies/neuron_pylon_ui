@@ -39,7 +39,12 @@ const RecieveToken = ({
     icpAddress = ai.toHex();
   }
   return (
-    <DialogRoot lazyMount placement={"center"} motionPreset="slide-in-bottom">
+    <DialogRoot
+      lazyMount
+      placement={"center"}
+      motionPreset="slide-in-bottom"
+      trapFocus={false}
+    >
       <DialogTrigger asChild>
         <MenuItem
           value="Recieve"
