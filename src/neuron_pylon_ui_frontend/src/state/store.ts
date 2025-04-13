@@ -7,14 +7,7 @@ const store = configureStore({
   reducer: { Wallet, Meta, Vectors },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredPaths: ["Wallet", "Meta", "Vectors"],
-        ignoredActions: [
-          "wallet/refreshWallet/fulfilled",
-          "meta/refreshMeta/fulfilled",
-          "vectors/refreshVectors/fulfilled",
-        ],
-      },
+      serializableCheck: false,
     }),
 });
 

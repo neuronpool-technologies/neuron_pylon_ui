@@ -71,7 +71,7 @@ const SendToken = ({
           fontSize="md"
           fontWeight={500}
           transition={"all 0.2s"}
-          _hover={{ cursor: "pointer", transform: "translateX(5px)" }}
+          _hover={{ cursor: "pointer" }}
           closeOnSelect={false}
         >
           <BiSend /> Send

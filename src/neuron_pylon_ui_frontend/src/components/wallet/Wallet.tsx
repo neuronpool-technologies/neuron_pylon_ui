@@ -167,6 +167,7 @@ const Wallet = () => {
               boxShadow="xs"
               w="100%"
               onClick={cleanupWallet}
+              colorPalette="red"
             >
               <BiPowerOff /> Disconnect
             </Button>

@@ -39,19 +39,14 @@ const RecieveToken = ({
     icpAddress = ai.toHex();
   }
   return (
-    <DialogRoot
-      lazyMount
-      placement={"center"}
-      motionPreset="slide-in-bottom"
-      trapFocus={false}
-    >
+    <DialogRoot lazyMount placement={"center"} motionPreset="slide-in-bottom">
       <DialogTrigger asChild>
         <MenuItem
           value="Recieve"
           fontSize="md"
           fontWeight={500}
           transition={"all 0.2s"}
-          _hover={{ cursor: "pointer", transform: "translateX(5px)" }}
+          _hover={{ cursor: "pointer" }}
           closeOnSelect={false}
         >
           <BiReceipt />
@@ -102,7 +97,7 @@ const RecieveToken = ({
             <Alert.Content>
               <Alert.Description>
                 Wallets that support sending to these ICRC Accounts include the
-                NNS, Oisy and SwapRunner.
+                NNS, Oisy, KongSwap and SwapRunner.
               </Alert.Description>
             </Alert.Content>
           </Alert.Root>
