@@ -222,7 +222,7 @@ const CreateVector = ({
           colorPalette="blue"
           rounded="0"
           size="sm"
-          disabled={!loggedIn}
+          disabled={true}
         >
           <BiPlus />
           <Text hideBelow={"md"}>Create Vector</Text>
