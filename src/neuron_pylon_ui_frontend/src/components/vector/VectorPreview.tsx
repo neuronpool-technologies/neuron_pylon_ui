@@ -54,7 +54,6 @@ const VectorPreview = ({
             alt={image.symbol}
             bg={"bg.emphasized"}
             borderRadius="full"
-            p={2.5}
             h={45}
             w={45}
           />

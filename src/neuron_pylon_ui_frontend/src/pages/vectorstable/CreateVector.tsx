@@ -362,6 +362,8 @@ const CreateVector = ({
                     ? "0.05 NTN per day"
                     : vectorToCreate === "ICP Neuron"
                     ? "5% of Maturity"
+                    : vectorToCreate === "Split"
+                    ? "5x Ledger fee"
                     : "None"
                 }
               />

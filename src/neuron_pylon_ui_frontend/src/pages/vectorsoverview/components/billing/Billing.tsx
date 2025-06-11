@@ -41,7 +41,7 @@ const Billing = ({
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
-  const { billing } = extractNodeType(vector, meta);
+  const { billing, symbol } = extractNodeType(vector, meta);
 
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
@@ -104,6 +104,10 @@ const Billing = ({
         } per day`
       : billing.transaction_percentage_fee_e8s > 0
       ? "5% of Maturity"
+      : billing.flat_fee_multiplier > 0
+      ? `${
+          Number(billing.flat_fee_multiplier) * realFee
+        } ${symbol} per transaction`
       : "None";
 
   return (

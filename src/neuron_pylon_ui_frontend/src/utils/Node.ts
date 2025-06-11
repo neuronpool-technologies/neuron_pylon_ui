@@ -53,6 +53,7 @@ export type NodeTypeResult = {
     account: string;
     cost_per_day: bigint;
     ledger: string;
+    flat_fee_multiplier: bigint;
   };
   activity?: Array<Activity>;
   destinations: Array<[string, string]>;
@@ -97,19 +98,29 @@ export const extractNodeType = (
   const isActive = vector.active && !vector.billing.frozen;
 
   // Extract billing information to be included in all return types
-  const transactionFee: bigint = match(vector.billing.transaction_fee)
+  const transactionFeePercentageE8s: bigint = match(
+    vector.billing.transaction_fee
+  )
     .with(
       { transaction_percentage_fee_e8s: P.not(P.nullish) },
       ({ transaction_percentage_fee_e8s }) => transaction_percentage_fee_e8s
     )
     .otherwise(() => BigInt(0));
 
+  const flatTransactionFee: bigint = match(vector.billing.transaction_fee)
+    .with(
+      { flat_fee_multiplier: P.not(P.nullish) },
+      ({ flat_fee_multiplier }) => flat_fee_multiplier
+    )
+    .otherwise(() => BigInt(0));
+
   const billingInfo = {
-    transaction_percentage_fee_e8s: transactionFee,
+    transaction_percentage_fee_e8s: transactionFeePercentageE8s,
     current_balance: vector.billing.current_balance,
     account: accountToString(vector.billing.account),
     cost_per_day: vector.billing.cost_per_day,
     ledger: meta.billing.ledger.toString(),
+    flat_fee_multiplier: flatTransactionFee,
   };
 
   // Helper function to get token info
@@ -296,10 +307,12 @@ export const extractNodeType = (
               )
             : "None",
           neuronFollowee: devefi_jes1_snsneuron.neuron_cache[0]
-            ?.followees?.[1]?.[1]?.followees?.[0]?.id
+            ?.topic_followees?.[0]?.topic_id_to_followees?.[1]?.[1]
+            ?.followees?.[0]?.neuron_id?.[0]?.id
             ? uint8ArrayToHexString(
-                devefi_jes1_snsneuron.neuron_cache[0]?.followees?.[1]?.[1]
-                  ?.followees?.[0]?.id
+                devefi_jes1_snsneuron.neuron_cache[0]?.topic_followees?.[0]
+                  ?.topic_id_to_followees?.[1]?.[1]?.followees?.[0]
+                  ?.neuron_id?.[0]?.id
               )
             : "None",
           dissolveDelay: devefi_jes1_snsneuron.neuron_cache[0]

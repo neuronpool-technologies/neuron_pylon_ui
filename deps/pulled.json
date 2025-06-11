@@ -2,8 +2,8 @@
   "canisters": {
     "6jvpj-sqaaa-aaaaj-azwnq-cai": {
       "name": "neuron_pylon",
-      "wasm_hash": "9dc694dcb2feb49a725fb88b59bac75275b0e582809b4cbd5877a33750d7cbe7",
-      "wasm_hash_download": "9dc694dcb2feb49a725fb88b59bac75275b0e582809b4cbd5877a33750d7cbe7",
+      "wasm_hash": "b09d37d05cecddf8b4fad4da6076afe6214125058be1e053ed0f752c7dc67b92",
+      "wasm_hash_download": "b09d37d05cecddf8b4fad4da6076afe6214125058be1e053ed0f752c7dc67b92",
       "init_guide": "dfx deps pull",
       "init_arg": null,
       "candid_args": "(opt SETTINGS)",
