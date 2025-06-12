@@ -22,7 +22,7 @@ const Stats = () => {
         />
         <Separator />
         <StatBox
-          title="spawning maturity"
+          title="Total maturity"
           value={`${stats?.total_icp_maturity} ICP`}
           icon={<BiPlusCircle />}
           ready={stats ? true : false}

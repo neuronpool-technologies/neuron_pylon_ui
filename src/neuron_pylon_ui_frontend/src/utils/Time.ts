@@ -97,3 +97,60 @@ export function calculateTimeUntilTimestamp(timestampSeconds: number): string {
   // Use the existing function to format the days into years, months, and days
   return convertDaysToMonthsAndYears(diffDays);
 }
+
+export function calculateDaysAndHoursUntilTimestamp(timestampSeconds: number): string {
+  // Get current timestamp in seconds
+  const currentTimestampSeconds = Math.floor(Date.now() / 1000);
+  
+  // Calculate difference in seconds
+  const diffSeconds = timestampSeconds - currentTimestampSeconds;
+  
+  // If the timestamp is in the past, return "Ready"
+  if (diffSeconds <= 0) {
+    return "Ready";
+  }
+  
+  // Calculate days and remaining hours
+  const days = Math.floor(diffSeconds / (60 * 60 * 24));
+  const remainingSeconds = diffSeconds % (60 * 60 * 24);
+  const hours = Math.floor(remainingSeconds / (60 * 60));
+  
+  // If 1 or more days, only show days
+  if (days >= 1) {
+    return `${days} day${days > 1 ? "s" : ""}`;
+  }
+  
+  // Less than 1 day, show hours only
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""}`;
+  }
+  
+  // Less than 1 hour
+  return "less than 1 hour";
+}
+
+// TODO remove when migrating to new NNS neuron pylon with maturity disbursement
+export function calculateDaysAndHoursFromSeconds(secondsLeft: number): string {
+  // If no seconds left, return "Ready"
+  if (secondsLeft <= 0) {
+    return "Ready";
+  }
+  
+  // Calculate days and remaining hours
+  const days = Math.floor(secondsLeft / (60 * 60 * 24));
+  const remainingSeconds = secondsLeft % (60 * 60 * 24);
+  const hours = Math.floor(remainingSeconds / (60 * 60));
+  
+  // If 1 or more days, only show days
+  if (days >= 1) {
+    return `${days} day${days > 1 ? "s" : ""}`;
+  }
+  
+  // Less than 1 day, show hours only
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""}`;
+  }
+  
+  // Less than 1 hour
+  return "less than 1 hour";
+}

@@ -7,6 +7,8 @@ import {
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "./TokenTools";
 import {
+  calculateDaysAndHoursFromSeconds,
+  calculateDaysAndHoursUntilTimestamp,
   calculateTimeUntilTimestamp,
   convertDaysToMonthsAndYears,
   convertNanosecondsToElapsedTime,
@@ -61,9 +63,12 @@ export type NodeTypeResult = {
   neuronFollowee?: string;
   dissolveDelay?: string;
   neuronStatus?: string;
-  unspawnedMaturity?: string;
+  undisbursedMaturity?: string;
   lastUpdated?: string;
-  spawningMaturity?: string;
+  disbursingMaturity?: Array<{
+    amount_e8s: number;
+    timeleft: string;
+  }>;
   varFollowee?: string;
   varDissolve?: string;
   varDelay?: string;
@@ -218,18 +223,19 @@ export const extractNodeType = (
               ? "Locked"
               : "Dissolving"
             : "None",
-          unspawnedMaturity: e8sToIcp(
+          undisbursedMaturity: e8sToIcp(
             Number(devefi_jes1_icpneuron.cache.maturity_e8s_equivalent?.[0])
           ).toFixed(4),
           lastUpdated: updatingStatus,
-          spawningMaturity:
-            devefi_jes1_icpneuron.internals.spawning_neurons.reduce(
-              (accumulator, neuron) =>
-                accumulator +
+          disbursingMaturity:
+            devefi_jes1_icpneuron.internals.spawning_neurons?.map((neuron) => ({
+              amount_e8s:
                 Number(neuron.maturity_e8s_equivalent[0]) +
                 Number(neuron.cached_neuron_stake_e8s[0]),
-              0
-            ),
+              timeleft: calculateDaysAndHoursFromSeconds(
+                Number(neuron.dissolve_delay_seconds[0])
+              ),
+            })) || [],
           varFollowee: varFollowee,
           varDissolve: varDissolve,
           varDelay: varDelay,
@@ -341,24 +347,21 @@ export const extractNodeType = (
                 )
                 .otherwise(() => "None")
             : "None",
-          unspawnedMaturity: e8sToIcp(
+          undisbursedMaturity: e8sToIcp(
             Number(
               devefi_jes1_snsneuron.neuron_cache[0]?.maturity_e8s_equivalent
             )
           ).toFixed(4),
           lastUpdated: updatingStatus,
-          snsMaturitySpawning:
-            devefi_jes1_snsneuron.neuron_cache[0]
-              ?.disburse_maturity_in_progress,
-          spawningMaturity: devefi_jes1_snsneuron.neuron_cache[0]
-            ?.disburse_maturity_in_progress
-            ? Number(
-                devefi_jes1_snsneuron.neuron_cache[0].disburse_maturity_in_progress.reduce(
-                  (total, item) => total + item.amount_e8s,
-                  0n
-                )
-              )
-            : 0,
+          disbursingMaturity:
+            devefi_jes1_snsneuron.neuron_cache[0]?.disburse_maturity_in_progress?.map(
+              (item) => ({
+                amount_e8s: Number(item.amount_e8s),
+                timeleft: calculateDaysAndHoursUntilTimestamp(
+                  Number(item.finalize_disbursement_timestamp_seconds[0])
+                ),
+              })
+            ) || [],
           varFollowee: varFollowee,
           varDissolve: varDissolve,
           varDelay: varDelay,
