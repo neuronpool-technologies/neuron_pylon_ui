@@ -302,7 +302,7 @@ const VectorOverview = () => {
         </Tabs.Root>
       </Flex>
       <Flex
-        direction={{ base: "column", md: "row" }}
+        direction={{ base: "column", md: "column", lg: "row" }}
         gap={{ base: 0, md: 3 }}
         w="100%"
       >
@@ -312,7 +312,7 @@ const VectorOverview = () => {
           mt={6}
           borderRadius={"md"}
           direction={"column"}
-          w="100%"
+          maxW={{ base: "100%", md: "100%", lg: "50%" }}
         >
           <Heading p={3}>About</Heading>
           <Separator />
