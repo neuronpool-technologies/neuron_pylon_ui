@@ -18,7 +18,7 @@ type TokenProps = {
 const Token = ({ endpoint, portalRef }: TokenProps) => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { balance, account } = endpointToBalanceAndAccount(endpoint);
-  const { meta, status } = useTypedSelector((state) => state.Meta);
+  const { meta, prices, status } = useTypedSelector((state) => state.Meta);
   const [open, setOpen] = useState(false);
 
   if (!("ic" in endpoint.endpoint)) return null;
@@ -36,6 +36,8 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
     tokensIcons[1]; // default to ICP logo
 
   if (!token) return null;
+
+  const tokenRate = prices?.find((price) => price.symbol === token?.symbol);
 
   return (
     <MenuRoot
@@ -82,6 +84,16 @@ const Token = ({ endpoint, portalRef }: TokenProps) => {
           <Spacer />
           <Flex direction="column" gap={0}>
             <Text fontSize="sm">{balance.toFixed(4)}</Text>
+            {prices && prices.length > 0 ? (
+              <Text fontSize="sm" color="fg.muted">
+                {balance !== undefined && tokenRate
+                  ? `$${(Number(balance) * tokenRate.last_price).toLocaleString(
+                      "en-US",
+                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                    )}`
+                  : "$0.00"}
+              </Text>
+            ) : null}
           </Flex>
         </Flex>
       </MenuTrigger>

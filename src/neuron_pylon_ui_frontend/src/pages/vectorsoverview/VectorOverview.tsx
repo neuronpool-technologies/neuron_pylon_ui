@@ -36,7 +36,7 @@ const VectorOverview = () => {
   const { controller, id, tab } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { meta } = useTypedSelector((state) => state.Meta);
+  const { meta, prices } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { principal, actors } = useTypedSelector((state) => state.Wallet);
 
@@ -49,11 +49,22 @@ const VectorOverview = () => {
   const vector = vectors.find((v) => v.id.toString() === id);
   if (!vector) return <VectorLoading />;
 
-  const { type, name, value, label, symbol, active, created, activity } =
-    extractNodeType(vector, meta);
+  const {
+    type,
+    name,
+    value,
+    label,
+    symbol,
+    active,
+    created,
+    activity,
+    amount,
+  } = extractNodeType(vector, meta);
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
+
+  const tokenRate = prices?.find((price) => price.symbol === symbol);
 
   return (
     <Header>
@@ -150,6 +161,26 @@ const VectorOverview = () => {
           >
             {created}
           </Text>
+          {type === "Neuron" && prices && prices.length > 0 ? (
+            <>
+              <Text fontSize="sm" fontWeight={500} color="fg.muted">
+                •
+              </Text>
+              <Text
+                fontSize="sm"
+                fontWeight={500}
+                color="fg.muted"
+                textTransform={"uppercase"}
+              >
+                {amount !== undefined && Number(amount) > 0 && tokenRate
+                  ? `$${(Number(amount) * tokenRate.last_price).toLocaleString(
+                      "en-US",
+                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                    )}`
+                  : null}
+              </Text>
+            </>
+          ) : null}
         </Flex>
         <Flex gap={3} direction={{ base: "column", md: "row" }}>
           <Flex w="fit-content">
