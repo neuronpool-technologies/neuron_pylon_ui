@@ -106,13 +106,26 @@ const NeuronAbout = ({
                     <Popover.Arrow>
                       <Popover.ArrowTip />
                     </Popover.Arrow>
-                    <Popover.Body p={3}>
-                      <Popover.Title fontSize="sm" fontWeight={500} color="fg">
+                    <Popover.Body p={0}>
+                      <Popover.Title
+                        fontSize="sm"
+                        fontWeight={500}
+                        color="fg"
+                        px={3}
+                        pb={2}
+                        pt={3}
+                      >
                         Time until next disbursement
                         {(disbursingMaturity?.length ?? 0) > 1 ? "s" : ""}
                       </Popover.Title>
-                      <Separator my={2} />
-                      <Grid templateColumns="repeat(2, 1fr)" gap={1}>
+                      <Separator />
+                      <Grid
+                        templateColumns="repeat(2, 1fr)"
+                        gap={1}
+                        px={3}
+                        pb={3}
+                        pt={2}
+                      >
                         {disbursingMaturity?.map((item, index) => (
                           <GridItem key={index}>
                             <StatBox
