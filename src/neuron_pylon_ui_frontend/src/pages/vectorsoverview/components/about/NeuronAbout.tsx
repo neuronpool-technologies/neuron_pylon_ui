@@ -108,7 +108,8 @@ const NeuronAbout = ({
                     </Popover.Arrow>
                     <Popover.Body p={3}>
                       <Popover.Title fontSize="sm" fontWeight={500} color="fg">
-                        Time until next disbursements
+                        Time until next disbursement
+                        {(disbursingMaturity?.length ?? 0) > 1 ? "s" : ""}
                       </Popover.Title>
                       <Separator my={2} />
                       <Grid templateColumns="repeat(2, 1fr)" gap={1}>
