@@ -312,7 +312,12 @@ const VectorOverview = () => {
           mt={6}
           borderRadius={"md"}
           direction={"column"}
-          maxW={{ base: "100%", md: "100%", lg: "50%" }}
+          w="100%"
+          maxW={{
+            base: "100%",
+            md: "100%",
+            lg: type === "Splitter" ? "100%" : "50%",
+          }}
         >
           <Heading p={3}>About</Heading>
           <Separator />
