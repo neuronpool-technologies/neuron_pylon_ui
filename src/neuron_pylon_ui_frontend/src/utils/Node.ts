@@ -187,7 +187,10 @@ export const extractNodeType = (
           name: "Internet Computer",
           value: `${e8sToIcp(
             Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
-          ).toFixed(2)} ICP`,
+          ).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })} ICP`,
           amount: e8sToIcp(
             Number(devefi_jes1_icpneuron.cache?.cached_neuron_stake_e8s?.[0])
           )
@@ -284,7 +287,10 @@ export const extractNodeType = (
             Number(
               devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s
             )
-          ).toFixed(2)} ${symbol}`,
+          ).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })} ${symbol}`,
           amount: e8sToIcp(
             Number(
               devefi_jes1_snsneuron.neuron_cache[0]?.cached_neuron_stake_e8s

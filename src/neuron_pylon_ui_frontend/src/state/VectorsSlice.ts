@@ -8,8 +8,7 @@ import {
 import { fetchVectors } from "@/client/fetchVectors";
 
 type PylonVectorsResp = {
-  total_icp_staked: string;
-  total_icp_maturity: string;
+  total_icp_staked: number;
   total_vectors: string;
   total_controllers: string;
 };

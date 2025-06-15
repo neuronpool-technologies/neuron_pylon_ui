@@ -1,10 +1,25 @@
 import { StatIcon } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { Flex, Text, Separator, Skeleton } from "@chakra-ui/react";
-import { BiLock, BiRefresh, BiPlusCircle, BiUser } from "react-icons/bi";
+import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
 
 const Stats = () => {
   const { stats } = useTypedSelector((state) => state.Vectors);
+  const { prices } = useTypedSelector((state) => state.Meta);
+  const tokenRate = prices?.find((price) => price.symbol === "ICP");
+
+  const tvl =
+    stats?.total_icp_staked !== undefined &&
+    Number(stats?.total_icp_staked) > 0 &&
+    tokenRate
+      ? `$${(
+          Number(stats?.total_icp_staked) * tokenRate.last_price
+        ).toLocaleString("en-US", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        })}`
+      : null;
+
   return (
     <Flex
       bg="bg.subtle"
@@ -15,17 +30,17 @@ const Stats = () => {
     >
       <Flex direction={"column"} p={3} w="100%" gap={3}>
         <StatBox
-          title="total staked"
-          value={`${stats?.total_icp_staked} ICP`}
+          title="icp staked"
+          value={`${stats?.total_icp_staked.toLocaleString()} ICP`}
           icon={<BiLock />}
-          ready={stats ? true : false}
+          ready={stats && tvl ? true : false}
         />
         <Separator />
         <StatBox
-          title="Total maturity"
-          value={`${stats?.total_icp_maturity} ICP`}
-          icon={<BiPlusCircle />}
-          ready={stats ? true : false}
+          title="total value"
+          value={`${tvl}`}
+          icon={<BiDollar />}
+          ready={stats && tvl ? true : false}
         />
       </Flex>
       <Separator orientation="vertical" my={3} hideBelow={"md"} />
@@ -35,14 +50,14 @@ const Stats = () => {
           title="total vectors"
           value={`${stats?.total_vectors}`}
           icon={<BiRefresh />}
-          ready={stats ? true : false}
+          ready={stats && tvl ? true : false}
         />
         <Separator />
         <StatBox
           title="Unique owners"
           value={`${stats?.total_controllers}`}
           icon={<BiUser />}
-          ready={stats ? true : false}
+          ready={stats && tvl ? true : false}
         />
       </Flex>
     </Flex>

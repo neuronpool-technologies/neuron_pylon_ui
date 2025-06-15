@@ -12,8 +12,7 @@ import { extractAllLogs } from "@/utils/Node";
 
 type PylonVectorsResp = {
   stats: {
-    total_icp_staked: string;
-    total_icp_maturity: string;
+    total_icp_staked: number;
     total_vectors: string;
     total_controllers: string;
   };
@@ -62,28 +61,15 @@ export const fetchVectors = async ({
         // Calculate totalStake
         const stake = Number(cache?.cached_neuron_stake_e8s?.[0] || 0);
 
-        // Calculate totalMaturity including any spawning neurons
-        const current = Number(cache?.maturity_e8s_equivalent?.[0] || 0);
-        const spawning =
-          internals?.spawning_neurons?.reduce(
-            (spawningAcc, neuron) =>
-              spawningAcc +
-              Number(neuron.maturity_e8s_equivalent?.[0] || 0) +
-              Number(neuron.cached_neuron_stake_e8s?.[0] || 0),
-            0
-          ) || 0;
-
         return {
           totalVectors: acc.totalVectors + hasVector,
           totalStake: acc.totalStake + stake,
-          totalMaturity: acc.totalMaturity + current + spawning,
           uniqueOwners: acc.uniqueOwners,
         };
       },
       {
         totalVectors: 0,
         totalStake: 0,
-        totalMaturity: 0,
         uniqueOwners: new Set<string>(),
       }
     );
@@ -114,16 +100,11 @@ export const fetchVectors = async ({
       .slice(0, 6);
 
     // Extract the computed values and determine the count of unique controllers
-    const { totalVectors, totalStake, totalMaturity, uniqueOwners } = result;
+    const { totalVectors, totalStake, uniqueOwners } = result;
 
     return {
       stats: {
-        total_icp_staked: Math.round(
-          e8sToIcp(Number(totalStake))
-        ).toLocaleString(),
-        total_icp_maturity: Math.round(
-          e8sToIcp(Number(totalMaturity))
-        ).toLocaleString(),
+        total_icp_staked: Math.round(e8sToIcp(Number(totalStake))),
         total_vectors: totalVectors.toLocaleString(),
         total_controllers: uniqueOwners.size.toLocaleString(),
       },
