@@ -1,29 +1,26 @@
 import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
-  Shared,
   NodeShared,
   Activity,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { _SERVICE as Router } from "@/chrono/declarations/chrono_router/chrono_router.did.js";
 import { toaster } from "@/components/ui/toaster";
-import { match, P } from "ts-pattern";
-import { e8sToIcp } from "@/utils/TokenTools";
 import { extractAllLogs } from "@/utils/Node";
+import moment from "moment";
 
 type PylonVectorsResp = {
-  stats: {
-    total_icp_staked: number;
-    total_vectors: string;
-    total_controllers: string;
-  };
   vectors: NodeShared[];
   latest_log: Array<{ log: Activity; node: NodeShared }>;
+  chrono_log: any[]; // TODO: Define a proper type for chrono logs
 };
 
 export const fetchVectors = async ({
   pylon,
+  router,
 }: {
   pylon: ActorSubclass<NeuronPylon>;
+  router: ActorSubclass<Router>;
 }): Promise<PylonVectorsResp | null> => {
   try {
     const idObjects = Array.from(
@@ -32,47 +29,6 @@ export const fetchVectors = async ({
     );
 
     const nodes = await pylon.icrc55_get_nodes(idObjects);
-
-    const result = nodes.reduce(
-      (acc, node) => {
-        // Skip nodes with an empty node[0]
-        if (!node[0]) return acc;
-
-        // Extract the controller and convert its owner to a string using toString()
-        const controller = node[0].controllers[0];
-        const ownerId = controller.owner.toString();
-        acc.uniqueOwners.add(ownerId);
-
-        const { custom } = node[0];
-
-        const icpNeuron = match(custom?.[0] as Shared)
-          .with(
-            { devefi_jes1_icpneuron: P.not(P.nullish) },
-            ({ devefi_jes1_icpneuron }) => devefi_jes1_icpneuron
-          )
-          .otherwise(() => undefined);
-
-        const cache = icpNeuron?.cache;
-        const internals = icpNeuron?.internals;
-
-        // Increment totalVectors if node[0] is defined
-        const hasVector = 1;
-
-        // Calculate totalStake
-        const stake = Number(cache?.cached_neuron_stake_e8s?.[0] || 0);
-
-        return {
-          totalVectors: acc.totalVectors + hasVector,
-          totalStake: acc.totalStake + stake,
-          uniqueOwners: acc.uniqueOwners,
-        };
-      },
-      {
-        totalVectors: 0,
-        totalStake: 0,
-        uniqueOwners: new Set<string>(),
-      }
-    );
 
     // Collect all logs from all nodes, sort by timestamp, and take the latest 6
     const latestLogs = nodes
@@ -99,23 +55,52 @@ export const fetchVectors = async ({
       // Take only the 6 most recent logs
       .slice(0, 6);
 
-    // Extract the computed values and determine the count of unique controllers
-    const { totalVectors, totalStake, uniqueOwners } = result;
+    const orderedNodes = nodes.flatMap((node) => (node[0] ? [node[0]] : [])).reverse()
 
+    const chronoLogs = await fetchChrono({ router, vectors: orderedNodes });
+    
     return {
-      stats: {
-        total_icp_staked: Math.round(e8sToIcp(Number(totalStake))),
-        total_vectors: totalVectors.toLocaleString(),
-        total_controllers: uniqueOwners.size.toLocaleString(),
-      },
-      vectors: nodes.flatMap((node) => (node[0] ? [node[0]] : [])).reverse(),
+      vectors: orderedNodes,
       latest_log: latestLogs,
+      chrono_log: [], // Placeholder for chrono logs, to be fetched separately
     };
   } catch (error) {
     console.error(error);
 
     toaster.create({
       title: "Error fetching vectors",
+      description: `${String(error).substring(0, 200)}...`,
+      type: "warning",
+    });
+
+    return null;
+  }
+};
+
+const fetchChrono = async ({
+  router,
+  vectors,
+}: {
+  router: ActorSubclass<Router>;
+  vectors: NodeShared[];
+}): Promise<any> => {
+  try {
+    const slices = await router.get_slices();
+
+    let now = moment().unix(); // Gets current time in seconds
+
+    // Finds the index of the current time slice in the slices array.
+    // A slice is considered 'current' if the current timestamp (now) falls within its time range.
+    let current_slice_idx = slices.findIndex((x) => x[1] <= now && x[2] > now);
+    console.log(slices[current_slice_idx]);
+
+    // TODO: get all the logs for all the vectors in the neuron pylon, get last X logs for each vector
+
+  } catch (error) {
+    console.error(error);
+
+    toaster.create({
+      title: "Error fetching chrono logs",
       description: `${String(error).substring(0, 200)}...`,
       type: "warning",
     });

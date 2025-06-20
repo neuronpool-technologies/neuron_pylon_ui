@@ -2,11 +2,60 @@ import { StatIcon } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { Flex, Text, Separator, Skeleton } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
+import { match, P } from "ts-pattern";
+import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
+import { e8sToIcp } from "@/utils/TokenTools";
 
 const Stats = () => {
-  const { stats } = useTypedSelector((state) => state.Vectors);
+  const { vectors } = useTypedSelector((state) => state.Vectors);
   const { prices } = useTypedSelector((state) => state.Meta);
   const tokenRate = prices?.find((price) => price.symbol === "ICP");
+
+  const calculatedStats = vectors.reduce(
+    (acc, node) => {
+      // Skip nodes with an empty node[0]
+      if (!node) return acc;
+
+      // Extract the controller and convert its owner to a string using toString()
+      const controller = node.controllers[0];
+      const ownerId = controller.owner.toString();
+      acc.uniqueOwners.add(ownerId);
+
+      const { custom } = node;
+
+      const icpNeuron = match(custom?.[0] as Shared)
+        .with(
+          { devefi_jes1_icpneuron: P.not(P.nullish) },
+          ({ devefi_jes1_icpneuron }) => devefi_jes1_icpneuron
+        )
+        .otherwise(() => undefined);
+
+      const cache = icpNeuron?.cache;
+
+      // Increment totalVectors if node[0] is defined
+      const hasVector = 1;
+
+      // Calculate totalStake
+      const stake = Number(cache?.cached_neuron_stake_e8s?.[0] || 0);
+
+      return {
+        totalVectors: acc.totalVectors + hasVector,
+        totalStake: acc.totalStake + stake,
+        uniqueOwners: acc.uniqueOwners,
+      };
+    },
+    {
+      totalVectors: 0,
+      totalStake: 0,
+      uniqueOwners: new Set<string>(),
+    }
+  );
+
+  const stats = {
+    total_icp_staked: Math.round(e8sToIcp(Number(calculatedStats.totalStake))),
+    total_vectors: calculatedStats.totalVectors.toLocaleString(),
+    total_controllers: calculatedStats.uniqueOwners.size.toLocaleString(),
+  };
 
   const tvl =
     stats?.total_icp_staked !== undefined &&

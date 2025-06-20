@@ -43,8 +43,13 @@ const AppLayout = () => {
   useEffect(() => {
     if (actors.neuronPylon) {
       const refresh = () => {
-        dispatch(refreshVectors({ pylon: actors.neuronPylon }));
-      };
+        dispatch(
+          refreshVectors({
+            pylon: actors.neuronPylon,
+            router: actors.router,
+          })
+        );
+      };``
 
       dispatch(refreshMeta({ pylon: actors.neuronPylon }));
       refresh();
