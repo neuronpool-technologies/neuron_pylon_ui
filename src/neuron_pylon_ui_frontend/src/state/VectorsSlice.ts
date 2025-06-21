@@ -7,11 +7,12 @@ import {
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { _SERVICE as Router } from "@/chrono/declarations/chrono_router/chrono_router.did.js";
 import { fetchVectors } from "@/client/fetchVectors";
+import { SearchResp } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
 
 type VectorsState = {
   vectors: NodeShared[];
   latest_log: Array<{ log: Activity; node: NodeShared }>;
-  chrono_log: any[]; // TODO: Define a proper type for chrono logs
+  chrono_log: SearchResp | null;
   status: string;
   error: string | null;
 };
