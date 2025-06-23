@@ -44,6 +44,67 @@ export function convertNanosecondsToElapsedTime(
   }
 }
 
+export function convertSecondsToElapsedTime(
+  timestampSeconds: number
+): string {
+  // Validate the input timestamp
+  if (
+    timestampSeconds === null ||
+    timestampSeconds === undefined ||
+    typeof timestampSeconds !== "number"
+  ) {
+    throw new Error("Invalid timestamp provided.");
+  }
+
+  // Convert seconds to milliseconds
+  const timestampMillis = timestampSeconds * 1000;
+
+  // Create a moment object from the timestamp
+  const pastMoment = moment(timestampMillis);
+
+  // Get the current time
+  const currentMoment = moment();
+
+  // Calculate the difference in milliseconds
+  const diffMillis = currentMoment.diff(pastMoment);
+
+  // Create a duration from the difference
+  const duration = moment.duration(diffMillis);
+
+  // Determine whether to display in minutes, hours, or days
+  if (duration.asDays() >= 1) {
+    const days = Math.floor(duration.asDays());
+    return days === 1 ? "1 day ago" : `${days} days ago`;
+  } else if (duration.asHours() >= 1) {
+    const hours = Math.floor(duration.asHours());
+    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  } else {
+    const minutes = Math.floor(duration.asMinutes());
+    // Handle cases where duration is less than a minute
+    if (minutes <= 0) {
+      return "just now";
+    }
+    return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+  }
+}
+
+export function formatUnixTimestampToDateString(timestampSeconds: number): string {
+  // Validate the input timestamp
+  if (
+    timestampSeconds === null ||
+    timestampSeconds === undefined ||
+    typeof timestampSeconds !== "number"
+  ) {
+    throw new Error("Invalid timestamp provided.");
+  }
+
+  // Convert seconds to milliseconds
+  const timestampMillis = timestampSeconds * 1000;
+  
+  // Format the date using moment
+  return moment(timestampMillis).format("MMM D, YYYY");
+}
+
 export function convertSecondsToDays(seconds: number): number {
   const days = moment.duration(seconds, "seconds").asDays();
   return days;

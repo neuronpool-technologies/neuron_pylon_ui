@@ -3,7 +3,6 @@ import { ActorSubclass } from "@dfinity/agent";
 import {
   _SERVICE as NeuronPylon,
   NodeShared,
-  Activity,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { _SERVICE as Router } from "@/chrono/declarations/chrono_router/chrono_router.did.js";
 import { fetchVectors } from "@/client/fetchVectors";
@@ -11,15 +10,13 @@ import { SearchResp } from "@/chrono/declarations/chrono_slice/chrono_slice.did"
 
 type VectorsState = {
   vectors: NodeShared[];
-  latest_log: Array<{ log: Activity; node: NodeShared }>;
-  chrono_log: SearchResp | null;
+  chrono_log: SearchResp;
   status: string;
   error: string | null;
 };
 
 const initialState: VectorsState = {
   vectors: [],
-  latest_log: [],
   chrono_log: [],
   status: "idle",
   error: null,
@@ -39,7 +36,6 @@ const VectorsSlice = createSlice({
       .addCase(refreshVectors.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.vectors = action.payload?.vectors ?? [];
-        state.latest_log = action.payload?.latest_log ?? [];
         state.chrono_log = action.payload?.chrono_log ?? [];
       })
       .addCase(refreshVectors.rejected, (state, action) => {

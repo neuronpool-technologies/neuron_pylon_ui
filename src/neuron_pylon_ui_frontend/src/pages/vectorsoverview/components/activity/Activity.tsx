@@ -22,7 +22,7 @@ const Activity = ({
       direction={"column"}
       w="100%"
     >
-      <Heading p={3}>Recent Activity</Heading>
+      <Heading p={3}>Activity</Heading>
       <Separator />
       <Flex direction="column" w="100%" h="100%">
         {logToShow.length > 0 ? (
@@ -44,7 +44,7 @@ const Activity = ({
             h="100%"
             fontSize="md"
           >
-            No activity...
+            No activity found...
           </Flex>
         )}
       </Flex>

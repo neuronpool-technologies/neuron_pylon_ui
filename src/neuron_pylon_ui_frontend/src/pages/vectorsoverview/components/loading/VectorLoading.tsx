@@ -62,6 +62,20 @@ const VectorLoading = () => {
         <Separator />
         <SkeletonText mt="4" noOfLines={7} gap="4" />
       </Flex>
+      {/* Transactions section skeleton */}
+      <Flex
+        bg="bg.subtle"
+        boxShadow={"md"}
+        mt={6}
+        borderRadius={"md"}
+        direction={"column"}
+        w="100%"
+        p={3}
+      >
+        <Skeleton height="40px" width="100px" mb={3} />
+        <Separator />
+        <SkeletonText mt="4" noOfLines={7} gap="4" />
+      </Flex>
     </Header>
   );
 };

@@ -3,9 +3,38 @@ import { Flex, Heading, Separator, Text } from "@chakra-ui/react";
 import { VectorLog } from "@/components";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { NavLink } from "react-router-dom";
+import { extractAllLogs } from "@/utils/Node";
+import {
+  Activity,
+  NodeShared,
+} from "@/declarations/neuron_pylon/neuron_pylon.did";
 
 const RecentActivity = () => {
-  const { latest_log } = useTypedSelector((state) => state.Vectors);
+  const { vectors } = useTypedSelector((state) => state.Vectors);
+
+  const latest_log: Array<{ log: Activity; node: NodeShared }> = vectors
+    .flatMap((node) => {
+      if (!node) return [];
+      // For each log in the node, return an object containing both the log and the node
+      return extractAllLogs(node).map((log) => ({
+        log,
+        node: node as NodeShared,
+      }));
+    })
+    // Sort by timestamp in descending order (most recent first)
+    .sort((a, b) => {
+      const timestampA =
+        "Ok" in a.log
+          ? Number(a.log.Ok.timestamp)
+          : Number(a.log.Err.timestamp);
+      const timestampB =
+        "Ok" in b.log
+          ? Number(b.log.Ok.timestamp)
+          : Number(b.log.Err.timestamp);
+      return timestampB - timestampA; // Higher timestamps (more recent) come first
+    })
+    // Take only the 6 most recent logs
+    .slice(0, 6);
 
   return (
     <Flex
@@ -47,7 +76,7 @@ const RecentActivity = () => {
           color="fg.muted"
         >
           <Text fontSize="sm" fontWeight={500} textTransform={"uppercase"}>
-            view all
+            view vectors
           </Text>
           <BiRightArrowAlt />
         </Flex>

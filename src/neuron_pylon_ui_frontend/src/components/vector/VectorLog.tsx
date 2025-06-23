@@ -1,10 +1,9 @@
-import { Flex, Text, Heading, Code, Separator } from "@chakra-ui/react";
-import { BiCog } from "react-icons/bi";
+import { Flex, Text, Heading, Code, Separator, Icon } from "@chakra-ui/react";
+import { BiCog, BiCheckCircle, BiXCircle } from "react-icons/bi";
 import {
   NodeShared,
   Activity,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { StatIcon } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { NavLink } from "react-router-dom";
 import { extractActivityType, extractNodeType } from "@/utils/Node";
@@ -22,7 +21,7 @@ const VectorLog = ({
 }) => {
   const { meta } = useTypedSelector((state) => state.Meta);
   if (!meta) return null;
-  const { type, controller } = extractNodeType(vector, meta);
+  const { controller } = extractNodeType(vector, meta);
   const { isError, operation, timestamp, message } =
     extractActivityType(activity);
 
@@ -45,12 +44,44 @@ const VectorLog = ({
         borderRadius="md"
       >
         <Flex w={{ base: "65%", md: "80%" }} gap={3} align="center">
-          <StatIcon>
-            <BiCog />
-          </StatIcon>
+          <Flex position="relative">
+            <Icon
+              fontSize={45}
+              p={2.5}
+              bg={"bg.emphasized"}
+              borderRadius="full"
+            >
+              <BiCog />
+            </Icon>
+            {isError ? (
+              <Icon
+                fontSize={"20px"}
+                color="red.solid"
+                bg={"bg.emphasized"}
+                position="absolute"
+                top="-3px"
+                right="-3px"
+                borderRadius="full"
+              >
+                <BiXCircle />
+              </Icon>
+            ) : (
+              <Icon
+                fontSize={"20px"}
+                color="green.solid"
+                bg={"bg.emphasized"}
+                position="absolute"
+                top="-3px"
+                right="-3px"
+                borderRadius="full"
+              >
+                <BiCheckCircle />
+              </Icon>
+            )}
+          </Flex>
           <Flex direction="column" gap={0}>
             <Heading fontSize="sm" lineClamp={1} color="blue.fg">
-              {type} #{vector.id}
+              Vector #{vector.id}
             </Heading>
             <Text fontSize="sm" color="fg.muted" lineClamp={1}>
               {timestamp}

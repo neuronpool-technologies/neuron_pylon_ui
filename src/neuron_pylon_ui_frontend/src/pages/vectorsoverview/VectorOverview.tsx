@@ -30,6 +30,7 @@ import {
   SplitterModify,
   Delete,
   VectorLoading,
+  Transactions,
 } from "./components";
 
 const VectorOverview = () => {
@@ -331,6 +332,7 @@ const VectorOverview = () => {
           <Activity vectorLog={activity || []} vector={vector} />
         ) : null}
       </Flex>
+      <Transactions vector={vector} />
     </Header>
   );
 };

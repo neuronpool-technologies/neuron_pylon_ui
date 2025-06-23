@@ -1,6 +1,5 @@
-import { StatIcon } from "@/components";
 import { useTypedSelector } from "@/hooks/useRedux";
-import { Flex, Text, Separator, Skeleton } from "@chakra-ui/react";
+import { Flex, Text, Separator, Skeleton, Icon } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
 import { match, P } from "ts-pattern";
 import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
@@ -128,7 +127,9 @@ const StatBox = ({
 }) => {
   return (
     <Flex align="center" gap={3}>
-      <StatIcon>{icon}</StatIcon>
+      <Icon fontSize={45} p={2.5} bg={"bg.emphasized"} borderRadius="full">
+        {icon}
+      </Icon>
       <Flex direction="column" gap={0}>
         <Text
           fontSize="sm"

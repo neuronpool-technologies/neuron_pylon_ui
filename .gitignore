@@ -11,7 +11,7 @@
 .dfx/
 
 # generated files
-declarations/
+src/neuron_pylon_ui_frontend/src/declarations
 
 # rust
 target/
