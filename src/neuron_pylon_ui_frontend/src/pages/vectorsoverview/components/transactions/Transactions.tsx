@@ -18,7 +18,7 @@ const Transactions = ({ vector }: { vector: NodeShared }) => {
     chrono_log,
     {
       vectorId: vector.id,
-      limit: 5,
+      limit: 6,
     }
   );
   const { controller } = extractNodeType(vector, meta);
@@ -74,7 +74,7 @@ const Transactions = ({ vector }: { vector: NodeShared }) => {
             color="fg.muted"
           >
             <Text fontSize="sm" fontWeight={500} textTransform={"uppercase"}>
-              view all
+              view transactions
             </Text>
             <BiRightArrowAlt />
           </Flex>
@@ -93,7 +93,7 @@ const Transactions = ({ vector }: { vector: NodeShared }) => {
           opacity={0.6}
         >
           <Text fontSize="sm" fontWeight={500} textTransform={"uppercase"}>
-            view all
+            view transactions
           </Text>
           <BiRightArrowAlt />
         </Flex>

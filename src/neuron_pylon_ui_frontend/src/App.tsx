@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { Flex, Box } from "@chakra-ui/react";
 import { Nav } from "@/components";
-import { Home, VectorsTable, VectorOverview, Error } from "@/pages";
+import { Home, VectorsTable, VectorOverview, VectorTransactions, Error } from "@/pages";
 import { Toaster } from "@/components/ui/toaster";
 import { refreshMeta } from "@/state/MetaSlice";
 import { useTypedDispatch } from "./hooks/useRedux";
@@ -29,7 +29,7 @@ const App = () => {
           />
           <Route
             path="/vectors/:controller/:id/transactions"
-            element={<p>transactions page</p>}
+            element={<VectorTransactions />}
           />
           <Route path="*" element={<Error />} />
         </Route>
