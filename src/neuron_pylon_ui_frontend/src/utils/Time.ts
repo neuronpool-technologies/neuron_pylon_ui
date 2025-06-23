@@ -88,7 +88,7 @@ export function convertSecondsToElapsedTime(
   }
 }
 
-export function formatUnixTimestampToDateString(timestampSeconds: number): string {
+export function formatSecondsToDateString(timestampSeconds: number): string {
   // Validate the input timestamp
   if (
     timestampSeconds === null ||
@@ -100,6 +100,23 @@ export function formatUnixTimestampToDateString(timestampSeconds: number): strin
 
   // Convert seconds to milliseconds
   const timestampMillis = timestampSeconds * 1000;
+  
+  // Format the date using moment
+  return moment(timestampMillis).format("MMM D, YYYY");
+}
+
+export function formatNanosecondsToDateString(timestampNanos: number): string {
+  // Validate the input timestamp
+  if (
+    timestampNanos === null ||
+    timestampNanos === undefined ||
+    typeof timestampNanos !== "number"
+  ) {
+    throw new Error("Invalid timestamp provided.");
+  }
+
+  // Convert nanoseconds to milliseconds
+  const timestampMillis = Math.floor(timestampNanos / 1_000_000);
   
   // Format the date using moment
   return moment(timestampMillis).format("MMM D, YYYY");

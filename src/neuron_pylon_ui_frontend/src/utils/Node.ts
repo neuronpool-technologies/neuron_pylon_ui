@@ -13,6 +13,7 @@ import {
   convertDaysToMonthsAndYears,
   convertNanosecondsToElapsedTime,
   convertSecondsToDays,
+  formatNanosecondsToDateString,
 } from "./Time";
 import { accountToString } from "./AccountTools";
 import { uint8ArrayToHexString } from "@dfinity/utils";
@@ -79,7 +80,7 @@ export const extractNodeType = (
   meta: PylonMetaResp
 ): NodeTypeResult => {
   // Common properties
-  const created = convertNanosecondsToElapsedTime(Number(vector.created));
+  const created = formatNanosecondsToDateString(Number(vector.created));
   const controller = accountToString(vector.controllers[0]);
 
   // Map destinations to an array of tuples [name, address]

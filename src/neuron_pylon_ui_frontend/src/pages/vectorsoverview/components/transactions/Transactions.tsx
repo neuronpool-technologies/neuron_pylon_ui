@@ -18,7 +18,7 @@ const Transactions = ({ vector }: { vector: NodeShared }) => {
     chrono_log,
     {
       vectorId: vector.id,
-      limit: 6,
+      limit: 5,
     }
   );
   const { controller } = extractNodeType(vector, meta);
