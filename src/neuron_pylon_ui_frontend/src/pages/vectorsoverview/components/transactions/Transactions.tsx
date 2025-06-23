@@ -40,7 +40,6 @@ const Transactions = ({ vector }: { vector: NodeShared }) => {
             transactions={transactions}
             key={index}
             first={index === 0}
-            showLink
           />
         ))}
         {filteredTransactions.length === 0 && (

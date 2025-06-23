@@ -74,108 +74,118 @@ const VectorTransaction = ({
           actualTxType = "Spawned";
         }
 
-        return (
-          <NavLink to={`/vectors/${controller}/${vector.id}`} key={index}>
-            {first && index === 0 ? null : <Separator />}
-            <Flex
-              direction={"row"}
-              align="center"
-              transition={"all 0.2s"}
-              _hover={
-                showLink
-                  ? {
-                      cursor: "pointer",
-                      bg: "bg.muted",
-                    }
-                  : { cursor: "default" }
-              }
-              p={3}
-              borderRadius="md"
-              bg="bg.subtle"
-            >
-              <Flex w={{ base: "55%", md: "80%" }} gap={3} align="center">
-                <Flex position="relative">
+        const content = (
+          <Flex
+            direction={"row"}
+            align="center"
+            transition={"all 0.2s"}
+            _hover={
+              showLink
+                ? {
+                    cursor: "pointer",
+                    bg: "bg.muted",
+                  }
+                : {}
+            }
+            p={3}
+            borderRadius="md"
+            bg="bg.subtle"
+          >
+            <Flex w={{ base: "55%", md: "80%" }} gap={3} align="center">
+              <Flex position="relative">
+                <Icon
+                  fontSize={45}
+                  p={2.5}
+                  bg={"bg.emphasized"}
+                  borderRadius="full"
+                >
+                  <BiReceipt />
+                </Icon>
+                {actualTxType === "Staked" ? (
                   <Icon
-                    fontSize={45}
-                    p={2.5}
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
                     bg={"bg.emphasized"}
                     borderRadius="full"
                   >
-                    <BiReceipt />
+                    <BiLock />
                   </Icon>
-                  {actualTxType === "Staked" ? (
-                    <Icon
-                      fontSize={"20px"}
-                      position="absolute"
-                      top="-3px"
-                      right="-3px"
-                      bg={"bg.emphasized"}
-                      borderRadius="full"
-                    >
-                      <BiLock />
-                    </Icon>
-                  ) : actualTxType === "Received" ? (
-                    <Icon
-                      fontSize={"20px"}
-                      position="absolute"
-                      top="-3px"
-                      right="-3px"
-                      bg={"bg.emphasized"}
-                      borderRadius="full"
-                      color={"green.solid"}
-                    >
-                      <BiArrowToBottom />
-                    </Icon>
-                  ) : actualTxType === "Spawned" ? (
-                    <Icon
-                      fontSize={"20px"}
-                      position="absolute"
-                      top="-3px"
-                      right="-3px"
-                      bg={"bg.emphasized"}
-                      borderRadius="full"
-                      color={"green.solid"}
-                    >
-                      <BiPlusCircle />
-                    </Icon>
-                  ) : (
-                    <Icon
-                      fontSize={"20px"}
-                      position="absolute"
-                      top="-3px"
-                      right="-3px"
-                      bg={"bg.emphasized"}
-                      borderRadius="full"
-                      transform={"rotate(135deg)"}
-                    >
-                      <BiArrowBack />
-                    </Icon>
-                  )}
-                </Flex>
-                <Flex direction="column" gap={0}>
-                  <Heading fontSize="sm" lineClamp={1} color="blue.fg">
-                    {type} #{vector_id}
-                  </Heading>
-                  <Text fontSize="sm" color="fg.muted" lineClamp={1}>
-                    {convertSecondsToElapsedTime(record.timestamp)}
-                  </Text>
-                </Flex>
+                ) : actualTxType === "Received" ? (
+                  <Icon
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    color={"green.solid"}
+                  >
+                    <BiArrowToBottom />
+                  </Icon>
+                ) : actualTxType === "Spawned" ? (
+                  <Icon
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    color={"green.solid"}
+                  >
+                    <BiPlusCircle />
+                  </Icon>
+                ) : (
+                  <Icon
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    transform={"rotate(135deg)"}
+                  >
+                    <BiArrowBack />
+                  </Icon>
+                )}
               </Flex>
-              <Flex
-                w={{ base: "45%", md: "25%" }}
-                align={"center"}
-                bg="inherit"
-                color={tx_type === "Received" ? "green.solid" : ""}
-              >
-                <StatBox
-                  title={actualTxType}
-                  value={`${amount} ${symbol}`}
-                  bg="inherit"
-                  fontSize="sm"
-                />
+              <Flex direction="column" gap={0}>
+                <Heading fontSize="sm" lineClamp={1} color="blue.fg">
+                  {type} #{vector_id}
+                </Heading>
+                <Text fontSize="sm" color="fg.muted" lineClamp={1}>
+                  {convertSecondsToElapsedTime(record.timestamp)}
+                </Text>
               </Flex>
             </Flex>
-          </NavLink>
+            <Flex
+              w={{ base: "45%", md: "25%" }}
+              align={"center"}
+              bg="inherit"
+              color={tx_type === "Received" ? "green.solid" : ""}
+            >
+              <StatBox
+                title={actualTxType}
+                value={`${amount} ${symbol}`}
+                bg="inherit"
+                fontSize="sm"
+              />
+            </Flex>
+          </Flex>
+        );
+
+        return (
+          <Box key={index}>
+            {first && index === 0 ? null : <Separator />}
+            {showLink ? (
+              <NavLink to={`/vectors/${controller}/${vector.id}`}>
+                {content}
+              </NavLink>
+            ) : (
+              content
+            )}
+          </Box>
         );
       })}
     </Box>
