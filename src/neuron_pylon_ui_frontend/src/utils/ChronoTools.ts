@@ -6,6 +6,70 @@ import {
 import { ChronoChannelShared } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "./TokenTools";
+import { SearchResp } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
+
+export const processChronoLogTransactions = (
+  chronoLog: SearchResp,
+  options?: {
+    vectorId?: number;
+    limit?: number;
+  }
+): SearchResp => {
+  const { vectorId, limit = 6 } = options || {};
+
+  // Filter transactions if vectorId is provided
+  const filteredLog = vectorId
+    ? chronoLog.filter(
+        (transaction) =>
+          transaction[1] &&
+          "vectorId" in transaction[1] &&
+          transaction[1].vectorId === vectorId
+      )
+    : vectorId === undefined
+    ? chronoLog
+    : [];
+
+  // Extract and flatten all entries with timestamps
+  const allEntries: Array<{
+    txId: string;
+    chronoId: bigint;
+    value: any;
+    timestamp: number;
+    vectorId: number;
+  }> = [];
+
+  filteredLog.forEach((tx) => {
+    match(tx[1])
+      .with({ CANDID: P.select() }, (CANDID) => {
+        CANDID.forEach(([chronoId, value]) => {
+          const [timestamp] = chronoIdToTsid(chronoId);
+          allEntries.push({
+            txId: tx[0],
+            chronoId,
+            value,
+            timestamp,
+            vectorId: "vectorId" in tx[1] ? (tx[1].vectorId as number) : 0,
+          });
+        });
+      })
+      .otherwise(() => {});
+  });
+
+  // Sort by timestamp (newest first)
+  const sortedEntries = allEntries.sort((a, b) => b.timestamp - a.timestamp);
+
+  // Apply limit and create individual entries
+  const limitedEntries = sortedEntries.slice(0, limit);
+
+  // Create final result where each entry is separate
+  return limitedEntries.map(({ txId, chronoId, value, vectorId }) => [
+    txId,
+    {
+      CANDID: [[chronoId, value]],
+      vectorId,
+    },
+  ]);
+};
 
 export const extractDataFromChronoRecord = (
   data: [string, ChronoChannelShared]
@@ -54,8 +118,8 @@ export const extractTransactionTypeFromChronoRecord = (
             tx_type: "Sent",
             // other_account: sent.to,
             amount: e8sToIcp(Number(sent.amount)).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
             }),
           };
         })
@@ -63,13 +127,13 @@ export const extractTransactionTypeFromChronoRecord = (
           return {
             tx_type: "Received",
             // other_account: received.from,
-            amount: e8sToIcp(Number(received.amount)).toLocaleString(
+            amount: `+${e8sToIcp(Number(received.amount)).toLocaleString(
               undefined,
               {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4,
               }
-            ),
+            )}`,
           };
         })
         .exhaustive();

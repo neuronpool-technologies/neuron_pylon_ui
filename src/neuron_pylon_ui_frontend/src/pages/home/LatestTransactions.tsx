@@ -3,57 +3,14 @@ import { Flex, Heading, Separator, Text, Box } from "@chakra-ui/react";
 import { VectorTransaction } from "@/components";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { NavLink } from "react-router-dom";
-import { chronoIdToTsid } from "@/utils/ChronoTools";
-import { match, P } from "ts-pattern";
-import { SearchResp } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
+import { processChronoLogTransactions } from "@/utils/ChronoTools";
 
 const LatestTransactions = () => {
   const { chrono_log } = useTypedSelector((state) => state.Vectors);
 
-  // Extract and flatten all entries with timestamps
-  const allEntries: any[] = [];
-
-  chrono_log.forEach((tx) => {
-    match(tx[1])
-      .with({ CANDID: P.select() }, (CANDID) => {
-        CANDID.forEach(([chronoId, value]) => {
-          const [timestamp] = chronoIdToTsid(chronoId);
-          allEntries.push({
-            txId: tx[0],
-            chronoId,
-            value,
-            timestamp,
-            vectorId: "vectorId" in tx[1] ? (tx[1].vectorId as number) : 0,
-          });
-        });
-      })
-      .otherwise(() => {});
+  const latest_transactions = processChronoLogTransactions(chrono_log, {
+    limit: 6,
   });
-
-  // Sort by timestamp and take top 6
-  const latestEntries = allEntries
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 6);
-
-  // Group by txId to reconstruct the format
-  const txMap = new Map();
-
-  latestEntries.forEach(
-    ({ txId, chronoId, value, vectorId }) => {
-      if (!txMap.has(txId)) {
-        txMap.set(txId, { txId, CANDID: [], vectorId });
-      }
-      txMap.get(txId).CANDID.push([chronoId, value]);
-    }
-  );
-
-  // Create final result
-  const latest_transactions: SearchResp = Array.from(txMap.values()).map(
-    ({ txId, CANDID, vectorId }) => [
-      txId,
-      { CANDID, vectorId },
-    ]
-  );
 
   return (
     <Flex
@@ -67,9 +24,9 @@ const LatestTransactions = () => {
       <Heading p={3}>Latest Transactions</Heading>
       <Separator />
       <Flex direction="column" w="100%">
-        {latest_transactions.map((transaction, index) => (
+        {latest_transactions.map((transactions, index) => (
           <VectorTransaction
-            transaction={transaction}
+            transactions={transactions}
             key={index}
             first={index === 0}
             showLink

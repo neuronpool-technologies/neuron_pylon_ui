@@ -27,6 +27,10 @@ const App = () => {
             path="/vectors/:controller/:id/:tab"
             element={<VectorOverview />}
           />
+          <Route
+            path="/vectors/:controller/:id/transactions"
+            element={<p>transactions page</p>}
+          />
           <Route path="*" element={<Error />} />
         </Route>
       </Routes>
@@ -49,7 +53,8 @@ const AppLayout = () => {
             router: actors.router,
           })
         );
-      };``
+      };
+      ``;
 
       dispatch(refreshMeta({ pylon: actors.neuronPylon }));
       refresh();

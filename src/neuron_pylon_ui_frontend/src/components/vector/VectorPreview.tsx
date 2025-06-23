@@ -48,7 +48,7 @@ const VectorPreview = ({
         bg="bg.subtle"
         borderRadius="md"
       >
-        <Flex w={{ base: "60%", md: "75%" }} gap={3} align="center">
+        <Flex w={{ base: "55%", md: "80%" }} gap={3} align="center">
           <ChakraImage
             src={image.src}
             alt={image.symbol}
@@ -78,7 +78,7 @@ const VectorPreview = ({
             </Text>
           </Flex>
         </Flex>
-        <Flex w={{ base: "40%", md: "25%" }} align={"center"} bg="inherit">
+        <Flex w={{ base: "45%", md: "25%" }} align={"center"} bg="inherit">
           <StatBox title={label} value={value} bg="inherit" fontSize="sm" />
         </Flex>
       </Flex>

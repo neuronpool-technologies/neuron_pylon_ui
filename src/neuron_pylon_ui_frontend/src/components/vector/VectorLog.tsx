@@ -21,7 +21,7 @@ const VectorLog = ({
 }) => {
   const { meta } = useTypedSelector((state) => state.Meta);
   if (!meta) return null;
-  const { controller } = extractNodeType(vector, meta);
+  const { controller, type } = extractNodeType(vector, meta);
   const { isError, operation, timestamp, message } =
     extractActivityType(activity);
 
@@ -81,7 +81,7 @@ const VectorLog = ({
           </Flex>
           <Flex direction="column" gap={0}>
             <Heading fontSize="sm" lineClamp={1} color="blue.fg">
-              Vector #{vector.id}
+              {type} #{vector.id}
             </Heading>
             <Text fontSize="sm" color="fg.muted" lineClamp={1}>
               {timestamp}
