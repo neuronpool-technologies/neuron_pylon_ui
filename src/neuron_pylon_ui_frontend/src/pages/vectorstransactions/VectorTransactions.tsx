@@ -36,7 +36,7 @@ import { fetchVectorTransactions } from "@/client/fetchVectorTransactions";
 import { VectorTransactionsLoading } from "./components";
 
 const TRANSACTIONS_PER_PAGE = 10;
-const MAX_TRANSACTIONS_FETCH = 1000;
+const MAX_TRANSACTIONS_FETCH = 500;
 
 const VectorTransactions = () => {
   const { controller, id } = useParams();
@@ -115,16 +115,7 @@ const VectorTransactions = () => {
   };
 
   // Compute derived values
-  const {
-    type,
-    name,
-    value,
-    label,
-    symbol,
-    active,
-    created,
-    amount,
-  } =
+  const { type, name, value, label, symbol, active, created, amount } =
     vector && meta
       ? extractNodeType(vector, meta)
       : {
@@ -176,13 +167,13 @@ const VectorTransactions = () => {
               </NavLink>
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
-            <Breadcrumb.Item  lineClamp={1}>
+            <Breadcrumb.Item lineClamp={1}>
               <NavLink to={`/vectors/${controller}/${id}`}>
                 Vector #{id}
               </NavLink>
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
-            <Breadcrumb.Item lineClamp={1}> 
+            <Breadcrumb.Item lineClamp={1}>
               <Breadcrumb.CurrentLink>Transactions</Breadcrumb.CurrentLink>
             </Breadcrumb.Item>
           </Breadcrumb.List>
@@ -308,22 +299,7 @@ const VectorTransactions = () => {
         direction={"column"}
         w="100%"
       >
-        <Flex justify="space-between" align="center" p={3}>
-          <Heading>Transactions</Heading>
-          {loading ? (
-            <Text fontSize="sm" color="fg.muted">
-              Loading transactions...
-            </Text>
-          ) : error ? (
-            <Text fontSize="sm" color="red.solid">
-              Error loading transactions
-            </Text>
-          ) : (
-            <Text fontSize="sm" color="fg.muted">
-              {totalTransactions} total transactions
-            </Text>
-          )}
-        </Flex>
+        <Heading p={3}>Transactions</Heading>
         <Separator />
 
         <Flex direction="column" w="100%" h="100%">

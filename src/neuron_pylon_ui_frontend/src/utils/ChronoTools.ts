@@ -7,6 +7,8 @@ import { ChronoChannelShared } from "@/chrono/declarations/chrono_slice/chrono_s
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "./TokenTools";
 import { SearchResp } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
+import { accountToString } from "./AccountTools";
+import { accountIdentifierFromBytes } from "@dfinity/ledger-icp";
 
 export const processChronoLogTransactions = (
   chronoLog: SearchResp,
@@ -107,16 +109,26 @@ export const extractTransactionTypeFromChronoRecord = (
   record: ChronoRecord
 ): {
   tx_type: string;
-  // other_account: string;
+  other_account: string;
   amount: string;
 } => {
   return match(record)
     .with({ account: P.select() }, (account) => {
       return match(account)
         .with({ sent: P.select() }, (sent) => {
+
+          let otherAccount: string = match(sent.to)
+            .with({ icrc: P.select() }, (icrc) => {
+              return accountToString(icrc);
+            })
+            .with({ icp: P.select() }, (icp) => {
+              return accountIdentifierFromBytes(icp as Uint8Array);
+            })
+            .exhaustive();
+
           return {
             tx_type: "Sent",
-            // other_account: sent.to,
+            other_account: otherAccount,
             amount: e8sToIcp(Number(sent.amount)).toLocaleString(undefined, {
               minimumFractionDigits: 4,
               maximumFractionDigits: 4,
@@ -124,9 +136,18 @@ export const extractTransactionTypeFromChronoRecord = (
           };
         })
         .with({ received: P.select() }, (received) => {
+          let otherAccount: string = match(received.from)
+            .with({ icrc: P.select() }, (icrc) => {
+              return accountToString(icrc);
+            })
+            .with({ icp: P.select() }, (icp) => {
+              return accountIdentifierFromBytes(icp as Uint8Array);
+            })
+            .exhaustive();
+
           return {
             tx_type: "Received",
-            // other_account: received.from,
+            other_account: otherAccount,
             amount: `+${e8sToIcp(Number(received.amount)).toLocaleString(
               undefined,
               {
@@ -141,7 +162,7 @@ export const extractTransactionTypeFromChronoRecord = (
     .otherwise(() => {
       return {
         tx_type: "unknown",
-        // other_account: "",
+        other_account: "",
         amount: "0.00",
       };
     });

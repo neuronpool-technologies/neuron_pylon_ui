@@ -1,22 +1,48 @@
-import { Flex, Text, Heading, Separator, Icon, Box } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Heading,
+  Separator,
+  Icon,
+  Box,
+  DialogActionTrigger,
+  Button,
+  Spacer,
+  ClipboardRoot,
+} from "@chakra-ui/react";
 import {
   BiArrowBack,
   BiArrowToBottom,
+  BiCollapse,
   BiLock,
   BiPlusCircle,
   BiReceipt,
 } from "react-icons/bi";
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ChronoChannelShared } from "@/chrono/declarations/chrono_slice/chrono_slice.did";
 import {
   extractDataFromChronoRecord,
   extractTransactionTypeFromChronoRecord,
 } from "@/utils/ChronoTools";
-import { convertSecondsToElapsedTime } from "@/utils/Time";
+import {
+  convertSecondsToElapsedTime,
+  formatSecondsToDateString,
+} from "@/utils/Time";
 import StatBox from "../stat/StatBox";
 import { useTypedSelector } from "@/hooks/useRedux";
 import { extractNodeType } from "@/utils/Node";
 import { endpointToBalanceAndAccount } from "@/utils/AccountTools";
+import { ClipboardIconButton } from "../ui/clipboard";
 
 const VectorTransaction = ({
   transactions,
@@ -29,6 +55,8 @@ const VectorTransaction = ({
 }) => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { meta } = useTypedSelector((state) => state.Meta);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   if (!meta) return null;
 
   const { vector_id, chrono_record, vector_account } =
@@ -42,9 +70,8 @@ const VectorTransaction = ({
   return (
     <Box>
       {chrono_record.map((record, index) => {
-        const { tx_type, amount } = extractTransactionTypeFromChronoRecord(
-          record.value
-        );
+        const { tx_type, other_account, amount } =
+          extractTransactionTypeFromChronoRecord(record.value);
 
         let actualTxType = tx_type;
 
@@ -79,14 +106,11 @@ const VectorTransaction = ({
             direction={"row"}
             align="center"
             transition={"all 0.2s"}
-            _hover={
-              showLink
-                ? {
-                    cursor: "pointer",
-                    bg: "bg.muted",
-                  }
-                : {}
-            }
+            _hover={{
+              cursor: "pointer",
+              bg: "bg.muted",
+            }}
+            onClick={!showLink ? () => setIsDialogOpen(true) : undefined}
             p={3}
             borderRadius="md"
             bg="bg.subtle"
@@ -183,7 +207,97 @@ const VectorTransaction = ({
                 {content}
               </NavLink>
             ) : (
-              content
+              <>
+                {content}
+                <DialogRoot
+                  lazyMount
+                  placement={"center"}
+                  motionPreset="slide-in-bottom"
+                  open={isDialogOpen}
+                  onOpenChange={(e) => setIsDialogOpen(e.open)}
+                  trapFocus={false}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Transaction Details</DialogTitle>
+                    </DialogHeader>
+                    <DialogBody>
+                      <Flex w="100%" gap={3} direction={"column"}>
+                        <StatBox
+                          title="Vector"
+                          value={`${type} #${vector_id}`}
+                          bg={"bg.panel"}
+                          fontSize="md"
+                        />
+                        <StatBox
+                          title="Transaction Type"
+                          value={actualTxType}
+                          bg={"bg.panel"}
+                          fontSize="md"
+                        />
+                        <Flex
+                          bg="inherit"
+                          color={tx_type === "Received" ? "green.solid" : ""}
+                        >
+                          <StatBox
+                            title="Amount"
+                            value={`${amount} ${symbol}`}
+                            bg={"bg.panel"}
+                            fontSize="md"
+                          />
+                        </Flex>
+                        {(actualTxType === "Disbursed" ||
+                          actualTxType === "Sent" ||
+                          actualTxType === "Received") && (
+                          <StatBox
+                            title={actualTxType === "Received" ? "From" : "To"}
+                            bg={"bg.panel"}
+                            fontSize="md"
+                          >
+                            <Flex align="center" w="100%">
+                              <Text truncate fontSize="md" fontWeight={500}>
+                                {other_account}
+                              </Text>
+                              <Spacer />
+                              <ClipboardRoot value={other_account}>
+                                <ClipboardIconButton
+                                  variant="surface"
+                                  rounded="md"
+                                  boxShadow="xs"
+                                  size="2xs"
+                                  ms={3}
+                                />
+                              </ClipboardRoot>
+                            </Flex>
+                          </StatBox>
+                        )}
+                        <StatBox
+                          title="Date"
+                          value={formatSecondsToDateString(
+                            record.timestamp,
+                            true
+                          )}
+                          bg={"bg.panel"}
+                          fontSize="md"
+                        />
+                      </Flex>
+                    </DialogBody>
+                    <DialogFooter>
+                      <DialogActionTrigger asChild>
+                        <Button
+                          variant="surface"
+                          rounded="md"
+                          boxShadow="xs"
+                          w="100%"
+                        >
+                          <BiCollapse /> Done
+                        </Button>
+                      </DialogActionTrigger>
+                    </DialogFooter>
+                    <DialogCloseTrigger />
+                  </DialogContent>
+                </DialogRoot>
+              </>
             )}
           </Box>
         );

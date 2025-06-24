@@ -88,7 +88,7 @@ export function convertSecondsToElapsedTime(
   }
 }
 
-export function formatSecondsToDateString(timestampSeconds: number): string {
+export function formatSecondsToDateString(timestampSeconds: number, includeTime = false): string {
   // Validate the input timestamp
   if (
     timestampSeconds === null ||
@@ -101,8 +101,9 @@ export function formatSecondsToDateString(timestampSeconds: number): string {
   // Convert seconds to milliseconds
   const timestampMillis = timestampSeconds * 1000;
   
-  // Format the date using moment
-  return moment(timestampMillis).format("MMM D, YYYY");
+  // Format the date using moment, with optional time format
+  const format = includeTime ? "MMM D, YYYY [at] h:mm A" : "MMM D, YYYY";
+  return moment(timestampMillis).format(format);
 }
 
 export function formatNanosecondsToDateString(timestampNanos: number): string {
