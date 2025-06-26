@@ -3,3 +3,4 @@ export { default as Error } from "./error/Error";
 export { default as VectorsTable } from "./vectorstable/VectorsTable";
 export { default as VectorOverview } from "./vectorsoverview/VectorOverview";
 export { default as VectorTransactions } from "./vectorstransactions/VectorTransactions";
+export { default as Recover } from "./recover/Recover";

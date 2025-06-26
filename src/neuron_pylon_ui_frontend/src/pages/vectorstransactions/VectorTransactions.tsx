@@ -352,14 +352,16 @@ const VectorTransactions = () => {
         {!loading && !error && (
           <>
             <Separator />
-            <Flex p={3} justify="center">
+            <Flex justify="center">
               <PaginationRoot
                 count={totalTransactions}
                 pageSize={TRANSACTIONS_PER_PAGE}
                 page={currentPage}
                 onPageChange={(e) => handlePageChange(e.page)}
                 variant="outline"
-                size="sm"
+                size={{ base: "xs", md: "sm" }}
+                py={3}
+                siblingCount={1}
               >
                 <PaginationPrevTrigger />
                 <PaginationItems />
