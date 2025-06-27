@@ -62,7 +62,6 @@ const AppLayout = () => {
           })
         );
       };
-      ``;
 
       dispatch(refreshMeta({ pylon: actors.neuronPylon }));
       refresh();
