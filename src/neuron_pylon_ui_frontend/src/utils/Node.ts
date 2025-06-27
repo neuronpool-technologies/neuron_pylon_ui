@@ -7,7 +7,6 @@ import {
 import { match, P } from "ts-pattern";
 import { e8sToIcp } from "./TokenTools";
 import {
-  calculateDaysAndHoursFromSeconds,
   calculateDaysAndHoursUntilTimestamp,
   calculateTimeUntilTimestamp,
   convertDaysToMonthsAndYears,
@@ -232,14 +231,14 @@ export const extractNodeType = (
           ).toFixed(4),
           lastUpdated: updatingStatus,
           disbursingMaturity:
-            devefi_jes1_icpneuron.internals.spawning_neurons?.map((neuron) => ({
-              amount_e8s:
-                Number(neuron.maturity_e8s_equivalent[0]) +
-                Number(neuron.cached_neuron_stake_e8s[0]),
-              timeleft: calculateDaysAndHoursFromSeconds(
-                Number(neuron.dissolve_delay_seconds[0])
-              ),
-            })) || [],
+            devefi_jes1_icpneuron.cache.maturity_disbursements_in_progress?.[0]?.map(
+              (item) => ({
+                amount_e8s: Number(item.amount_e8s),
+                timeleft: calculateDaysAndHoursUntilTimestamp(
+                  Number(item.finalize_disbursement_timestamp_seconds[0])
+                ),
+              })
+            ) || [],
           varFollowee: varFollowee,
           varDissolve: varDissolve,
           varDelay: varDelay,

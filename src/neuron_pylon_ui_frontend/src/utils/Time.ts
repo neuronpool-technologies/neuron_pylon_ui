@@ -207,29 +207,3 @@ export function calculateDaysAndHoursUntilTimestamp(timestampSeconds: number): s
   // Less than 1 hour
   return "less than 1 hour";
 }
-
-// TODO remove when migrating to new NNS neuron pylon with maturity disbursement
-export function calculateDaysAndHoursFromSeconds(secondsLeft: number): string {
-  // If no seconds left, return "Ready"
-  if (secondsLeft <= 0) {
-    return "Ready";
-  }
-  
-  // Calculate days and remaining hours
-  const days = Math.floor(secondsLeft / (60 * 60 * 24));
-  const remainingSeconds = secondsLeft % (60 * 60 * 24);
-  const hours = Math.floor(remainingSeconds / (60 * 60));
-  
-  // If 1 or more days, only show days
-  if (days >= 1) {
-    return `${days} day${days > 1 ? "s" : ""}`;
-  }
-  
-  // Less than 1 day, show hours only
-  if (hours > 0) {
-    return `${hours} hour${hours > 1 ? "s" : ""}`;
-  }
-  
-  // Less than 1 hour
-  return "less than 1 hour";
-}
