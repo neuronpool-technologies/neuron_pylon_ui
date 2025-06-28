@@ -20,16 +20,14 @@ export const processChronoLogTransactions = (
   const { vectorId, limit = 6 } = options || {};
 
   // Filter transactions if vectorId is provided
-  const filteredLog = vectorId
+  const filteredLog = vectorId !== undefined
     ? chronoLog.filter(
         (transaction) =>
           transaction[1] &&
           "vectorId" in transaction[1] &&
           transaction[1].vectorId === vectorId
       )
-    : vectorId === undefined
-    ? chronoLog
-    : [];
+    : chronoLog;
 
   // Extract and flatten all entries with timestamps
   const allEntries: Array<{
