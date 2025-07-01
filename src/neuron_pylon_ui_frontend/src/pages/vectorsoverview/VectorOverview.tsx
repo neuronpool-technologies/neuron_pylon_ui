@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox } from "@/components";
-import { extractNodeType } from "@/utils/Node";
+import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
@@ -50,22 +50,17 @@ const VectorOverview = () => {
   const vector = vectors.find((v) => v.id.toString() === id);
   if (!vector) return <VectorLoading />;
 
-  const {
-    type,
-    name,
-    value,
-    label,
-    symbol,
-    active,
-    created,
-    activity,
-    amount,
-  } = extractNodeType(vector, meta);
+  const { type, name, value, label, symbol, active, created, activity } =
+    extractNodeType(vector, meta);
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
 
-  const tokenRate = prices?.find((price) => price.symbol === symbol);
+  const usdValue = computeUsdValueOfNodes({
+    nodes: [vector],
+    prices: prices,
+    meta: meta,
+  });
 
   return (
     <Header>
@@ -173,12 +168,7 @@ const VectorOverview = () => {
                 color="fg.muted"
                 textTransform={"uppercase"}
               >
-                {amount !== undefined && Number(amount) > 0 && tokenRate
-                  ? `$${(Number(amount) * tokenRate.last_price).toLocaleString(
-                      "en-US",
-                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                    )}`
-                  : null}
+                {usdValue}
               </Text>
             </>
           ) : null}

@@ -20,7 +20,7 @@ import {
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox, VectorTransaction } from "@/components";
 import { useActors } from "@/hooks/useActors";
-import { extractNodeType } from "@/utils/Node";
+import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
@@ -133,12 +133,15 @@ const VectorTransactions = () => {
     ? tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]
     : tokensIcons[1];
 
-  const tokenRate = prices?.find((price) => price.symbol === symbol);
-
   if (!meta || !vectors.length) return <VectorTransactionsLoading />;
 
   if (!vector) return <VectorTransactionsLoading />;
 
+  const usdValue = computeUsdValueOfNodes({
+    nodes: [vector],
+    prices: prices,
+    meta: meta,
+  });
   return (
     <Header>
       <Flex gap={3} mb={3} align="center">
@@ -247,12 +250,7 @@ const VectorTransactions = () => {
                 color="fg.muted"
                 textTransform={"uppercase"}
               >
-                {amount !== undefined && Number(amount) > 0 && tokenRate
-                  ? `$${(Number(amount) * tokenRate.last_price).toLocaleString(
-                      "en-US",
-                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                    )}`
-                  : null}
+                {usdValue}
               </Text>
             </>
           ) : null}

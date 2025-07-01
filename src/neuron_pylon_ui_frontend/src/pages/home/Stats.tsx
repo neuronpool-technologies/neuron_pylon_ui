@@ -1,72 +1,62 @@
 import { useTypedSelector } from "@/hooks/useRedux";
 import { Flex, Text, Separator, Skeleton, Icon } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
-import { match, P } from "ts-pattern";
-import { Shared } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
-import { e8sToIcp } from "@/utils/TokenTools";
+import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
 
 const Stats = () => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { prices } = useTypedSelector((state) => state.Meta);
-  const tokenRate = prices?.find((price) => price.symbol === "ICP");
+  const { meta, prices } = useTypedSelector((state) => state.Meta);
 
   const calculatedStats = vectors.reduce(
     (acc, node) => {
-      // Skip nodes with an empty node[0]
       if (!node) return acc;
 
-      // Extract the controller and convert its owner to a string using toString()
-      const controller = node.controllers[0];
-      const ownerId = controller.owner.toString();
+      // Add owner to unique owners set
+      const ownerId = node.controllers[0].owner.toString();
       acc.uniqueOwners.add(ownerId);
 
-      const { custom } = node;
+      if (meta) {
+        const { symbol, type, amount } = extractNodeType(node, meta);
 
-      const icpNeuron = match(custom?.[0] as Shared)
-        .with(
-          { devefi_jes1_icpneuron: P.not(P.nullish) },
-          ({ devefi_jes1_icpneuron }) => devefi_jes1_icpneuron
-        )
-        .otherwise(() => undefined);
+        // Update staked amounts for Neurons
+        if (type === "Neuron") {
+          const amountNum = Number(amount);
 
-      const cache = icpNeuron?.cache;
+          // Increment the appropriate token counter based on symbol
+          if (symbol === "ICP") acc.totalIcpStaked += amountNum;
+          else if (symbol === "NTN") acc.totalNtnStaked += amountNum;
+          else if (symbol === "KONG") acc.totalKongStaked += amountNum;
+        }
+      }
 
-      // Increment totalVectors if node[0] is defined
-      const hasVector = 1;
+      // Increment total vectors
+      acc.totalVectors++;
 
-      // Calculate totalStake
-      const stake = Number(cache?.cached_neuron_stake_e8s?.[0] || 0);
-
-      return {
-        totalVectors: acc.totalVectors + hasVector,
-        totalStake: acc.totalStake + stake,
-        uniqueOwners: acc.uniqueOwners,
-      };
+      return acc;
     },
     {
       totalVectors: 0,
-      totalStake: 0,
+      totalIcpStaked: 0,
+      totalNtnStaked: 0,
+      totalKongStaked: 0,
       uniqueOwners: new Set<string>(),
     }
   );
 
   const stats = {
-    total_icp_staked: Math.round(e8sToIcp(Number(calculatedStats.totalStake))),
+    total_icp_staked: Math.round(calculatedStats.totalIcpStaked),
+    total_ntn_staked: Math.round(calculatedStats.totalNtnStaked),
+    total_kong_staked: Math.round(calculatedStats.totalKongStaked),
     total_vectors: calculatedStats.totalVectors.toLocaleString(),
     total_controllers: calculatedStats.uniqueOwners.size.toLocaleString(),
   };
 
-  const tvl =
-    stats?.total_icp_staked !== undefined &&
-    Number(stats?.total_icp_staked) > 0 &&
-    tokenRate
-      ? `$${(
-          Number(stats?.total_icp_staked) * tokenRate.last_price
-        ).toLocaleString("en-US", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        })}`
-      : null;
+  const tvl = computeUsdValueOfNodes({
+    nodes: vectors,
+    prices: prices,
+    meta: meta,
+    decimals: 0,
+  });
 
   return (
     <Flex
@@ -76,7 +66,7 @@ const Stats = () => {
       borderRadius={"md"}
       direction={{ base: "column", md: "row" }}
     >
-      <Flex direction={"column"} p={3} w="100%" gap={3}>
+      <Flex direction={"column"} w="100%">
         <StatBox
           title="icp staked"
           value={`${stats?.total_icp_staked.toLocaleString()} ICP`}
@@ -85,15 +75,29 @@ const Stats = () => {
         />
         <Separator />
         <StatBox
+          title="ntn staked"
+          value={`${stats?.total_ntn_staked.toLocaleString()} NTN`}
+          icon={<BiLock />}
+          ready={stats && tvl ? true : false}
+        />
+        <Separator />
+        <StatBox
+          title="kong staked"
+          value={`${stats?.total_kong_staked.toLocaleString()} KONG`}
+          icon={<BiLock />}
+          ready={stats && tvl ? true : false}
+        />
+      </Flex>
+      <Separator orientation="vertical" hideBelow={"md"} />
+      <Separator hideFrom={"md"} />
+      <Flex direction={"column"} w="100%">
+        <StatBox
           title="total value"
           value={`${tvl}`}
           icon={<BiDollar />}
           ready={stats && tvl ? true : false}
         />
-      </Flex>
-      <Separator orientation="vertical" my={3} hideBelow={"md"} />
-      <Separator mx={3} hideFrom={"md"} />
-      <Flex direction={"column"} p={3} w="100%" gap={3}>
+        <Separator />
         <StatBox
           title="total vectors"
           value={`${stats?.total_vectors}`}
@@ -126,7 +130,7 @@ const StatBox = ({
   ready: boolean;
 }) => {
   return (
-    <Flex align="center" gap={3}>
+    <Flex align="center" gap={3} p={3}>
       <Icon fontSize={45} p={2.5} bg={"bg.emphasized"} borderRadius="full">
         {icon}
       </Icon>

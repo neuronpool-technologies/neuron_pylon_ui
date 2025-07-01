@@ -415,3 +415,33 @@ export const extractActivityType = (activity: Activity): ActivityTypeResult => {
     }))
     .exhaustive();
 };
+
+export const computeUsdValueOfNodes = ({
+  nodes,
+  prices,
+  meta,
+  decimals = 2,
+}: {
+  nodes: NodeShared[];
+  prices: Array<Record<string, any>> | null;
+  meta: PylonMetaResp | null;
+  decimals?: number;
+}) => {
+  if (!meta || !prices || !nodes.length) return;
+
+  let totalValue = 0;
+
+  for (const node of nodes) {
+    const { symbol, amount } = extractNodeType(node, meta);
+
+    const tokenRate = prices?.find((price) => price.symbol === symbol);
+    if (!tokenRate || !amount) continue;
+
+    totalValue += Number(amount) * tokenRate.last_price;
+  }
+
+  return `$${totalValue.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`;
+};
