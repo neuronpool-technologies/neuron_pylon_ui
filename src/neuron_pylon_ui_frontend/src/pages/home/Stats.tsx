@@ -1,5 +1,12 @@
 import { useTypedSelector } from "@/hooks/useRedux";
-import { Flex, Text, Separator, Skeleton, Icon } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Separator,
+  SkeletonCircle,
+  SkeletonText,
+  Icon,
+} from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
 import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
 
@@ -111,7 +118,7 @@ const StatBox = ({
   icon: React.ReactElement;
   ready: boolean;
 }) => {
-  return (
+  return ready ? (
     <Flex align="center" gap={3} p={3}>
       <Icon fontSize={45} p={2.5} bg={"bg.emphasized"} borderRadius="full">
         {icon}
@@ -125,11 +132,17 @@ const StatBox = ({
         >
           {title}
         </Text>
-        <Skeleton height="5" loading={!ready}>
-          <Text fontWeight={500} fontSize="md">
-            {value}
-          </Text>
-        </Skeleton>
+        <Text fontWeight={500} fontSize="md">
+          {value}
+        </Text>
+      </Flex>
+    </Flex>
+  ) : (
+    <Flex align="center" gap={3} p={3}>
+      <SkeletonCircle size="45px" />
+      <Flex direction="column" gap={2}>
+        <SkeletonText width="100px" noOfLines={1} />
+        <SkeletonText width="100px" noOfLines={1} />
       </Flex>
     </Flex>
   );
