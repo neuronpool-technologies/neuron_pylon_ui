@@ -8,6 +8,7 @@ import {
   Heading,
   Highlight,
   Text,
+  Skeleton,
 } from "@chakra-ui/react";
 import {
   HiMiniArrowsUpDown,
@@ -46,7 +47,7 @@ const VectorsTable = () => {
   useEffect(() => {
     if (controller && principal && controller === principal) {
       setActiveTab("my");
-    } else if (!controller) {
+    } else {
       setActiveTab("all");
     }
   }, [controller, principal]);
@@ -189,7 +190,7 @@ const VectorsTable = () => {
 
   return (
     <Header>
-      <Heading letterSpacing="tight" mb={3} size={{ base: "xl", md: "2xl" }}>
+      <Heading letterSpacing="tight" size={{ base: "xl", md: "2xl" }}>
         <Highlight
           query="Vectors"
           styles={{
@@ -201,46 +202,53 @@ const VectorsTable = () => {
           NeuronPool Vectors
         </Highlight>
       </Heading>
-      <Text fontSize="md" color="fg.muted" fontWeight={500}>
+      <Text fontSize="md" color="fg.muted" mt={1} fontWeight={500}>
         Stake neurons and receive maturity directly to your destination
       </Text>
-      <Flex direction="row" gap={3} align="center" mt={3} color="fg.muted">
-        <Flex
-          align="center"
-          px={2}
-          py={1}
-          bg="bg.muted"
-          boxShadow={"md"}
-          rounded="md"
-        >
-          <Text fontSize="sm" fontWeight={500}>
-            Total value: {tvl ? tvl : "$0.00"}
-          </Text>
-        </Flex>
-        {controller && (
+      <Flex direction="row" gap={3} align="center" mt={2} color="fg.muted">
+        <Skeleton loading={!tvl && !vectors.length} rounded="md">
           <Flex
             align="center"
-            gap={1}
             px={2}
             py={1}
             bg="bg.muted"
-            boxShadow={"md"}
+            outline="1px solid"
+            outlineColor="border"
             rounded="md"
           >
             <Text fontSize="sm" fontWeight={500}>
-              {controller.substring(0, 5)}...
-              {controller.substring(controller.length - 3)}
+              Total value:{" "}
+              {tvl ? tvl : !tvl && !vectors.length ? "$1,000,000.00" : "$0.00"}
             </Text>
-            <Flex
-              aria-label="Remove controller filter"
-              rounded="md"
-              _hover={{ bg: "bg.emphasized", cursor: "pointer" }}
-              onClick={() => navigate("/vectors")}
-              fontSize="lg"
-            >
-              <HiMiniXMark />
-            </Flex>
           </Flex>
+        </Skeleton>
+        {controller && (
+          <Skeleton loading={!tvl && !vectors.length} rounded="md">
+            <Flex
+              align="center"
+              gap={1}
+              px={2}
+              py={1}
+              outline="1px solid"
+              outlineColor="border"
+              bg="bg.muted"
+              rounded="md"
+            >
+              <Text fontSize="sm" fontWeight={500}>
+                {controller.substring(0, 5)}...
+                {controller.substring(controller.length - 3)}
+              </Text>
+              <Flex
+                aria-label="Remove controller filter"
+                rounded="md"
+                _hover={{ bg: "bg.emphasized", cursor: "pointer" }}
+                onClick={() => navigate("/vectors")}
+                fontSize="lg"
+              >
+                <HiMiniXMark />
+              </Flex>
+            </Flex>
+          </Skeleton>
         )}
       </Flex>
       <Flex

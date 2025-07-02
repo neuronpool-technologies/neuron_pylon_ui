@@ -133,9 +133,8 @@ const VectorTransactions = () => {
     ? tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]
     : tokensIcons[1];
 
-  if (!meta || !vectors.length) return <VectorTransactionsLoading />;
-
-  if (!vector) return <VectorTransactionsLoading />;
+  if (!meta || !vectors.length || !vector || loading)
+    return <VectorTransactionsLoading />;
 
   const usdValue = computeUsdValueOfNodes({
     nodes: [vector],
@@ -272,20 +271,28 @@ const VectorTransactions = () => {
               </ClipboardRoot>
             </StatBox>
           </Flex>
-          <Flex w="fit-content">
-            <StatBox title={label} bg={"bg.subtle"}>
-              <Flex gap={2} align="center">
-                <Text fontSize="md" fontWeight={500}>
-                  {value}
-                </Text>
+          <Separator orientation="vertical" mt={3} hideBelow={"md"} />
+          <Flex direction={{ base: "row", md: "row" }} gap={3}>
+            <Flex w="fit-content">
+              <StatBox
+                title={label}
+                value={value}
+                bg={"bg.subtle"}
+                fontSize="md"
+              />
+            </Flex>
+            <Separator orientation="vertical" mt={3} hideBelow={"md"} />
+            <Flex w="fit-content">
+              <StatBox title={active ? "Active" : "Frozen"} bg={"bg.subtle"}>
                 <Icon
-                  fontSize={18}
+                  size="lg"
                   color={active ? "green.solid" : "red.solid"}
+                  w="40px"
                 >
                   {active ? <TiBatteryFull /> : <TiBatteryLow />}
                 </Icon>
-              </Flex>
-            </StatBox>
+              </StatBox>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
@@ -301,18 +308,7 @@ const VectorTransactions = () => {
         <Separator />
 
         <Flex direction="column" w="100%" h="100%">
-          {loading ? (
-            <Flex
-              align="center"
-              justify={"center"}
-              fontWeight={500}
-              my={12}
-              h="100%"
-              fontSize="md"
-            >
-              Loading transactions...
-            </Flex>
-          ) : error ? (
+          {error ? (
             <Flex
               align="center"
               justify={"center"}

@@ -1,6 +1,6 @@
 import { Header } from "@/components";
 import { SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
-import { Flex, Separator, Skeleton } from "@chakra-ui/react";
+import { Flex, Skeleton } from "@chakra-ui/react";
 
 const VectorTransactionsLoading = () => {
   return (
@@ -46,7 +46,7 @@ const VectorTransactionsLoading = () => {
         p={3}
       >
         <Skeleton height="40px" width="300px" mb={4} />
-        <SkeletonText mt="4" noOfLines={4} gap="4" />
+        <SkeletonText mt="4" noOfLines={15} gap="4" />
       </Flex>
     </Header>
   );

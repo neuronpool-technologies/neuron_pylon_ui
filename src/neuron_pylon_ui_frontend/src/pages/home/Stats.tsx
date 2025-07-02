@@ -24,8 +24,6 @@ const Stats = () => {
 
           // Increment the appropriate token counter based on symbol
           if (symbol === "ICP") acc.totalIcpStaked += amountNum;
-          else if (symbol === "NTN") acc.totalNtnStaked += amountNum;
-          else if (symbol === "KONG") acc.totalKongStaked += amountNum;
         }
       }
 
@@ -45,8 +43,6 @@ const Stats = () => {
 
   const stats = {
     total_icp_staked: Math.round(calculatedStats.totalIcpStaked),
-    total_ntn_staked: Math.round(calculatedStats.totalNtnStaked),
-    total_kong_staked: Math.round(calculatedStats.totalKongStaked),
     total_vectors: calculatedStats.totalVectors.toLocaleString(),
     total_controllers: calculatedStats.uniqueOwners.size.toLocaleString(),
   };
@@ -75,29 +71,15 @@ const Stats = () => {
         />
         <Separator />
         <StatBox
-          title="ntn staked"
-          value={`${stats?.total_ntn_staked.toLocaleString()} NTN`}
-          icon={<BiLock />}
-          ready={stats && tvl ? true : false}
-        />
-        <Separator />
-        <StatBox
-          title="kong staked"
-          value={`${stats?.total_kong_staked.toLocaleString()} KONG`}
-          icon={<BiLock />}
+          title="total value"
+          value={`${tvl}`}
+          icon={<BiDollar />}
           ready={stats && tvl ? true : false}
         />
       </Flex>
       <Separator orientation="vertical" hideBelow={"md"} />
       <Separator hideFrom={"md"} />
       <Flex direction={"column"} w="100%">
-        <StatBox
-          title="total value"
-          value={`${tvl}`}
-          icon={<BiDollar />}
-          ready={stats && tvl ? true : false}
-        />
-        <Separator />
         <StatBox
           title="total vectors"
           value={`${stats?.total_vectors}`}
