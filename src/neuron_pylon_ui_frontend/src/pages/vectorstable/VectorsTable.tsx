@@ -206,24 +206,26 @@ const VectorsTable = () => {
         Stake neurons and receive maturity directly to your destination
       </Text>
       <Flex direction="row" gap={3} align="center" mt={2} color="fg.muted">
-        <Skeleton loading={!tvl && !vectors.length} rounded="md">
-          <Flex
-            align="center"
-            px={2}
-            py={1}
-            bg="bg.muted"
-            outline="1px solid"
-            outlineColor="border"
-            rounded="md"
-          >
-            <Text fontSize="sm" fontWeight={500}>
-              Total value:{" "}
-              {tvl ? tvl : !tvl && !vectors.length ? "$1,000,000.00" : "$0.00"}
-            </Text>
-          </Flex>
-        </Skeleton>
-        {controller && (
-          <Skeleton loading={!tvl && !vectors.length} rounded="md">
+        {(() => {
+          const showSkeleton = vectors.length === 0;
+          
+          const TotalValueContent = (
+            <Flex
+              align="center"
+              px={2}
+              py={1}
+              bg="bg.muted"
+              outline="1px solid"
+              outlineColor="border"
+              rounded="md"
+            >
+              <Text fontSize="sm" fontWeight={500}>
+                Total value: {showSkeleton ? "$1,000,000.00" : tvl || "$0.00"}
+              </Text>
+            </Flex>
+          );
+
+          const ControllerContent = controller ? (
             <Flex
               align="center"
               gap={1}
@@ -248,8 +250,27 @@ const VectorsTable = () => {
                 <HiMiniXMark />
               </Flex>
             </Flex>
-          </Skeleton>
-        )}
+          ) : null;
+
+          return (
+            <>
+              {showSkeleton ? (
+                <Skeleton asChild loading={true} rounded="md">
+                  {TotalValueContent}
+                </Skeleton>
+              ) : (
+                TotalValueContent
+              )}
+              {controller && showSkeleton ? (
+                <Skeleton asChild loading={true} rounded="md">
+                  {ControllerContent}
+                </Skeleton>
+              ) : (
+                ControllerContent
+              )}
+            </>
+          );
+        })()}
       </Flex>
       <Flex
         bg="bg.subtle"
