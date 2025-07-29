@@ -2,17 +2,25 @@ import { Flex, Heading, Separator } from "@chakra-ui/react";
 import {
   NodeShared,
   Activity,
+  PylonMetaResp,
 } from "@/declarations/neuron_pylon/neuron_pylon.did.js";
 import { VectorLog } from "@/components";
+import { extractNodeType } from "@/utils/Node";
 
 const Activity = ({
   vectorLog,
   vector,
+  meta,
 }: {
   vectorLog: Array<Activity>;
   vector: NodeShared;
+  meta: PylonMetaResp;
 }) => {
-  const logToShow = [...vectorLog].reverse().slice(0, 5);
+  const { label } = extractNodeType(vector, meta);
+
+  const maxLogs = label === "Mint NTC" ? 2 : 5;
+  const logToShow = [...vectorLog].reverse().slice(0, maxLogs);
+  
   return (
     <Flex
       bg="bg.subtle"

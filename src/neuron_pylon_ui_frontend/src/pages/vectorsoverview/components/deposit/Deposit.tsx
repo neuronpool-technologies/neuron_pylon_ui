@@ -41,8 +41,20 @@ const Deposit = ({
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
-  const { label, symbol, active, fee, amount, refreshingStake, minimumStake } =
-    extractNodeType(vector, meta);
+  const nodeType = extractNodeType(vector, meta);
+
+  const { label, symbol, active, fee, amount, refreshing, minimum } =
+    nodeType.label !== "Mint"
+      ? { ...nodeType }
+      : {
+          label: "Mint",
+          symbol: "ICP",
+          active: nodeType.active,
+          fee: 10000,
+          amount: nodeType.amount,
+          refreshing: nodeType.refreshing,
+          minimum: nodeType.minimum,
+        };
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
@@ -215,18 +227,32 @@ const Deposit = ({
                 active
                   ? amount !== undefined && Number(amount) > 0
                     ? "Neuron stake"
-                    : minimumStake ?? "Neuron stake"
+                    : minimum ?? "Neuron stake"
                   : "Neuron frozen"
               }
               value={`${amount} ${symbol}`}
               bg={"bg.subtle"}
               fontSize="md"
-              animation={refreshingStake && active}
+              animation={refreshing && active}
             />
           ) : label === "Split" ? (
             <StatBox
               title={active ? label : `${label} frozen`}
               value={`${symbol}`}
+              bg={"bg.subtle"}
+              fontSize="md"
+            />
+          ) : label === "Mint" ? (
+            <StatBox
+              title={active ? `${label} ${minimum}` : `${label} frozen`}
+              value={`${"NTC"}`}
+              bg={"bg.subtle"}
+              fontSize="md"
+            />
+          ) : label === "Redeem" ? (
+            <StatBox
+              title={active ? `${label}` : `${label} frozen`}
+              value={`${"NTC"}`}
               bg={"bg.subtle"}
               fontSize="md"
             />

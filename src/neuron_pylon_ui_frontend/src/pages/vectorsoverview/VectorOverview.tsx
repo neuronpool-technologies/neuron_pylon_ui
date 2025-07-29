@@ -23,11 +23,15 @@ import { BiArrowBack } from "react-icons/bi";
 import {
   NeuronAbout,
   SplitterAbout,
+  MintAbout,
+  RedeemAbout,
   Activity,
   Deposit,
   Billing,
   NeuronModify,
   SplitterModify,
+  MintModify,
+  RedeemModify,
   Delete,
   VectorLoading,
   Transactions,
@@ -288,6 +292,10 @@ const VectorOverview = () => {
               <NeuronModify vector={vector} meta={meta} actors={actors} />
             ) : type === "Splitter" ? (
               <SplitterModify vector={vector} meta={meta} actors={actors} />
+            ) : type === "Mint" ? (
+              <MintModify vector={vector} meta={meta} actors={actors} />
+            ) : type === "Redeem" ? (
+              <RedeemModify vector={vector} meta={meta} actors={actors} />
             ) : null}
           </Tabs.Content>
         </Tabs.Root>
@@ -307,7 +315,7 @@ const VectorOverview = () => {
           maxW={{
             base: "100%",
             md: "100%",
-            lg: type === "Splitter" ? "100%" : "50%",
+            lg: type === "Splitter" || type === "Redeem" ? "100%" : "50%",
           }}
         >
           <Heading p={3}>About</Heading>
@@ -316,10 +324,14 @@ const VectorOverview = () => {
             <NeuronAbout vector={vector} meta={meta} />
           ) : type === "Splitter" ? (
             <SplitterAbout vector={vector} meta={meta} />
+          ) : type === "Mint" ? (
+            <MintAbout vector={vector} meta={meta} />
+          ) : type === "Redeem" ? (
+            <RedeemAbout vector={vector} meta={meta} />
           ) : null}
         </Flex>
-        {label === "Stake" ? (
-          <Activity vectorLog={activity || []} vector={vector} />
+        {label === "Stake" || label === "Mint" ? (
+          <Activity vectorLog={activity || []} vector={vector} meta={meta} />
         ) : null}
       </Flex>
       <Transactions vector={vector} />

@@ -25,6 +25,7 @@ import {
   AccountEndpoint,
   CommonCreateRequest,
   CreateRequest,
+  InputAddress,
 } from "@/declarations/neuron_pylon/neuron_pylon.did";
 import { e8sToIcp } from "@/utils/TokenTools";
 import { tokensIcons } from "@/utils/TokensIcons";
@@ -96,6 +97,10 @@ const CreateVector = ({
     const ledgerFound =
       vectorToCreate === "ICP Neuron"
         ? meta.supported_ledgers.find((ledger) => ledger.symbol === "ICP")
+        : vectorToCreate === "Mint NTC"
+        ? meta.supported_ledgers.find((ledger) => ledger.symbol === "NTC")
+        : vectorToCreate === "Redeem NTC"
+        ? meta.supported_ledgers.find((ledger) => ledger.symbol === "NTC")
         : meta.supported_ledgers.find(
             (ledger) => ledger.symbol === ledgerToUse
           );
@@ -113,11 +118,31 @@ const CreateVector = ({
       endpointToBalanceAndAccount(w).account
     );
 
+    // For Mint NTC, we need ICP ledger first and NTC ledger second
+    const ledgers =
+      vectorToCreate === "Mint NTC"
+        ? [
+            meta.supported_ledgers.find((ledger) => ledger.symbol === "ICP")
+              ?.ledger || ledgerFound.ledger,
+            ledgerFound.ledger,
+          ]
+        : [ledgerFound.ledger];
+
+    const destinations: [InputAddress][] =
+      vectorToCreate === "Mint NTC"
+        ? [[{ ic: walletAccount }]]
+        : vectorToCreate === "Redeem NTC"
+        ? [
+            [{ ic: { owner: walletAccount.owner, subaccount: [] } }],
+            [{ ic: { owner: walletAccount.owner, subaccount: [] } }],
+          ]
+        : [[{ ic: walletAccount }], [{ ic: walletAccount }]];
+
     const commonCreateRequest: CommonCreateRequest = {
       controllers: [vectorOwner],
-      destinations: [[{ ic: walletAccount }], [{ ic: walletAccount }]],
+      destinations: destinations,
       refund: walletAccount,
-      ledgers: [ledgerFound.ledger],
+      ledgers: ledgers,
       sources: [],
       extractors: [],
       affiliate: process.env.REACT_APP_AFFILIATE
@@ -155,6 +180,19 @@ const CreateVector = ({
                         ),
                       }
                     : { Unspecified: null },
+              },
+            },
+          }
+        : vectorToCreate === "Mint NTC"
+        ? {
+            devefi_jes1_ntc_mint: {},
+          }
+        : vectorToCreate === "Redeem NTC"
+        ? {
+            devefi_jes1_ntc_redeem: {
+              variables: {
+                split: [50n, 50n],
+                names: ["Canister 1", "Canister 2"],
               },
             },
           }
@@ -244,54 +282,115 @@ const CreateVector = ({
                 Select a module to create a vector
               </RadioCard.Label>
               <Flex direction={"column"} gap={3}>
-                {meta.modules.map((module, index) => (
-                  <RadioCard.Item
-                    value={module.name}
-                    key={index}
-                    _hover={{ cursor: "pointer", bg: "bg.muted" }}
-                  >
-                    <RadioCard.ItemHiddenInput />
-                    <RadioCard.ItemControl>
-                      <Flex align="center" gap={3}>
-                        {module.name !== "Split" ? (
-                          <ChakraImage
-                            src={
-                              module.name === "ICP Neuron"
-                                ? tokensIcons[1].src
-                                : tokensIcons[0].src
-                            }
-                            alt={
-                              module.name === "ICP Neuron"
-                                ? tokensIcons[1].symbol
-                                : tokensIcons[0].symbol
-                            }
-                            bg={"bg.emphasized"}
-                            borderRadius="full"
-                            p={2.5}
-                            h={45}
-                            w={45}
-                          />
-                        ) : (
-                          <Icon
-                            h={45}
-                            w={45}
-                            p={2.5}
-                            bg={"bg.emphasized"}
-                            borderRadius="full"
-                          >
-                            <TbArrowsSplit2 />
-                          </Icon>
-                        )}
-                        <RadioCard.ItemContent>
-                          <RadioCard.ItemText>{module.name}</RadioCard.ItemText>
-                          <RadioCard.ItemDescription>
-                            {module.description}
-                          </RadioCard.ItemDescription>
-                        </RadioCard.ItemContent>
-                      </Flex>
-                    </RadioCard.ItemControl>
-                  </RadioCard.Item>
-                ))}
+                {meta.modules
+                  .slice()
+                  .sort((a, b) => {
+                    const order = [
+                      "ICP Neuron",
+                      "SNS Neuron",
+                      "Mint NTC",
+                      "Redeem NTC",
+                      "Split",
+                    ];
+                    return order.indexOf(a.name) - order.indexOf(b.name);
+                  })
+                  .map((module, index) => (
+                    <RadioCard.Item
+                      value={module.name}
+                      key={index}
+                      _hover={{ cursor: "pointer", bg: "bg.muted" }}
+                    >
+                      <RadioCard.ItemHiddenInput />
+                      <RadioCard.ItemControl>
+                        <Flex align="center" gap={3}>
+                          {module.name === "Split" ? (
+                            <Flex position="relative">
+                              <Icon
+                                fontSize={45}
+                                p={2.5}
+                                bg={"bg.emphasized"}
+                                borderRadius="full"
+                              >
+                                <TbArrowsSplit2 />
+                              </Icon>
+                              <ChakraImage
+                                src={tokensIcons[1].src}
+                                alt={tokensIcons[1].symbol}
+                                bg={"bg.emphasized"}
+                                borderRadius="full"
+                                h={"18px"}
+                                w={"18px"}
+                                position="absolute"
+                                top="-3px"
+                                right="-3px"
+                              />
+                            </Flex>
+                          ) : null}
+                          {module.name === "ICP Neuron" ? (
+                            <ChakraImage
+                              src={tokensIcons[1].src}
+                              alt={tokensIcons[1].symbol}
+                              bg={"bg.emphasized"}
+                              borderRadius="full"
+                              h={45}
+                              w={45}
+                            />
+                          ) : null}
+                          {module.name === "SNS Neuron" ? (
+                            <ChakraImage
+                              src={tokensIcons[0].src}
+                              alt={tokensIcons[0].symbol}
+                              bg={"bg.emphasized"}
+                              borderRadius="full"
+                              h={45}
+                              w={45}
+                            />
+                          ) : null}
+                          {module.name === "Mint NTC" ? (
+                            <ChakraImage
+                              src={tokensIcons[4].src}
+                              alt={tokensIcons[4].symbol}
+                              bg={"bg.emphasized"}
+                              borderRadius="full"
+                              h={45}
+                              w={45}
+                            />
+                          ) : null}
+                          {module.name === "Redeem NTC" ? (
+                            <Flex position="relative">
+                              <Icon
+                                fontSize={45}
+                                p={2.5}
+                                bg={"bg.emphasized"}
+                                borderRadius="full"
+                              >
+                                <TbArrowsSplit2 />
+                              </Icon>
+                              <ChakraImage
+                                src={tokensIcons[4].src}
+                                alt={tokensIcons[4].symbol}
+                                bg={"bg.emphasized"}
+                                borderRadius="full"
+                                h={"18px"}
+                                w={"18px"}
+                                position="absolute"
+                                top="-3px"
+                                right="-3px"
+                              />
+                            </Flex>
+                          ) : null}
+                          <RadioCard.ItemContent>
+                            <RadioCard.ItemText>
+                              {module.name}
+                            </RadioCard.ItemText>
+                            <RadioCard.ItemDescription>
+                              {module.description}
+                            </RadioCard.ItemDescription>
+                          </RadioCard.ItemContent>
+                        </Flex>
+                      </RadioCard.ItemControl>
+                    </RadioCard.Item>
+                  ))}
               </Flex>
             </RadioCard.Root>
           ) : (
@@ -302,7 +401,9 @@ const CreateVector = ({
                 fontSize="md"
                 value={vectorToCreate}
               />
-              {vectorToCreate !== "ICP Neuron" ? (
+              {vectorToCreate !== "ICP Neuron" &&
+              vectorToCreate !== "Mint NTC" &&
+              vectorToCreate !== "Redeem NTC" ? (
                 <RadioCard.Root
                   orientation="horizontal"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
@@ -315,8 +416,9 @@ const CreateVector = ({
                   <Flex direction={"column"} gap={3}>
                     {meta.supported_ledgers.map((item, index) => {
                       if (
-                        item.symbol === "ICP" &&
-                        vectorToCreate === "SNS Neuron"
+                        item.symbol === "ICP" ||
+                        (item.symbol === "NTC" &&
+                          vectorToCreate === "SNS Neuron")
                       )
                         return null;
                       return (
@@ -364,6 +466,10 @@ const CreateVector = ({
                     ? "5% of Maturity"
                     : vectorToCreate === "Split"
                     ? "5x Ledger fee"
+                    : vectorToCreate === "Mint NTC"
+                    ? "0.1 NTC per mint"
+                    : vectorToCreate === "Redeem NTC"
+                    ? "None"
                     : "None"
                 }
               />

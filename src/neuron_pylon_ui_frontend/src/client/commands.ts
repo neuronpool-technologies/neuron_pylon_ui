@@ -47,6 +47,7 @@ export const transfer = async ({
             },
           },
           amount: tokenAmountE8s,
+          memo: [],
         },
       },
     ],

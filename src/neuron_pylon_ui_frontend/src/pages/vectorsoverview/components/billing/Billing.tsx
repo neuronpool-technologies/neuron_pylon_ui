@@ -41,7 +41,7 @@ const Billing = ({
   const [sending, setSending] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
-  const { billing, symbol } = extractNodeType(vector, meta);
+  const { label, billing, symbol } = extractNodeType(vector, meta);
 
   const w = pylon_account?.find((w) => {
     const walletLedger = endpointToBalanceAndAccount(w).ledger;
@@ -98,7 +98,11 @@ const Billing = ({
   };
 
   const billingOption =
-    billing.cost_per_day > 0
+    label === "Mint"
+      ? "0.1 NTC per mint"
+      : label === "Redeem"
+      ? "None"
+      : billing.cost_per_day > 0
       ? `${e8sToIcp(Number(billing.cost_per_day))} ${
           billingTokenInfo.symbol
         } per day`

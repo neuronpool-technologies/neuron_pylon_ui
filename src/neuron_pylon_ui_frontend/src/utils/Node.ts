@@ -33,6 +33,12 @@ export const extractAllLogs = (node: NodeShared): Array<Activity> => {
         // Since SnsNeuronActivity has the same structure as Activity, we can cast the type
         (devefi_jes1_snsneuron?.log || []) as unknown as Activity[]
     )
+    .with(
+      { devefi_jes1_ntc_mint: P.not(P.nullish) },
+      ({ devefi_jes1_ntc_mint }) =>
+        // Since NtcMintActivity has the same structure as Activity, we can cast the type
+        (devefi_jes1_ntc_mint?.log || []) as unknown as Activity[]
+    )
     .otherwise(() => []);
 };
 
@@ -47,8 +53,9 @@ export type NodeTypeResult = {
   controller: string;
   active: boolean;
   fee: number;
-  refreshingStake?: boolean;
-  minimumStake?: string;
+  refreshing?: boolean;
+  minimum?: string;
+  splits?: Array<bigint>;
   billing: {
     transaction_percentage_fee_e8s: bigint;
     current_balance: bigint;
@@ -65,6 +72,7 @@ export type NodeTypeResult = {
   neuronStatus?: string;
   undisbursedMaturity?: string;
   lastUpdated?: string;
+  mintStatus?: string;
   disbursingMaturity?: Array<{
     amount_e8s: number;
     timeleft: string;
@@ -130,9 +138,11 @@ export const extractNodeType = (
 
   // Helper function to get token info
   const getTokenInfo = () => {
+    const sourceToUse = vector.sources[1] || vector.sources[0];
+
     const ledgerUsed =
-      "ic" in vector.sources[0]?.endpoint
-        ? vector.sources[0].endpoint.ic.ledger.toString()
+      "ic" in sourceToUse?.endpoint
+        ? sourceToUse?.endpoint.ic.ledger.toString()
         : "";
 
     const token = meta.supported_ledgers.find(
@@ -201,9 +211,8 @@ export const extractNodeType = (
           active: isActive,
           fee: Number(getTokenInfo().fee),
           billingLedger: meta.billing.ledger.toString(),
-          refreshingStake:
-            devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
-          minimumStake: "Minimum >20 ICP",
+          refreshing: devefi_jes1_icpneuron.internals.refresh_idx.length > 0,
+          minimum: "Minimum >20 ICP",
           billing: billingInfo,
           activity: extractAllLogs(vector),
           destinations: destinations,
@@ -302,9 +311,8 @@ export const extractNodeType = (
           controller,
           active: isActive,
           fee: Number(fee),
-          refreshingStake:
-            devefi_jes1_snsneuron.internals.refresh_idx.length > 0,
-          minimumStake: `Minimum ${e8sToIcp(
+          refreshing: devefi_jes1_snsneuron.internals.refresh_idx.length > 0,
+          minimum: `Minimum ${e8sToIcp(
             Number(
               devefi_jes1_snsneuron.parameters_cache[0]
                 ?.neuron_minimum_stake_e8s
@@ -390,6 +398,64 @@ export const extractNodeType = (
         destinations: destinations,
       };
     })
+    .with(
+      { devefi_jes1_ntc_mint: P.not(P.nullish) },
+      ({ devefi_jes1_ntc_mint }) => {
+        const { symbol, name, fee } = getTokenInfo();
+        const updatingStatus = match(devefi_jes1_ntc_mint.internals.updating)
+          .with({ Init: P._ }, () => "Ready")
+          .with({ Calling: P._ }, () => "Minting")
+          .with({ Done: P.select() }, (timestamp) =>
+            convertNanosecondsToElapsedTime(Number(timestamp))
+          )
+          .exhaustive();
+
+        const MintStatus = match(devefi_jes1_ntc_mint.internals.updating)
+          .with({ Init: P._ }, () => "Ready")
+          .with({ Calling: P._ }, () => "Minting")
+          .with({ Done: P.select() }, (timestamp) => "Ready")
+          .exhaustive();
+
+        return {
+          type: "Mint",
+          label: "Mint",
+          symbol,
+          name,
+          value: symbol,
+          created,
+          controller,
+          active: isActive,
+          fee: Number(fee),
+          billing: billingInfo,
+          destinations: destinations,
+          refreshing: devefi_jes1_ntc_mint.internals.tx_idx.length > 0,
+          minimum: "> 1 ICP",
+          lastUpdated: updatingStatus,
+          mintStatus: MintStatus,
+          activity: extractAllLogs(vector),
+        };
+      }
+    )
+    .with(
+      { devefi_jes1_ntc_redeem: P.not(P.nullish) },
+      ({ devefi_jes1_ntc_redeem }) => {
+        const { symbol, name, fee } = getTokenInfo();
+        return {
+          type: "Redeem",
+          label: "Redeem",
+          symbol,
+          name,
+          value: symbol,
+          created,
+          controller,
+          active: isActive,
+          fee: Number(fee),
+          billing: billingInfo,
+          destinations: destinations,
+          splits: devefi_jes1_ntc_redeem.variables.split,
+        };
+      }
+    )
     .exhaustive();
 };
 

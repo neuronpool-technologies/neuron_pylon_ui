@@ -1,10 +1,14 @@
 export { default as NeuronAbout } from "./about/NeuronAbout";
 export { default as SplitterAbout } from "./about/SplitterAbout";
+export { default as MintAbout } from "./about/MintAbout";
+export { default as RedeemAbout } from "./about/RedeemAbout";
 export { default as Activity } from "./activity/Activity";
 export { default as Deposit } from "./deposit/Deposit";
 export { default as Billing } from "./billing/Billing";
 export { default as Delete } from "./delete/Delete";
 export { default as NeuronModify } from "./modify/NeuronModify";
 export { default as SplitterModify } from "./modify/SplitterModify";
+export { default as MintModify } from "./modify/MintModify";
+export { default as RedeemModify } from "./modify/RedeemModify";
 export { default as VectorLoading } from "./loading/VectorLoading";
 export { default as Transactions } from "./transactions/Transactions";

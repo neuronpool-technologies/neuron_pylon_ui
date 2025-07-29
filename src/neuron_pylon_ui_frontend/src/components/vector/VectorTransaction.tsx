@@ -18,8 +18,9 @@ import {
   BiPlusCircle,
   BiReceipt,
 } from "react-icons/bi";
+import { PiFireBold } from "react-icons/pi";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { act, useState } from "react";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -65,13 +66,29 @@ const VectorTransaction = ({
 
   if (!vector) return null;
 
-  const { type, symbol, controller } = extractNodeType(vector, meta);
+  const {
+    type,
+    symbol: originalSymbol,
+    controller,
+  } = extractNodeType(vector, meta);
 
   return (
     <Box>
       {chrono_record.map((record, index) => {
         const { tx_type, other_account, amount } =
           extractTransactionTypeFromChronoRecord(record.value);
+
+        // Determine the correct symbol based on type and source account
+        let symbol = originalSymbol;
+        if (type === "Mint") {
+          if (
+            vector_account ===
+            endpointToBalanceAndAccount(vector.sources[0]).account
+          ) {
+            symbol = "ICP";
+          }
+          // For sources[1], keep the original symbol (which would be "NTC")
+        }
 
         let actualTxType = tx_type;
 
@@ -99,6 +116,24 @@ const VectorTransaction = ({
           tx_type === "Received"
         ) {
           actualTxType = "Spawned";
+        }
+        // Check if this is a burn transaction (from mint source)
+        else if (
+          type === "Mint" &&
+          vector_account ===
+            endpointToBalanceAndAccount(vector.sources[0]).account &&
+          tx_type === "Sent"
+        ) {
+          actualTxType = "Burned";
+        }
+        // Check if this is a mint transaction (to mint destination)
+        else if (
+          type === "Mint" &&
+          vector_account ===
+            endpointToBalanceAndAccount(vector.sources[1]).account &&
+          tx_type === "Received"
+        ) {
+          actualTxType = "Minted";
         }
 
         const content = (
@@ -135,6 +170,30 @@ const VectorTransaction = ({
                     borderRadius="full"
                   >
                     <BiLock />
+                  </Icon>
+                ) : actualTxType === "Burned" ? (
+                  <Icon
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    color={"red.solid"}
+                  >
+                    <PiFireBold />
+                  </Icon>
+                ) : actualTxType === "Minted" ? (
+                  <Icon
+                    fontSize={"20px"}
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    bg={"bg.emphasized"}
+                    borderRadius="full"
+                    color={"green.solid"}
+                  >
+                    <BiPlusCircle />
                   </Icon>
                 ) : actualTxType === "Received" ? (
                   <Icon
@@ -187,7 +246,13 @@ const VectorTransaction = ({
               w={{ base: "45%", md: "25%" }}
               align={"center"}
               bg="inherit"
-              color={tx_type === "Received" ? "green.solid" : ""}
+              color={
+                tx_type === "Received"
+                  ? "green.solid"
+                  : actualTxType === "Burned"
+                  ? "red.solid"
+                  : ""
+              }
             >
               <StatBox
                 title={actualTxType}
@@ -237,7 +302,13 @@ const VectorTransaction = ({
                         />
                         <Flex
                           bg="inherit"
-                          color={tx_type === "Received" ? "green.solid" : ""}
+                          color={
+                            tx_type === "Received"
+                              ? "green.solid"
+                              : actualTxType === "Burned"
+                              ? "red.solid"
+                              : ""
+                          }
                         >
                           <StatBox
                             title="Amount"
