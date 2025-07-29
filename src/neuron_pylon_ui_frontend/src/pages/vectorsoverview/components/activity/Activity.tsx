@@ -18,7 +18,7 @@ const Activity = ({
 }) => {
   const { label } = extractNodeType(vector, meta);
 
-  const maxLogs = label === "Mint NTC" ? 2 : 5;
+  const maxLogs = label === "Mint" ? 2 : 5;
   const logToShow = [...vectorLog].reverse().slice(0, maxLogs);
   
   return (

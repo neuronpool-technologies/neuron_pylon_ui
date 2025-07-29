@@ -404,17 +404,16 @@ export const extractNodeType = (
         const { symbol, name, fee } = getTokenInfo();
         const updatingStatus = match(devefi_jes1_ntc_mint.internals.updating)
           .with({ Init: P._ }, () => "Ready")
-          .with({ Calling: P._ }, () => "Minting")
+          .with({ Calling: P._ }, () => "Updating")
           .with({ Done: P.select() }, (timestamp) =>
             convertNanosecondsToElapsedTime(Number(timestamp))
           )
           .exhaustive();
 
-        const MintStatus = match(devefi_jes1_ntc_mint.internals.updating)
-          .with({ Init: P._ }, () => "Ready")
-          .with({ Calling: P._ }, () => "Minting")
-          .with({ Done: P.select() }, (timestamp) => "Ready")
-          .exhaustive();
+        const MintStatus =
+          devefi_jes1_ntc_mint.internals.tx_idx.length > 0
+            ? "Minting"
+            : "Ready";
 
         return {
           type: "Mint",
