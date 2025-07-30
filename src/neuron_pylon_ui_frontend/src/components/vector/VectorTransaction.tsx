@@ -179,7 +179,7 @@ const VectorTransaction = ({
                     right="-3px"
                     bg={"bg.emphasized"}
                     borderRadius="full"
-                    color={"red.solid"}
+                    color={"orange.solid"}
                   >
                     <PiFireBold />
                   </Icon>
@@ -250,7 +250,7 @@ const VectorTransaction = ({
                 tx_type === "Received"
                   ? "green.solid"
                   : actualTxType === "Burned"
-                  ? "red.solid"
+                  ? "orange.solid"
                   : ""
               }
             >
@@ -306,7 +306,7 @@ const VectorTransaction = ({
                             tx_type === "Received"
                               ? "green.solid"
                               : actualTxType === "Burned"
-                              ? "red.solid"
+                              ? "orange.solid"
                               : ""
                           }
                         >
