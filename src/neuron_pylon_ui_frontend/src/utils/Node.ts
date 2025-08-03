@@ -412,7 +412,7 @@ export const extractNodeType = (
 
         const MintStatus =
           devefi_jes1_ntc_mint.internals.tx_idx.length > 0
-            ? "Minting"
+            ? "Minting..."
             : "Ready";
 
         return {

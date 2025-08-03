@@ -15,10 +15,7 @@ const MintAbout = ({
   vector: NodeShared;
   meta: PylonMetaResp;
 }) => {
-  const { destinations, mintStatus, lastUpdated } = extractNodeType(
-    vector,
-    meta
-  );
+  const { destinations, mintStatus, active } = extractNodeType(vector, meta);
 
   return (
     <Flex direction={"column"} w="100%" gap={3} p={3} h="100%">
@@ -29,6 +26,7 @@ const MintAbout = ({
             value={mintStatus}
             bg={"bg.subtle"}
             fontSize="md"
+            animation={mintStatus == "Minting..." && active}
           />
         </Flex>
         <Icon size="lg" hideBelow={"md"}>
@@ -59,8 +57,8 @@ const MintAbout = ({
       </Flex>
       <Separator />
       <StatBox
-        title={"Last updated"}
-        value={lastUpdated}
+        title={"Mint rate (XDR-based)"}
+        value={"ICP/USD ÷ XDR/USD × NTC"}
         bg={"bg.subtle"}
         fontSize="md"
       />
