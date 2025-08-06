@@ -5,6 +5,7 @@ import {
   RadioCard,
   Image as ChakraImage,
   Icon,
+  Alert,
 } from "@chakra-ui/react";
 import { TbArrowsSplit2 } from "react-icons/tb";
 import { BiPlus } from "react-icons/bi";
@@ -473,6 +474,18 @@ const CreateVector = ({
                     : "None"
                 }
               />
+              {Number(createFee) > walletBalance ? (
+                <Alert.Root variant={"outline"} status="error">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Description>
+                      Insufficient balance to create vector. Please ensure your
+                      account has at least {createFee} {billingTokenInfo.symbol}{" "}
+                      to cover the creation fee.
+                    </Alert.Description>
+                  </Alert.Content>
+                </Alert.Root>
+              ) : null}
             </Flex>
           )}
         </DialogBody>
