@@ -8,6 +8,7 @@ import {
   IconButton,
   Grid,
   GridItem,
+  Alert,
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { StatBox } from "@/components";
@@ -37,133 +38,36 @@ const NeuronAbout = ({
     lastUpdated,
     undisbursedMaturity,
     disbursingMaturity,
+    minimum,
   } = extractNodeType(vector, meta);
 
   const totalDisbursingMaturity =
     disbursingMaturity?.reduce((acc, item) => acc + item.amount_e8s, 0) || 0;
 
+  const neuronIsNotCreated = neuronId === "None";
+
   return (
     <Flex direction={"column"} w="100%" gap={3} p={3} h="100%">
-      <StatBox title={"Neuron ID"} bg={"bg.subtle"}>
-        <Flex w="100%" align="center">
-          <Text lineClamp={1} fontSize="md" fontWeight={500}>
-            {neuronId?.slice(0, 60)}
-            {(neuronId?.length ?? 0) > 60 ? "..." : ""}
-          </Text>
-          <Spacer />
-          <ClipboardRoot value={neuronId}>
-            <ClipboardIconButton
-              variant="surface"
-              rounded="md"
-              boxShadow="xs"
-              size="2xs"
-              ms={3}
-            />
-          </ClipboardRoot>
-        </Flex>
-      </StatBox>
-      <Flex gap={3} align="center" direction={{ base: "column", md: "row" }}>
-        <Flex
-          w={{ base: "100%", md: "50%" }}
-          color={
-            !active
-              ? "red.solid"
-              : Number(totalDisbursingMaturity) > 0
-              ? "green.solid"
-              : ""
-          }
-        >
-          <StatBox
-            title={
-              active
-                ? `Disbursing ${destinations[0][0]}`
-                : `${destinations[0][0]} frozen`
-            }
-            bg={"bg.subtle"}
-          >
-            <Flex align="center" w="100%">
-              <Text bg={"bg.subtle"} fontSize="md" fontWeight={500}>
-                {e8sToIcp(Number(totalDisbursingMaturity)).toFixed(4)} {symbol}
+      {neuronIsNotCreated ? (
+        <Alert.Root variant={"outline"} status="warning" size="lg">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Neuron Not Created</Alert.Title>
+            <Alert.Description>
+              Send {minimum?.replace("Minimum ", "")} to create neuron
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+      ) : (
+        <>
+          <StatBox title={"Neuron ID"} bg={"bg.subtle"}>
+            <Flex w="100%" align="center">
+              <Text lineClamp={1} fontSize="md" fontWeight={500}>
+                {neuronId?.slice(0, 60)}
+                {(neuronId?.length ?? 0) > 60 ? "..." : ""}
               </Text>
               <Spacer />
-              <Popover.Root>
-                <Popover.Trigger asChild>
-                  <IconButton
-                    aria-label="Disbursing maturity list"
-                    variant="surface"
-                    rounded="md"
-                    boxShadow="xs"
-                    size="2xs"
-                    ms={3}
-                    disabled={!active || totalDisbursingMaturity === 0}
-                  >
-                    <BiTime />
-                  </IconButton>
-                </Popover.Trigger>
-                <Popover.Positioner>
-                  <Popover.Content bg="bg">
-                    <Popover.CloseTrigger />
-                    <Popover.Arrow>
-                      <Popover.ArrowTip />
-                    </Popover.Arrow>
-                    <Popover.Body p={0}>
-                      <Popover.Title
-                        fontSize="sm"
-                        fontWeight={500}
-                        color="fg"
-                        px={3}
-                        pb={2}
-                        pt={3}
-                      >
-                        Time until next disbursement
-                        {(disbursingMaturity?.length ?? 0) > 1 ? "s" : ""}
-                      </Popover.Title>
-                      <Separator />
-                      <Grid
-                        templateColumns="repeat(2, 1fr)"
-                        gap={1}
-                        px={3}
-                        pb={3}
-                        pt={2}
-                      >
-                        {disbursingMaturity?.map((item, index) => (
-                          <GridItem key={index}>
-                            <StatBox
-                              title={
-                                active
-                                  ? `${item.timeleft}`
-                                  : `${destinations[0][0]} frozen`
-                              }
-                              value={`${e8sToIcp(
-                                Number(item.amount_e8s)
-                              ).toFixed(4)} ${symbol}`}
-                              bg={"bg"}
-                              fontSize="md"
-                            />
-                          </GridItem>
-                        ))}
-                      </Grid>
-                    </Popover.Body>
-                  </Popover.Content>
-                </Popover.Positioner>
-              </Popover.Root>
-            </Flex>
-          </StatBox>
-        </Flex>
-        <Icon size="lg" hideBelow={"md"}>
-          <BiRightArrowAlt />
-        </Icon>
-        <Icon size="lg" hideFrom={"md"} transform="rotate(90deg)">
-          <BiRightArrowAlt />
-        </Icon>
-        <Flex w={{ base: "100%", md: "50%" }}>
-          <StatBox title={`${destinations[0][0]} destination`} bg={"bg.subtle"}>
-            <Flex align="center" w="100%">
-              <Text truncate fontSize="md" fontWeight={500}>
-                {destinations[0][1].slice(0, 50)}
-              </Text>
-              <Spacer />
-              <ClipboardRoot value={destinations[0][1]}>
+              <ClipboardRoot value={neuronId}>
                 <ClipboardIconButton
                   variant="surface"
                   rounded="md"
@@ -174,8 +78,130 @@ const NeuronAbout = ({
               </ClipboardRoot>
             </Flex>
           </StatBox>
-        </Flex>
-      </Flex>
+          <Flex
+            gap={3}
+            align="center"
+            direction={{ base: "column", md: "row" }}
+          >
+            <Flex
+              w={{ base: "100%", md: "50%" }}
+              color={
+                !active
+                  ? "red.solid"
+                  : Number(totalDisbursingMaturity) > 0
+                  ? "green.solid"
+                  : ""
+              }
+            >
+              <StatBox
+                title={
+                  active
+                    ? `Disbursing ${destinations[0][0]}`
+                    : `${destinations[0][0]} frozen`
+                }
+                bg={"bg.subtle"}
+              >
+                <Flex align="center" w="100%">
+                  <Text bg={"bg.subtle"} fontSize="md" fontWeight={500}>
+                    {e8sToIcp(Number(totalDisbursingMaturity)).toFixed(4)}{" "}
+                    {symbol}
+                  </Text>
+                  <Spacer />
+                  <Popover.Root>
+                    <Popover.Trigger asChild>
+                      <IconButton
+                        aria-label="Disbursing maturity list"
+                        variant="surface"
+                        rounded="md"
+                        boxShadow="xs"
+                        size="2xs"
+                        ms={3}
+                        disabled={!active || totalDisbursingMaturity === 0}
+                      >
+                        <BiTime />
+                      </IconButton>
+                    </Popover.Trigger>
+                    <Popover.Positioner>
+                      <Popover.Content bg="bg">
+                        <Popover.CloseTrigger />
+                        <Popover.Arrow>
+                          <Popover.ArrowTip />
+                        </Popover.Arrow>
+                        <Popover.Body p={0}>
+                          <Popover.Title
+                            fontSize="sm"
+                            fontWeight={500}
+                            color="fg"
+                            px={3}
+                            pb={2}
+                            pt={3}
+                          >
+                            Time until next disbursement
+                            {(disbursingMaturity?.length ?? 0) > 1 ? "s" : ""}
+                          </Popover.Title>
+                          <Separator />
+                          <Grid
+                            templateColumns="repeat(2, 1fr)"
+                            gap={1}
+                            px={3}
+                            pb={3}
+                            pt={2}
+                          >
+                            {disbursingMaturity?.map((item, index) => (
+                              <GridItem key={index}>
+                                <StatBox
+                                  title={
+                                    active
+                                      ? `${item.timeleft}`
+                                      : `${destinations[0][0]} frozen`
+                                  }
+                                  value={`${e8sToIcp(
+                                    Number(item.amount_e8s)
+                                  ).toFixed(4)} ${symbol}`}
+                                  bg={"bg"}
+                                  fontSize="md"
+                                />
+                              </GridItem>
+                            ))}
+                          </Grid>
+                        </Popover.Body>
+                      </Popover.Content>
+                    </Popover.Positioner>
+                  </Popover.Root>
+                </Flex>
+              </StatBox>
+            </Flex>
+            <Icon size="lg" hideBelow={"md"}>
+              <BiRightArrowAlt />
+            </Icon>
+            <Icon size="lg" hideFrom={"md"} transform="rotate(90deg)">
+              <BiRightArrowAlt />
+            </Icon>
+            <Flex w={{ base: "100%", md: "50%" }}>
+              <StatBox
+                title={`${destinations[0][0]} destination`}
+                bg={"bg.subtle"}
+              >
+                <Flex align="center" w="100%">
+                  <Text truncate fontSize="md" fontWeight={500}>
+                    {destinations[0][1].slice(0, 50)}
+                  </Text>
+                  <Spacer />
+                  <ClipboardRoot value={destinations[0][1]}>
+                    <ClipboardIconButton
+                      variant="surface"
+                      rounded="md"
+                      boxShadow="xs"
+                      size="2xs"
+                      ms={3}
+                    />
+                  </ClipboardRoot>
+                </Flex>
+              </StatBox>
+            </Flex>
+          </Flex>
+        </>
+      )}
       <Spacer />
       <Separator />
       <Spacer />
