@@ -49,7 +49,7 @@ const NeuronAbout = ({
   return (
     <Flex direction={"column"} w="100%" gap={3} p={3} h="100%">
       {neuronIsNotCreated ? (
-        <Alert.Root variant={"outline"} status="warning" size="lg">
+        <Alert.Root variant={"outline"} status="warning">
           <Alert.Indicator />
           <Alert.Content>
             <Alert.Title>Neuron not created</Alert.Title>
