@@ -52,7 +52,7 @@ const NeuronAbout = ({
         <Alert.Root variant={"outline"} status="warning" size="lg">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Title>Neuron Not Created</Alert.Title>
+            <Alert.Title>Neuron not created</Alert.Title>
             <Alert.Description>
               Send {minimum?.replace("Minimum ", "")} to create neuron
             </Alert.Description>
