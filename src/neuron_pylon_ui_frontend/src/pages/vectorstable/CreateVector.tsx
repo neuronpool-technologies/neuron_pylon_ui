@@ -475,13 +475,12 @@ const CreateVector = ({
                 }
               />
               {Number(createFee) > walletBalance ? (
-                <Alert.Root variant={"outline"} status="error">
+                <Alert.Root variant={"outline"} status="warning">
                   <Alert.Indicator />
                   <Alert.Content>
                     <Alert.Description>
-                      Insufficient balance to create vector. Please ensure your
-                      account has at least {createFee} {billingTokenInfo.symbol}{" "}
-                      to cover the creation fee.
+                      Insufficient balance. You need at least {createFee}{" "}
+                      {billingTokenInfo.symbol} for the creation fee.
                     </Alert.Description>
                   </Alert.Content>
                 </Alert.Root>
