@@ -417,9 +417,8 @@ const CreateVector = ({
                   <Flex direction={"column"} gap={3}>
                     {meta.supported_ledgers.map((item, index) => {
                       if (
-                        item.symbol === "ICP" ||
-                        (item.symbol === "NTC" &&
-                          vectorToCreate === "SNS Neuron")
+                        vectorToCreate === "SNS Neuron" &&
+                        (item.symbol === "ICP" || item.symbol === "NTC")
                       )
                         return null;
                       return (
