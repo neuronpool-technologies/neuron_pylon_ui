@@ -163,6 +163,8 @@ const CreateVector = ({
                 dissolve_delay: { Default: null },
                 dissolve_status: { Locked: null },
                 followee: { Default: null },
+                hotkey: { None: null },
+                visibility: { Private: null },
               },
             },
           }

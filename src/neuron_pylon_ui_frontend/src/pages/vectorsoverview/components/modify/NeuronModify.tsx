@@ -114,6 +114,8 @@ const NeuronModify = ({
                   : { Dissolving: null },
               ],
               followee: [getIcpFollowee()],
+              hotkey: [],
+              visibility: [],
             },
           }
         : {

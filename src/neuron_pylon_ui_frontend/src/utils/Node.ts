@@ -172,6 +172,7 @@ export const extractNodeType = (
         const varFollowee: string = match(
           devefi_jes1_icpneuron.variables.followee
         )
+          .with({ None: P._ }, () => "None")
           .with({ Default: P._ }, () => "Default")
           .with({ FolloweeId: P.select() }, (f) => f.toString())
           .exhaustive();
