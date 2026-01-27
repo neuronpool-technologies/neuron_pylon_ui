@@ -12,7 +12,7 @@ export const useActors = () => {
 
   const { identity, isAuthenticated, login, logout, actors } = useAuthClient({
     loginOptions: {
-      identityProvider: "https://identity.ic0.app/",
+      identityProvider: "https://id.ai/",
       derivationOrigin: isProduction
         ? `https://${process.env.REACT_APP_FRONTEND_CANISTER_ID}.icp0.io`
         : undefined,

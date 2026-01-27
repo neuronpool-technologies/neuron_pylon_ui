@@ -24,7 +24,7 @@ import { useActors } from "@/hooks/useActors";
 import { Usergeek } from "usergeek-ic-js";
 import { useTypedDispatch, useTypedSelector } from "@/hooks/useRedux";
 import { refreshWallet, setCleanup } from "@/state/WalletSlice";
-import IcLogo from "../../../assets/ic-logo.png";
+import IILogo from "../../../assets/ii-logo.svg";
 import Token from "./Token";
 import { Actor } from "@dfinity/agent";
 
@@ -111,7 +111,7 @@ const Wallet = () => {
       onClick={async () => await login()}
     >
       <ChakraImage
-        src={IcLogo}
+        src={IILogo}
         alt="Internet identity logo"
         h={"20px"}
         w={"auto"}
