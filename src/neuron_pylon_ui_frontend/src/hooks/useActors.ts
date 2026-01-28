@@ -9,6 +9,10 @@ export const useActors = () => {
   const pylonCanisterId = process.env.REACT_APP_NEURON_PYLON_CANISTER_ID;
   const routerCanisterId = process.env.REACT_APP_ROUTER_CANISTER_ID;
 
+  const width = 500;
+  const height = 600;
+  const left = (window.screen.width - width) / 2;
+  const top = (window.screen.height - height) / 2;
 
   const { identity, isAuthenticated, login, logout, actors } = useAuthClient({
     loginOptions: {
@@ -16,6 +20,8 @@ export const useActors = () => {
       derivationOrigin: isProduction
         ? `https://${process.env.REACT_APP_FRONTEND_CANISTER_ID}.icp0.io`
         : undefined,
+      windowOpenerFeatures:
+        `toolbar=0,location=0,menubar=0,width=${width},height=${height},left=${left},top=${top}`,
     },
     actorOptions: {
       neuronPylon: {
