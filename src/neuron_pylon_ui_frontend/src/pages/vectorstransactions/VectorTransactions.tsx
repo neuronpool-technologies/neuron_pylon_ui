@@ -20,7 +20,7 @@ import {
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox, VectorTransaction } from "@/components";
 import { useActors } from "@/hooks/useActors";
-import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
+import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
@@ -42,7 +42,7 @@ const VectorTransactions = () => {
   const { controller, id } = useParams();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { meta, prices } = useTypedSelector((state) => state.Meta);
+  const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { actors } = useActors();
 
@@ -136,11 +136,6 @@ const VectorTransactions = () => {
   if (!meta || !vectors.length || !vector || loading)
     return <VectorTransactionsLoading />;
 
-  const usdValue = computeUsdValueOfNodes({
-    nodes: [vector],
-    prices: prices,
-    meta: meta,
-  });
   return (
     <Header>
       <Flex gap={3} mb={3} align="center">
@@ -238,21 +233,6 @@ const VectorTransactions = () => {
           >
             {created}
           </Text>
-          {type === "Neuron" && prices && prices.length > 0 ? (
-            <>
-              <Text fontSize="sm" fontWeight={500} color="fg.muted">
-                •
-              </Text>
-              <Text
-                fontSize="sm"
-                fontWeight={500}
-                color="fg.muted"
-                textTransform={"uppercase"}
-              >
-                {usdValue}
-              </Text>
-            </>
-          ) : null}
         </Flex>
         <Flex gap={3} direction={{ base: "column", md: "row" }}>
           <Flex w="fit-content">

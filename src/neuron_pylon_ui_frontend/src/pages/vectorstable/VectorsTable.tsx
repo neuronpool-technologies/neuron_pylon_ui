@@ -17,7 +17,7 @@ import {
   HiMiniXMark,
 } from "react-icons/hi2";
 import { useState, useMemo, useEffect } from "react";
-import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
+import { extractNodeType } from "@/utils/Node";
 import { useParams, useNavigate } from "react-router-dom";
 import CreateVector from "./CreateVector";
 
@@ -26,7 +26,7 @@ type SortField = "created" | "staked";
 type SortDirection = "asc" | "desc";
 
 const VectorsTable = () => {
-  const { meta, prices } = useTypedSelector((state) => state.Meta);
+  const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { logged_in, principal, pylon_account, actors } = useTypedSelector(
     (state) => state.Wallet
@@ -181,13 +181,6 @@ const VectorsTable = () => {
     );
   };
 
-  const tvl = computeUsdValueOfNodes({
-    nodes: filteredVectors,
-    prices: prices,
-    meta: meta,
-    decimals: 2,
-  });
-
   return (
     <Header>
       <Heading letterSpacing="tight" size={{ base: "xl", md: "2xl" }}>
@@ -208,22 +201,6 @@ const VectorsTable = () => {
       <Flex direction="row" gap={3} align="center" mt={2} color="fg.muted">
         {(() => {
           const showSkeleton = vectors.length === 0;
-          
-          const TotalValueContent = (
-            <Flex
-              align="center"
-              px={2}
-              py={1}
-              bg="bg.muted"
-              outline="1px solid"
-              outlineColor="border"
-              rounded="md"
-            >
-              <Text fontSize="sm" fontWeight={500}>
-                Total value: {showSkeleton ? "$1,000,000.00" : tvl || "$0.00"}
-              </Text>
-            </Flex>
-          );
 
           const ControllerContent = controller ? (
             <Flex
@@ -254,13 +231,6 @@ const VectorsTable = () => {
 
           return (
             <>
-              {showSkeleton ? (
-                <Skeleton asChild loading={true} rounded="md">
-                  {TotalValueContent}
-                </Skeleton>
-              ) : (
-                TotalValueContent
-              )}
               {controller && showSkeleton ? (
                 <Skeleton asChild loading={true} rounded="md">
                   {ControllerContent}
@@ -275,7 +245,7 @@ const VectorsTable = () => {
       <Flex
         bg="bg.subtle"
         boxShadow={"md"}
-        mt={6}
+        mt={3}
         borderRadius={"md"}
         direction={"column"}
         w="100%"

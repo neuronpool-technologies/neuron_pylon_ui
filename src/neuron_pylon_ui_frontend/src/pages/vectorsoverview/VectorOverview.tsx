@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
 import { Header, StatBox } from "@/components";
-import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
+import { extractNodeType } from "@/utils/Node";
 import { tokensIcons } from "@/utils/TokensIcons";
 import { TiBatteryFull, TiBatteryLow } from "react-icons/ti";
 import { BiArrowBack } from "react-icons/bi";
@@ -41,7 +41,7 @@ const VectorOverview = () => {
   const { controller, id, tab } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { meta, prices } = useTypedSelector((state) => state.Meta);
+  const { meta } = useTypedSelector((state) => state.Meta);
   const { vectors } = useTypedSelector((state) => state.Vectors);
   const { principal, actors } = useTypedSelector((state) => state.Wallet);
 
@@ -59,12 +59,6 @@ const VectorOverview = () => {
 
   const tokenImage =
     tokensIcons.find((images) => images.symbol === symbol) || tokensIcons[1]; // default to ICP logo
-
-  const usdValue = computeUsdValueOfNodes({
-    nodes: [vector],
-    prices: prices,
-    meta: meta,
-  });
 
   return (
     <Header>
@@ -161,21 +155,6 @@ const VectorOverview = () => {
           >
             {created}
           </Text>
-          {type === "Neuron" && prices && prices.length > 0 ? (
-            <>
-              <Text fontSize="sm" fontWeight={500} color="fg.muted">
-                •
-              </Text>
-              <Text
-                fontSize="sm"
-                fontWeight={500}
-                color="fg.muted"
-                textTransform={"uppercase"}
-              >
-                {usdValue}
-              </Text>
-            </>
-          ) : null}
         </Flex>
         <Flex gap={3} direction={{ base: "column", md: "row" }}>
           <Flex w="fit-content">

@@ -8,14 +8,12 @@ import { fetchMeta } from "@/client/fetchMeta";
 
 type MetaState = {
   meta: PylonMetaResp | null;
-  prices: Array<Record<string, any>> | null;
   status: string;
   error: string | null;
 };
 
 const initialState: MetaState = {
   meta: null,
-  prices: null,
   status: "idle",
   error: null,
 };
@@ -34,7 +32,6 @@ const MetaSlice = createSlice({
       .addCase(refreshMeta.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.meta = action.payload?.meta ?? null;
-        state.prices = action.payload?.prices ?? null;
       })
       .addCase(refreshMeta.rejected, (state, action) => {
         state.status = "failed";

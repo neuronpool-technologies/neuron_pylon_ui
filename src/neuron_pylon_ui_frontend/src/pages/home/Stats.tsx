@@ -8,11 +8,12 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { BiLock, BiRefresh, BiDollar, BiUser } from "react-icons/bi";
-import { computeUsdValueOfNodes, extractNodeType } from "@/utils/Node";
+import { TiBatteryFull } from "react-icons/ti";
+import { extractNodeType } from "@/utils/Node";
 
 const Stats = () => {
   const { vectors } = useTypedSelector((state) => state.Vectors);
-  const { meta, prices } = useTypedSelector((state) => state.Meta);
+  const { meta } = useTypedSelector((state) => state.Meta);
 
   const calculatedStats = vectors.reduce(
     (acc, node) => {
@@ -34,6 +35,9 @@ const Stats = () => {
         }
       }
 
+      // Check if vector is active (not frozen)
+      if (!node.billing.frozen) acc.activeVectors++;
+
       // Increment total vectors
       acc.totalVectors++;
 
@@ -42,8 +46,7 @@ const Stats = () => {
     {
       totalVectors: 0,
       totalIcpStaked: 0,
-      totalNtnStaked: 0,
-      totalKongStaked: 0,
+      activeVectors: 0,
       uniqueOwners: new Set<string>(),
     }
   );
@@ -51,15 +54,9 @@ const Stats = () => {
   const stats = {
     total_icp_staked: Math.round(calculatedStats.totalIcpStaked),
     total_vectors: calculatedStats.totalVectors.toLocaleString(),
+    active_vectors: calculatedStats.activeVectors.toLocaleString(),
     total_controllers: calculatedStats.uniqueOwners.size.toLocaleString(),
   };
-
-  const tvl = computeUsdValueOfNodes({
-    nodes: vectors,
-    prices: prices,
-    meta: meta,
-    decimals: 0,
-  });
 
   return (
     <Flex
@@ -74,14 +71,14 @@ const Stats = () => {
           title="icp staked"
           value={`${stats?.total_icp_staked.toLocaleString()} ICP`}
           icon={<BiLock />}
-          ready={stats && tvl ? true : false}
+          ready={stats ? true : false}
         />
         <Separator />
         <StatBox
-          title="total value"
-          value={`${tvl}`}
-          icon={<BiDollar />}
-          ready={stats && tvl ? true : false}
+          title="active vectors"
+          value={`${stats?.active_vectors}`}
+          icon={<TiBatteryFull />}
+          ready={stats ? true : false}
         />
       </Flex>
       <Separator orientation="vertical" hideBelow={"md"} />
@@ -91,14 +88,14 @@ const Stats = () => {
           title="total vectors"
           value={`${stats?.total_vectors}`}
           icon={<BiRefresh />}
-          ready={stats && tvl ? true : false}
+          ready={stats ? true : false}
         />
         <Separator />
         <StatBox
           title="Unique owners"
           value={`${stats?.total_controllers}`}
           icon={<BiUser />}
-          ready={stats && tvl ? true : false}
+          ready={stats ? true : false}
         />
       </Flex>
     </Flex>
