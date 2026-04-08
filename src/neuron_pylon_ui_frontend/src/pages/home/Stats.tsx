@@ -40,6 +40,8 @@ const Stats = () => {
 
       // Increment total vectors
       acc.totalVectors++;
+      
+      acc.ready = true;
 
       return acc;
     },
@@ -48,14 +50,18 @@ const Stats = () => {
       totalIcpStaked: 0,
       activeVectors: 0,
       uniqueOwners: new Set<string>(),
-    }
+      ready: false,
+    },
   );
 
   const stats = {
-    total_icp_staked: Math.round(calculatedStats.totalIcpStaked),
+    total_icp_staked: Math.round(
+      calculatedStats.totalIcpStaked,
+    ).toLocaleString(),
     total_vectors: calculatedStats.totalVectors.toLocaleString(),
     active_vectors: calculatedStats.activeVectors.toLocaleString(),
     total_controllers: calculatedStats.uniqueOwners.size.toLocaleString(),
+    ready: calculatedStats.ready,
   };
 
   return (
@@ -69,16 +75,16 @@ const Stats = () => {
       <Flex direction={"column"} w="100%">
         <StatBox
           title="icp staked"
-          value={`${stats?.total_icp_staked.toLocaleString()} ICP`}
+          value={`${stats?.total_icp_staked} ICP`}
           icon={<BiLock />}
-          ready={stats ? true : false}
+          ready={stats.ready}
         />
         <Separator />
         <StatBox
           title="active vectors"
           value={`${stats?.active_vectors}`}
           icon={<TiBatteryFull />}
-          ready={stats ? true : false}
+          ready={stats.ready}
         />
       </Flex>
       <Separator orientation="vertical" hideBelow={"md"} />
@@ -88,14 +94,14 @@ const Stats = () => {
           title="total vectors"
           value={`${stats?.total_vectors}`}
           icon={<BiRefresh />}
-          ready={stats ? true : false}
+          ready={stats.ready}
         />
         <Separator />
         <StatBox
           title="Unique owners"
           value={`${stats?.total_controllers}`}
           icon={<BiUser />}
-          ready={stats ? true : false}
+          ready={stats.ready}
         />
       </Flex>
     </Flex>
